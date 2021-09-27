@@ -27,6 +27,8 @@ int		main(void)
 	int listensck;
 	size_t	addrlen = sizeof(struct sockaddr_in);
 	struct sockaddr_in myaddr;
+	int yes;
+
 
 
 	myaddr.sin_family = AF_INET;
@@ -34,13 +36,15 @@ int		main(void)
 	myaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); // INADDR_ANY -> myipaddress
 	memset(&myaddr.sin_zero, 0, sizeof(8 * sizeof(unsigned char)));
 
-	listensck = socket(AF_INET, SOCK_STREAM, 0);
+	listensck = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	bind(listensck, (struct sockaddr *)&myaddr, addrlen);
 	listen(listensck, 10);
 	std::cout << "Listening to the fucking world" << std::endl;
+	yes = 1;
+	setsockopt(listensck, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+	int ret = 0;
 	while(1)
 	{
-		int ret;
 		int tmpsck;
 		char buf[BUFFSIZE + 1];
 		char *end;
@@ -48,17 +52,19 @@ int		main(void)
 		struct sockaddr_in	clientaddr;
 	
 		memset(buf, 0, 10);
+		tmpsck = 0;
 		tmpsck = accept(listensck, (struct sockaddr *)&clientaddr, &client_size);
+		setsockopt(tmpsck, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+	//	std::cout << "tmpsck = " << tmpsck << std::endl;
 		if (tmpsck > 0)
 		{
 			std::cout << "Hello New Client Nbr [" << tmpsck << "]" << std::endl;
 		}
-		else
+		else if (tmpsck <= 0 && ret == 0)
 		{
-			std::cout << "No client" << std::endl;
-			break;
+			std::cout << "Waiting connection..." << std::endl;
+			//std::cout << "Error : Accept : Fatal" << std::endl;
 		}
-		ret = 0;
 		end = NULL;
 		while ((ret = recv(tmpsck, buf, BUFFSIZE, 0)) > 0)
 		{
@@ -67,9 +73,13 @@ int		main(void)
 			std::cout << buf;
 			memset(buf, 0, BUFFSIZE);
 		}
-			if (ret == -1)
+		if (ret == -1 && tmpsck >= 0)
+		{
 			std::cout << "Error while recv()" << std::endl;
-		if (ret == 0)
+			close(tmpsck);
+			break;
+		}
+		else if (ret == 0)
 		{
 			close(tmpsck);
 			std::cout << "Communication over. Good bye" << std::endl;
