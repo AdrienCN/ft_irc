@@ -55,13 +55,13 @@ void Server::init()
 	
 	//Rempli notre structure serv_info qui contient 
 	//tout les parametres pour call socket(), bind(), listen()
-	ret = getaddrinfo(NULL, _port.c_str(), &_hints, &_serv_info);
+	ret = getaddrinfo(NULL, "6667"/* _port.c_str()*/, &_hints, &_serv_info);
 	if (ret != 0)
 		throw Server::ExceptGetaddr();
 	
 	//Creer ce qui sera notre socket d'ecoute
 	//domain = type d'address = ai_family | type = socketype = ai_socktype |  protocole = ai_protocole
-	_socket = socket(_serv_info->ai_family, _serv_info->ai_socktype | SOCK_NONBLOCK, _serv_info->ai_protocol);
+	_socket = socket(_serv_info->ai_family, _serv_info->ai_socktype /*00| SOCK_NONBLOCK*/, _serv_info->ai_protocol);
 	if (_socket == -1)
 		throw Server::ExceptInit();
 		/*
