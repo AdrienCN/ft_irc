@@ -4,21 +4,37 @@
 #include "headers.hpp"
 
 //namespace ft
+//
+#define MAX_CLIENT 10
 
 class Server
 {
 
-    //class Exeception pour failed getaddrinfo
-    //class Exeception pour failed ERrno pour socket bind listen
+	class ExceptGetaddr : public std::exception
+	{
+		virtual const char* what() const throw()
+		{
+			return ("Error : GetAddressInfo() failed");
+		}
+	};
+
+    class ExceptInit : public std::exception
+	{
+	   virtual const char* what() const throw()
+	   {
+		   return (strerror(errno));
+		   //std::cout << "Error : Socket or Bind() or Listen() failed" << std::endl;
+	   }
+	};
     
     public:
         Server(std::string port, std::string password); 
         virtual ~Server(); 
 
-        int getSocket() const;
-        struct addrinfo* getServInfo() const;
-        std::string getPortconst() const;
-        std::string getPassword() const;
+        int const &				getSocket() const;
+        std::string const &		getPort() const;
+        std::string const &		getPassword() const;
+        struct addrinfo*		getServInfo() const;
 
         void init();
 

@@ -1,4 +1,5 @@
-SRCS = 	main.cpp	
+SRCS = 	main.cpp \
+		Server.cpp
 
 OBJ = $(SRCS:.cpp=.o)
 
@@ -8,7 +9,8 @@ CXXFLAGS = -Wall -Werror -Wextra -g3 -std=c++98 #-fsanitize=address
 
 NAME = IRC_90s
 
-INCLUDE =
+INCLUDE = headers.hpp \
+		  Server.hpp
 
 #$(subst cpp,hpp, $(SRCS))	
 
@@ -17,7 +19,7 @@ INCLUDE =
 
 
 $(NAME): $(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $(NAME)
+	$(CXX) $(CXXFLAGS) -I . $(OBJ) -o $(NAME)
 
 echo :
 	@echo $(SRCS)
