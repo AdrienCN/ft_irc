@@ -23,6 +23,8 @@ Server::Server(std::string port, std::string password) : _domain("NULL"), _port(
 
 Server::~Server()
 {
+	std::cout << "Server destruction" << std::endl;
+	//garder ?  ou creer une fonction Server.end() qui close tout proprement
 	close(_socket);
 	freeaddrinfo(_serv_info);
     return;
@@ -61,7 +63,7 @@ void Server::init()
 	
 	//Creer ce qui sera notre socket d'ecoute
 	//domain = type d'address = ai_family | type = socketype = ai_socktype |  protocole = ai_protocole
-	_socket = socket(_serv_info->ai_family, _serv_info->ai_socktype /*00| SOCK_NONBLOCK*/, _serv_info->ai_protocol);
+	_socket = socket(_serv_info->ai_family, _serv_info->ai_socktype | SOCK_NONBLOCK, _serv_info->ai_protocol);
 	if (_socket == -1)
 		throw Server::ExceptInit();
 		/*
