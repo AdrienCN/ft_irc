@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
+#include <vector>
 
 
 
@@ -21,4 +22,3 @@
 #include <cstring>
 #include <iostream>
 #include <string>
-#include <vector>

@@ -2,6 +2,8 @@
 #define Server_hpp
 
 #include "headers.hpp"
+#include "Channel.hpp"
+#include "Client.hpp"
 
 //namespace ft
 //
@@ -49,6 +51,10 @@ class Server
         struct addrinfo _hints; // to initialize the server
         std::string _password; // const?
         int _socket;
+
+        // Ajout
+        std::vector<Client&> _all_users;
+        std::vector<Channel&> _all_channels;
 
 
 
