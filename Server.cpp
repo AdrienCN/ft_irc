@@ -55,15 +55,17 @@ void Server::init()
 {
 	int ret;
 	
+	// 1. Prepare for launch!
 	//Rempli notre structure serv_info qui contient 
 	//tout les parametres pour call socket(), bind(), listen()
 	ret = getaddrinfo(NULL, "6667"/* _port.c_str()*/, &_hints, &_serv_info);
 	if (ret != 0)
 		throw Server::ExceptGetaddr();
 	
+	// 2. Get the FD
 	//Creer ce qui sera notre socket d'ecoute
 	//domain = type d'address = ai_family | type = socketype = ai_socktype |  protocole = ai_protocole
-	_socket = socket(_serv_info->ai_family, _serv_info->ai_socktype | SOCK_NONBLOCK, _serv_info->ai_protocol);
+	_socket = socket(_serv_info->ai_family, _serv_info->ai_socktype /*| SOCK_NONBLOCK*/, _serv_info->ai_protocol);
 	if (_socket == -1)
 		throw Server::ExceptInit();
 		/*
@@ -71,11 +73,20 @@ void Server::init()
 			ret = 1;
 			setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, &ret, sizeof(ret));
 		*/
+
+	//Pour passer notre socket en non blocking 
+	fcntl(_socket, F_SETFL, O_NONBLOCK); // c'est la seule maniere dont on a le droit de l'utiliser
+
+	//3. What port Am I on?
+	//Lie notre socket avec un port
 	if ((bind(_socket, _serv_info->ai_addr, _serv_info->ai_addrlen)) == -1)
 		throw Server::ExceptInit();
 
+	// 4. WIll somebody call me?
+	// sockfd et backlog = numbers of connection allowed in the back queue
 	if ((listen(_socket, MAX_CLIENT)) == -1)
 		throw Server::ExceptInit();
 	std::cout << "Server init success" << std::endl;
 	std::cout << "Listening for clients ..." << std::endl;
+
 }

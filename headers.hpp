@@ -4,9 +4,15 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
+#include <string>
 #include <vector>
 
+//Pour non blocking fcntl
+#include "unistd.h"
+#include "fcntl.h"
 
+//poll
+#include "poll.h"
 
 //printf
 #include <stdio.h>
@@ -21,4 +27,3 @@
 #include <exception>
 #include <cstring>
 #include <iostream>
-#include <string>

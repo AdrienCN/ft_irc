@@ -42,9 +42,9 @@ class Client
         //std::string _realname;
         // pas de roles car peut avoir des roles != dans != channels
 
-        std::vector<Channel &> _channels; // liste des channels dans lesquels il est     
+        std::vector<Channel *> _channels; // liste des channels dans lesquels il est     
         int _socket;
-        //Message _message: // template pour analyser un message
+        //Input _input: // template pour analyser un message
 
 
 };

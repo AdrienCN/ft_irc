@@ -16,7 +16,7 @@ class Server
 	{
 		virtual const char* what() const throw()
 		{
-			return ("Error : GetAddressInfo() failed");
+			return ("Error Server: GetAddressInfo() failed");
 		}
 	};
 
@@ -53,8 +53,8 @@ class Server
         int _socket;
 
         // Ajout
-        std::vector<Client&> _all_users;
-        std::vector<Channel&> _all_channels;
+        std::vector<Client*> _all_users;
+        std::vector<Channel*> _all_channels;
 
 
 

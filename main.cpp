@@ -20,6 +20,9 @@ int main()
 		int				fd_client;
 
 		fd_client = accept(irc.getSocket(), &new_client, &client_size);
+		//if (fd_client == -1)
+		// error 
+		
 
 	}
 	return (0);

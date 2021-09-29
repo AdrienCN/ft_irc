@@ -21,8 +21,8 @@ class Channel
         std::string const & getName() const;
 
         //en public pour pouvoir utiliser les iterateurs facilement?
-        std::vector<Client &> _operators; // liste des operateurs du cannal
-        std::vector<Client &> _members;
+        std::vector<Client *> _operators; // liste des operateurs du cannal
+        std::vector<Client *> _members;
 
     private:
         Channel();
