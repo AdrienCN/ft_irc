@@ -1,16 +1,18 @@
 SRCS = 	main.cpp \
-		Server.cpp
+		Server.cpp \
+		Client.cpp
 
 OBJ = $(SRCS:.cpp=.o)
 
 CXX = clang++
 
-CXXFLAGS = -Wall -Werror -Wextra -g3 -std=c++98 -fsanitize=address 
+CXXFLAGS = -Wall -Werror -Wextra -g3 -std=c++98 #-fsanitize=address 
 
 NAME = IRC_90s
 
 INCLUDE = headers.hpp \
-		  Server.hpp
+		  Server.hpp \
+		  Client.hpp
 
 #$(subst cpp,hpp, $(SRCS))	
 

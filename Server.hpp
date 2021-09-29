@@ -7,7 +7,7 @@
 
 //namespace ft
 //
-#define MAX_CLIENT 10
+#define MAX_CLIENT 2
 
 class Server
 {
@@ -20,7 +20,7 @@ class Server
 		}
 	};
 
-    class ExceptInit : public std::exception
+    class ExceptErrno : public std::exception
 	{
 	   virtual const char* what() const throw()
 	   {
@@ -39,22 +39,34 @@ class Server
         struct addrinfo*		getServInfo() const;
 
         void init();
+        void run();
+        void poll_add_client(Client const& new_client);
+       // void poll_remove_client(Client const& old_client);
+        void poll_remove_client(int const& fd);
+        void addClient();
+        void removeClient();
+
+        
+        
+        std::vector<struct pollfd > _fds;
 
     private:
         Server();
         Server(Server const& src);
         Server & operator=(Server const& src); 
-
+        
+        struct pollfd _poll;
         std::string _domain; // char* add IP ou nom de domain ou NULL si propre IP (!! flag AI8PASSIVE hint en plus)
         std::string _port; // char* port or http? Dans notre 6667
         struct addrinfo* _serv_info;        
         struct addrinfo _hints; // to initialize the server
         std::string _password; // const?
-        int _socket;
+        int _server_socket;
+        int _nbClients;
 
-        // Ajout
-        std::vector<Client*> _all_users;
+        std::vector<Client*> _all_clients;
         std::vector<Channel*> _all_channels;
+
 
 
 

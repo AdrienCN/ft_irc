@@ -7,23 +7,12 @@ int main()
 	try
 	{
 		irc.init();
+		irc.run();
 	}
 	catch (std::exception & e)
 	{
 		std::cout << e.what() << std::endl;
 		return (1);
-	}
-	while (1)
-	{
-		struct sockaddr new_client;
-		socklen_t		client_size = sizeof(new_client);
-		int				fd_client;
-
-		fd_client = accept(irc.getSocket(), &new_client, &client_size);
-		//if (fd_client == -1)
-		// error 
-		
-
 	}
 	return (0);
 }
