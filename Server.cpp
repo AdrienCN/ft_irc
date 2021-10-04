@@ -125,6 +125,8 @@ void	Server::poll_remove_client(int const & fd)
 		//if (old_client.getSocket() == it->fd)
 		if (fd == it->fd)
 		{
+			std::cout << "Erasing fd : " << it->fd << std::endl;
+			close(it->fd);
 			_fds.erase(it);
 			_nbClients--;
 			return;
@@ -140,7 +142,8 @@ void	Server::run()
 	while (1)
 	{
 		std::vector<pollfd>::iterator it = _fds.begin();
-		int poll_count = poll(&(*it), _nbClients + 1, 2000);
+//		std::cout << "Starting new poll ..." << std::endl;
+		int poll_count = poll(&(*it), _nbClients + 1, 5000);
 		if (poll_count == -1)
 			throw Server::ExceptErrno();
 
@@ -151,23 +154,39 @@ void	Server::run()
 		//for (int i = 0; i <= _nbClients; i++)
 		while (itb != ite)
 		{
+			if ((*itb).revents == POLLIN)
+			{
+				std::cout << "itb.fd.revent " << (*itb).fd << " : POLLIN" << std::endl;
+			}
+			else if (itb->revents == POLLHUP)
+			{
+				std::cout << "itb.fd.revent " << (*itb).fd << " : POLLHUP" << std::endl;
+
+			}
+			else if (itb->revents == (POLLIN | POLLHUP))
+			{
+				std::cout << "itb.fd.revent " << (*itb).fd << " : POLLIN | POLLHUP" << std::endl;
+			}
+			else
+				std::cout << "itb.fd.revent " << (*itb).fd << " : OTHER" << std::endl;
 			 if ((*itb).revents & POLLHUP)
 			{
+				std::cout << "Trying to disconnect .... fd = " << (*itb).fd << std::endl;
 				if ((*itb).fd != _server_socket)
 				{					
-					std::cout << "Client " << (*itb).fd << " has disconnected" << std::endl;
+					std::cout << "Client " << (*itb).fd << " has disconnected succesfully" << std::endl;
 					this->poll_remove_client((*itb).fd);
 					break;
 				}
 			}
 			//Event est un POLLIN
+			//if ou else if ?
 			if ((*itb).revents & POLLIN)
 			{
 				//Je suis le serveur
 				if ((*itb).fd == _server_socket)
 				{	
 					this->addClient();
-					std::cout << "New client added" <<std::endl;
 				}
 				//Je suis un client
 				else
@@ -178,10 +197,11 @@ void	Server::run()
 			}
 			// Je suis un POLLOUT
 			
+	//		std::cout << "End of loop for fd = " << (*itb).fd << "..." << std::endl;
 			itb++;
 		}//if (fd_client == -1)
-		std::cout << "time out" << std::endl;
 		// error 
+	//	std::cout << "End of poll ..." << std::endl;
 	}
 }
 
@@ -213,4 +233,5 @@ void	Server::addClient()
 	this->poll_add_client(*new_client);
 	_all_clients.push_back(new_client);
 	_nbClients++;
+	std::cout << "New client added" <<std::endl;
 	}

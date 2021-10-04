@@ -7,7 +7,7 @@
 
 //namespace ft
 //
-#define MAX_CLIENT 2
+#define MAX_CLIENT 1
 
 class Server
 {
