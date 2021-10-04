@@ -129,6 +129,7 @@ void	Server::poll_remove_client(int const & fd)
 			close(it->fd);
 			_fds.erase(it);
 			_nbClients--;
+			std::cout << "Client has disconnected succesfully" << std::endl;
 			return;
 		}
 		it++;
@@ -174,7 +175,6 @@ void	Server::run()
 				std::cout << "Trying to disconnect .... fd = " << (*itb).fd << std::endl;
 				if ((*itb).fd != _server_socket)
 				{					
-					std::cout << "Client " << (*itb).fd << " has disconnected succesfully" << std::endl;
 					this->poll_remove_client((*itb).fd);
 					break;
 				}
@@ -191,6 +191,14 @@ void	Server::run()
 				//Je suis un client
 				else
 				{
+					char buf[256];
+					int ret;
+
+					ret = recv(itb->fd, buf, 255, 0);
+					if (ret == -1)
+						throw Server::ExceptErrno();
+					if (ret == 0 || buf[0] == EOF)
+						this->poll_remove_client((*itb).fd);
 					//renomme all_user par client_list ? 
 					//this->_all_clients[x].read_data();
 				}
