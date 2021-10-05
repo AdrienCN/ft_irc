@@ -194,9 +194,7 @@ void	Server::run()
 				//Je suis un client
 				else
 				{
-					receiveMessage((*itb).fd);
-
-					
+					this->receiveMessage(this->find_client_from_fd((*itb).fd));			
 				}
 			}
 			// Je suis un POLLOUT
@@ -240,37 +238,60 @@ void	Server::addClient()
 	std::cout << "New client added" <<std::endl;
 }
 
-void Server::receiveMessage(int fd)
+Client* Server::find_client_from_fd(int fd)
 {
-	/*
+	std::vector<Client*>::iterator it = _all_clients.begin();
+	std::vector<Client*>::iterator ite = _all_clients.end();
+
+	while (it !=  ite)
+	{
+		if ((*it)->getSocket() == fd)
+			return *it;
+		it++;
+	}
+	return NULL;
+}
+
+
+void Server::receiveMessage(Client* client)
+{
 	char buf[MAX_CHAR];
 	int ret; // sisze_t?
-	
-	ret = recv(fd, buf, 255, 0);
+
+	if(client->getMessageStatus() == true)
+	{
+		client->clearMessage();
+		client->setMessageStatus(false);
+	}
+	ret = recv(client->getSocket(), buf, MAX_CHAR, 0);
 	if (ret == -1)
 		throw Server::ExceptErrno();
+	client->setMessage(client->getMessage() + buf);
+	if (std::strstr(buf, "stop") != NULL) // END CHAR
+	{
+		std::cout << "Message received : " << client->getMessage() << std::endl; 
+		client->setMessageStatus(true);
+		return;// tant que l'on ne trouve pas le end char
+	}
 	if (ret == 0 || buf[0] == EOF) // --> ne marche pas car on doit avoir le end char pour sortir de la boucle
-		this->poll_remove_client((fd);
+		this->poll_remove_client(client->getSocket());
 	//renomme all_user par client_list ? 
 	//this->_all_clients[x].read_data();
-	*/
+	/*
 	
 	char buf[MAX_CHAR];
 	int ret;
-	std::string message;
 
-	while (1) // tant que l'on ne trouve pas le end char
+	memset(buf, '\0', sizeof(buf));
+	ret = recv(fd, buf, MAX_CHAR, 0);
+	if (ret <= 0 || buf[0] == EOF)
 	{
-		memset(buf, '\0', sizeof(buf));
-		ret = recv(fd, buf, sizeof(buf), 0);
-		if (ret <= 0 || buf[0] == EOF)
-		{
-			this->poll_remove_client(fd);
+	this->poll_remove_client(fd);
 			break;
 		}
 		message = message + buf;
-		if (std::strstr(buf, END_CHAR) != NULL) 
+		//if (std::strstr(buf, END_CHAR) != NULL) 
+		if (std::strstr(buf, "stop") != NULL) 
 			break;// tant que l'on ne trouve pas le end char
-	}
-	std::cout << "Message received : " << message.c_str() << std::endl; 
+	}*/
 }

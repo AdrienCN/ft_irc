@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client()
+Client::Client() : _message_status(true)
 {
     return;
 }
@@ -29,6 +29,11 @@ std::string const &		Client::getUsername() const
 std::string const &		Client::getMessage() const
 {
     return this->_message;
+}
+
+bool const &		Client::getMessageStatus() const
+{
+    return this->_message_status;
 }
 
 int         const &     Client::getSocket() const
@@ -62,11 +67,22 @@ void Client::setMessage(std::string const& src)
     this->_message = src;
 }
 
+void Client::setMessageStatus(bool const& src)
+{
+    this->_message_status = src;
+}
+
 //OTHERS
 
 void Client::clearStr(std::string str)
 {
     str.clear();
+}
+
+
+void Client::clearMessage()
+{
+    _message.clear();
 }
 
 void Client::init(int const & socket)

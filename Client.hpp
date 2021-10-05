@@ -20,6 +20,7 @@ class Client
         std::string const &		getNickname() const;
         std::string const &		getUsername() const;
         std::string const &		getMessage() const;
+        bool        const &		getMessageStatus() const;
         int         const &     getSocket() const;
         struct pollfd   const & getPoll() const;
 
@@ -28,7 +29,9 @@ class Client
         void setNickname(std::string const& src);
         void setUsername(std::string const& src);
         void setMessage(std::string const& src);
+        void setMessageStatus(bool const& src);
         void clearStr(std::string str);
+        void clearMessage();
         void init(int const & socket);
 
         //Others
@@ -45,6 +48,7 @@ class Client
         std::string _nickname;
         std::string _username;
         std::string _message;
+        bool        _message_status; // true finished , false not finished
         
         //std::string _host;
         //std::string _servername;

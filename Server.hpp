@@ -46,7 +46,8 @@ class Server
         void poll_remove_client(int const& fd);
         void addClient();
         void removeClient();
-        void receiveMessage(int fd);
+        void receiveMessage(Client* client);
+        Client* find_client_from_fd(int fd);
         
         
         std::vector<struct pollfd > _fds;
