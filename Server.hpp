@@ -8,7 +8,8 @@
 
 //namespace ft
 //
-#define MAX_CLIENT 1
+#define MAX_CLIENT 2
+#define PORT_SERVER "6667"
 
 class Server
 {

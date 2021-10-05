@@ -58,7 +58,7 @@ void Server::init()
 	// 1. Prepare for launch!
 	//Rempli notre structure serv_info qui contient 
 	//tout les parametres pour call socket(), bind(), listen()
-	ret = getaddrinfo(NULL, "6667"/* _port.c_str()*/, &_hints, &_serv_info);
+	ret = getaddrinfo(NULL, PORT_SERVER, &_hints, &_serv_info);
 	if (ret != 0)
 		throw Server::ExceptGetaddr();
 	
@@ -144,7 +144,7 @@ void	Server::run()
 	{
 		std::vector<pollfd>::iterator it = _fds.begin();
 //		std::cout << "Starting new poll ..." << std::endl;
-		int poll_count = poll(&(*it), _nbClients + 1, 5000);
+		int poll_count = poll(&(*it), _nbClients + 1, -1);
 		if (poll_count == -1)
 			throw Server::ExceptErrno();
 
@@ -171,7 +171,7 @@ void	Server::run()
 			}
 			else
 				std::cout << "itb.fd.revent " << (*itb).fd << " : OTHER" << std::endl;
-			 if ((*itb).revents & POLLHUP)
+			 if (((*itb).revents & POLLHUP) == POLLHUP)
 			{
 				std::cout << "Trying to disconnect .... fd = " << (*itb).fd << std::endl;
 				if ((*itb).fd != _server_socket)
@@ -190,6 +190,7 @@ void	Server::run()
 				if ((*itb).fd == _server_socket)
 				{	
 					this->addClient();
+					//break; on comprends pas mais on copie
 				}
 				//Je suis un client
 				else
@@ -223,6 +224,9 @@ void	Server::addClient()
 		throw Server::ExceptErrno();
 	}
 
+	if (fcntl(socket, F_SETFL,  O_NONBLOCK) == -1)
+		throw Server::ExceptErrno();
+
 	if (_nbClients == MAX_CLIENT)
 	{
 		std::cout << "Error : Client number already maximum" << std::endl;
@@ -236,6 +240,7 @@ void	Server::addClient()
 	_all_clients.push_back(new_client);
 	_nbClients++;
 	std::cout << "New client added" <<std::endl;
+	send(new_client->getSocket(), "Hello to you NEW CLIENT JOANN\n", 30, 0);
 }
 
 Client* Server::find_client_from_fd(int fd)
@@ -258,6 +263,7 @@ void Server::receiveMessage(Client* client)
 	char buf[MAX_CHAR];
 	int ret; // sisze_t?
 
+	memset(buf, 0, MAX_CHAR);
 	if(client->getMessageStatus() == true)
 	{
 		client->clearMessage();
@@ -267,14 +273,25 @@ void Server::receiveMessage(Client* client)
 	if (ret == -1)
 		throw Server::ExceptErrno();
 	client->setMessage(client->getMessage() + buf);
-	if (std::strstr(buf, "stop") != NULL) // END CHAR
+	if (std::strstr(buf, END_CHAR) != NULL) // END CHAR
 	{
 		std::cout << "Message received : " << client->getMessage() << std::endl; 
 		client->setMessageStatus(true);
+		client->clearMessage();
+		memset(buf, 0, MAX_CHAR);
 		return;// tant que l'on ne trouve pas le end char
 	}
-	if (ret == 0 || buf[0] == EOF) // --> ne marche pas car on doit avoir le end char pour sortir de la boucle
+	if (ret == 0)
+	{
+		std::cout << "ret = 0" << std::endl;
 		this->poll_remove_client(client->getSocket());
+	}
+	else if (buf[0] == EOF) // --> ne marche pas car on doit avoir le end char pour sortir de la boucle
+	{
+		std::cout << "ret = EOF" << std::endl;
+		this->poll_remove_client(client->getSocket());
+	}
+	memset(buf, 0, MAX_CHAR);
 	//renomme all_user par client_list ? 
 	//this->_all_clients[x].read_data();
 	/*
