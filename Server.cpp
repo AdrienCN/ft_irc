@@ -190,7 +190,7 @@ void	Server::run()
 				if ((*itb).fd == _server_socket)
 				{	
 					this->addClient();
-					//break; on comprends pas mais on copie
+					//break; on comprends pas mais on copie github
 				}
 				//Je suis un client
 				else
@@ -275,7 +275,7 @@ void Server::receiveMessage(Client* client)
 	client->setMessage(client->getMessage() + buf);
 	if (std::strstr(buf, END_CHAR) != NULL) // END CHAR
 	{
-		std::cout << "Message received : " << client->getMessage() << std::endl; 
+		std::cout << "Final message received : " << GREEN << client->getMessage() << RESET << std::endl; 
 		client->setMessageStatus(true);
 		client->clearMessage();
 		memset(buf, 0, MAX_CHAR);
@@ -285,12 +285,21 @@ void Server::receiveMessage(Client* client)
 	{
 		std::cout << "ret = 0" << std::endl;
 		this->poll_remove_client(client->getSocket());
+		return;
 	}
 	else if (buf[0] == EOF) // --> ne marche pas car on doit avoir le end char pour sortir de la boucle
 	{
 		std::cout << "ret = EOF" << std::endl;
 		this->poll_remove_client(client->getSocket());
+		return;
 	}
+	std::cout << "Pollin recv :|";
+	for (int i = 0; buf[i] != '\0'; i++)
+	{
+		std::cout << buf[i];
+	}
+	std::cout << "|" << std::endl;
+	std::cout << "Message in construction : <<" << YELLOW << client->getMessage() << RESET << ">>" << std::endl;
 	memset(buf, 0, MAX_CHAR);
 	//renomme all_user par client_list ? 
 	//this->_all_clients[x].read_data();
