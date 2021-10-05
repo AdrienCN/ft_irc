@@ -27,3 +27,4 @@
 #include <exception>
 #include <cstring>
 #include <iostream>
+#include <istream>

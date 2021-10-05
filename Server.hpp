@@ -4,6 +4,7 @@
 #include "headers.hpp"
 #include "Channel.hpp"
 #include "Client.hpp"
+#include "Grammar.hpp"
 
 //namespace ft
 //
@@ -45,7 +46,7 @@ class Server
         void poll_remove_client(int const& fd);
         void addClient();
         void removeClient();
-
+        void receiveMessage(int fd);
         
         
         std::vector<struct pollfd > _fds;

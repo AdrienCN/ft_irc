@@ -155,6 +155,7 @@ void	Server::run()
 		//for (int i = 0; i <= _nbClients; i++)
 		while (itb != ite)
 		{
+			//JUST POUR CLARIFIER EVENTS
 			if ((*itb).revents == POLLIN)
 			{
 				std::cout << "itb.fd.revent " << (*itb).fd << " : POLLIN" << std::endl;
@@ -179,6 +180,8 @@ void	Server::run()
 					break;
 				}
 			}
+			//END
+
 			//Event est un POLLIN
 			//if ou else if ?
 			if ((*itb).revents & POLLIN)
@@ -191,16 +194,9 @@ void	Server::run()
 				//Je suis un client
 				else
 				{
-					char buf[256];
-					int ret;
+					receiveMessage((*itb).fd);
 
-					ret = recv(itb->fd, buf, 255, 0);
-					if (ret == -1)
-						throw Server::ExceptErrno();
-					if (ret == 0 || buf[0] == EOF)
-						this->poll_remove_client((*itb).fd);
-					//renomme all_user par client_list ? 
-					//this->_all_clients[x].read_data();
+					
 				}
 			}
 			// Je suis un POLLOUT
@@ -242,4 +238,39 @@ void	Server::addClient()
 	_all_clients.push_back(new_client);
 	_nbClients++;
 	std::cout << "New client added" <<std::endl;
+}
+
+void Server::receiveMessage(int fd)
+{
+	/*
+	char buf[MAX_CHAR];
+	int ret; // sisze_t?
+	
+	ret = recv(fd, buf, 255, 0);
+	if (ret == -1)
+		throw Server::ExceptErrno();
+	if (ret == 0 || buf[0] == EOF) // --> ne marche pas car on doit avoir le end char pour sortir de la boucle
+		this->poll_remove_client((fd);
+	//renomme all_user par client_list ? 
+	//this->_all_clients[x].read_data();
+	*/
+	
+	char buf[MAX_CHAR];
+	int ret;
+	std::string message;
+
+	while (1) // tant que l'on ne trouve pas le end char
+	{
+		memset(buf, '\0', sizeof(buf));
+		ret = recv(fd, buf, sizeof(buf), 0);
+		if (ret <= 0 || buf[0] == EOF)
+		{
+			this->poll_remove_client(fd);
+			break;
+		}
+		message = message + buf;
+		if (std::strstr(buf, END_CHAR) != NULL) 
+			break;// tant que l'on ne trouve pas le end char
 	}
+	std::cout << "Message received : " << message.c_str() << std::endl; 
+}

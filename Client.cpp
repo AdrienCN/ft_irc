@@ -26,6 +26,11 @@ std::string const &		Client::getUsername() const
     return this->_username;
 }
 
+std::string const &		Client::getMessage() const
+{
+    return this->_message;
+}
+
 int         const &     Client::getSocket() const
 {
     return this->_socket;
@@ -50,6 +55,18 @@ void Client::setNickname(std::string const& src)
 void Client::setUsername(std::string const& src)
 {
     this->_username = src;
+}
+
+void Client::setMessage(std::string const& src)
+{
+    this->_message = src;
+}
+
+//OTHERS
+
+void Client::clearStr(std::string str)
+{
+    str.clear();
 }
 
 void Client::init(int const & socket)

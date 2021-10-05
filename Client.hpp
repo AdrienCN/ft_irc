@@ -19,6 +19,7 @@ class Client
         std::string const &		getPassword() const;
         std::string const &		getNickname() const;
         std::string const &		getUsername() const;
+        std::string const &		getMessage() const;
         int         const &     getSocket() const;
         struct pollfd   const & getPoll() const;
 
@@ -26,6 +27,8 @@ class Client
         void setPassword(std::string const& src);
         void setNickname(std::string const& src);
         void setUsername(std::string const& src);
+        void setMessage(std::string const& src);
+        void clearStr(std::string str);
         void init(int const & socket);
 
         //Others
@@ -41,6 +44,7 @@ class Client
         std::string _password;
         std::string _nickname;
         std::string _username;
+        std::string _message;
         
         //std::string _host;
         //std::string _servername;
