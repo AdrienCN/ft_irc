@@ -11,9 +11,10 @@ Commands::~Commands()
 }
 
 
-void Commands::find_command(std::vector<std::string> input, Client *client)
+void Commands::find_command(std::vector<std::string> input, Client *client, Server & server)
 {
     (void)client;
+    (void)server;
     std::vector<std::string>::iterator it = input.begin();
     std::vector<std::string>::iterator ite = input.end();
 

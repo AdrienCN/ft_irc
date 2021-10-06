@@ -4,6 +4,7 @@
 
 #include "headers.hpp"
 #include "Client.hpp"
+#include "Server.hpp"
 
 class Server;
 
@@ -16,7 +17,7 @@ class Commands
 
         //General
         void initialize_list();
-        void find_command(std::vector<std::string> input, Client* client); 
+        void find_command(std::vector<std::string> input, Client* client, Server & server); 
         void print_command(std::string prefix, std::string command, std::vector<std::string> params); 
 
         //Commandes
