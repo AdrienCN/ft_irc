@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 //Pour non blocking fcntl
 #include "unistd.h"
@@ -28,6 +29,8 @@
 #include <cstring>
 #include <iostream>
 #include <istream>
+#include <sstream>
+
 
 
 #define GREEN "\033[0;32m"

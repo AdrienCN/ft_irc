@@ -1,6 +1,7 @@
 SRCS = 	main.cpp \
 		Server.cpp \
-		Client.cpp
+		Client.cpp \
+		Commands.cpp
 
 OBJ = $(SRCS:.cpp=.o)
 

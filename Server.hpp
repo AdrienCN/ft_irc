@@ -5,6 +5,7 @@
 #include "Channel.hpp"
 #include "Client.hpp"
 #include "Grammar.hpp"
+#include "Commands.hpp"
 
 //namespace ft
 //
@@ -35,11 +36,13 @@ class Server
         Server(std::string port, std::string password); 
         virtual ~Server(); 
 
+        // GETTERS
         int const &				getSocket() const;
         std::string const &		getPort() const;
         std::string const &		getPassword() const;
         struct addrinfo*		getServInfo() const;
 
+        //MAIN FUNCTIONS
         void init();
         void run();
         void poll_add_client(Client const& new_client);
@@ -48,6 +51,8 @@ class Server
         void addClient();
         void removeClient();
         void receiveMessage(Client* client);
+        void analyzeMessage(std::string message, Client* client);
+
         Client* find_client_from_fd(int fd);
         
         
@@ -66,13 +71,10 @@ class Server
         std::string _password; // const?
         int _server_socket;
         int _nbClients;
+        Commands _command_list;
 
         std::vector<Client*> _all_clients;
         std::vector<Channel*> _all_channels;
-
-
-
-
 
 };
 

@@ -277,6 +277,7 @@ void Server::receiveMessage(Client* client)
 	{
 		std::cout << "Final message received : " << GREEN << client->getMessage() << RESET << std::endl; 
 		client->setMessageStatus(true);
+		analyzeMessage(client->getMessage(), client);
 		client->clearMessage();
 		memset(buf, 0, MAX_CHAR);
 		return;// tant que l'on ne trouve pas le end char
@@ -321,3 +322,50 @@ void Server::receiveMessage(Client* client)
 			break;// tant que l'on ne trouve pas le end char
 	}*/
 }
+
+void Server::analyzeMessage(std::string message, Client* client)
+{
+	if (message.length() > 512)
+	{
+		//message trop long --> quelle erreur?
+		return;
+	}
+
+	std::vector<std::string> inputs;
+	std::istringstream str(message);
+	std::string tmp;
+	bool part = 0;
+
+	//1. Split du message par les whitespaces dans un vector
+	while (part == 0 && std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
+	{
+		if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
+		{
+				tmp.erase(tmp.length() - 1);
+				tmp.erase(tmp.length() - 1);
+				part = 1;
+		}
+		if (tmp != "\0") // si je suis pas une chaine vide
+		{
+			inputs.push_back(tmp);
+			tmp.clear(); // on enleve tout le contenu et size = 0
+		}
+	}
+
+	// Juste pour imprimer le vector crée si besoin
+	std::cout << "print vector:" << std::endl;
+	std::vector<std::string>::iterator it =  inputs.begin();
+	std::vector<std::string>::iterator ite=  inputs.end();
+	int nb = 0;
+	while (it != ite)
+	{
+		std::cout << nb << "|" << *it << "|" << std::endl;
+		it++;
+		nb++;
+	}
+	
+	// 2. Gestion du message
+	_command_list.find_command(inputs, client);
+	part = 0;
+}
+
