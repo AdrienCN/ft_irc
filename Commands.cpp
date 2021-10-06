@@ -2,6 +2,10 @@
 
 Commands::Commands() 
 {
+	_cmd_list["PASS"] = &Commands::pass;
+	_cmd_list["NICK"] = &Commands::nick;
+	_cmd_list["USER"] = &Commands::user;
+	_cmd_list["JOIN"] = &Commands::join;
     return;
 }
 
@@ -13,6 +17,20 @@ Commands::~Commands()
 
 void Commands::find_command(std::vector<std::string> input, Client* client, std::vector<Client*> client_list, std::vector<Channel*> channel_list) 
 {
+
+	(void)client;
+    (void)client_list;
+    (void)channel_list;
+   
+	std::string key(input[0]);	
+
+	//std::map<std::string , void(Commands::*)(std::vector<std::string>)>::iterator it = _cmd_list.begin();
+	if (_cmd_list[key])
+		(this->*_cmd_list[key])(input, client, client_list, channel_list);
+	else
+		std::cout << "Command not found(Adrien)" << std::endl;
+
+	/* OPTION JOANN
     (void)client;
     (void)client_list;
     (void)channel_list;
@@ -23,13 +41,13 @@ void Commands::find_command(std::vector<std::string> input, Client* client, std:
     std::string prefix; // je pense pas qu'on en ai besoin
     std::string command;
 
-   /* if ((*it)[0] == ':') // si je suis un prefix
+    if ((*it)[0] == ':') // si je suis un prefix
     {
         prefix.assign(*it);
         input.erase(it);
         it = input.begin(); // on remet les iterateurs à jour
         ite = input.end();
-    }*/
+    } 
     command.assign(*it);
     it++;
     std::vector<std::string> params(it, ite); // on construit les params
@@ -41,6 +59,7 @@ void Commands::find_command(std::vector<std::string> input, Client* client, std:
         join(params);
     else
         std::cout << "Command not found" << std::endl;
+	*/
 
 }
 
@@ -61,20 +80,59 @@ void Commands::print_command(std::string prefix, std::string command, std::vecto
 	}
 }
 
-void Commands::join(std::vector<std::string> params)
+void Commands::join(std::vector<std::string> params, Client *client, std::vector<Client*> client_list, std::vector<Channel*> channel_list)
 {
-   (void)params;
-    std::cout << "Hello from join function!" << std::endl;
+	(void)client;
+    (void)client_list;
+    (void)channel_list;
+	(void)params;
+
+    std::cout << YELLOW << "Hello from join function!" << RESET << std::endl;
 }
+
+void Commands::pass(CMD_PARAM)
+{
+	(void)client;
+    (void)client_list;
+    (void)channel_list;
+	(void)params;
+	// do the action
+		//if success
+			//RPL_XXX
+		
+		//else
+			//ERR_XXX
+    std::cout << YELLOW << "Hello from PASS function!" << RESET << std::endl;
+}
+
+void Commands::nick(CMD_PARAM)
+{
+	(void)client;
+    (void)client_list;
+    (void)channel_list;
+	(void)params;
+
+    std::cout << YELLOW << "Hello from NICK function!"<< RESET  << std::endl;
+}
+
+void Commands::user(CMD_PARAM)
+{
+    (void)client;
+    (void)client_list;
+    (void)channel_list;
+	(void)params;
+
+	std::cout << YELLOW << "Hello from USER function!" << RESET << std::endl;
+}
+
+
+
 /*
 void Commands::quit(std::vector<std::string> params)
 {
     (void)params;
     std::cout << "Hello from quit function!" << std::endl;
 }
+*/
 
-void Commands::nick(std::vector<std::string> params)
-{
-    (void)params;
-    std::cout << "Hello from nick function!" << std::endl;
-}*/
+

@@ -17,6 +17,7 @@
 
 //printf
 #include <stdio.h>
+#include <unistd.h> //write
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
