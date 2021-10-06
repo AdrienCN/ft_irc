@@ -105,6 +105,20 @@ void Commands::pass(CMD_PARAM)
     std::cout << YELLOW << "Hello from PASS function!" << RESET << std::endl;
 }
 
+// Faire fonction generique qui retourne un *Client puis NULL au bout de la liste
+int		ft_nickname_exist(std::vector<Client*> client_list, std::string nickname)
+{
+	std::vector<Client*>::iterator it = client_list.begin();
+
+	while (it != client_list.end())
+	{
+		if ((*it)->getNickname() == nickname)
+			return (1);
+		it++;
+	}
+	return (0);
+}
+
 void Commands::nick(CMD_PARAM)
 {
 	(void)client;
@@ -113,6 +127,28 @@ void Commands::nick(CMD_PARAM)
 	(void)params;
 
     std::cout << YELLOW << "Hello from NICK function!"<< RESET  << std::endl;
+	//Pas de pseudo donne
+	if (params.size() == 0 || params.size() == 1)
+	{
+		//ft_error(431);
+		std::cout << "Error : nick : 431" << std::endl;
+	}
+		//Pseudo contient des chars non autorise 
+		//	ft_error(432)a coder ??
+		//Pseudo exist deja
+	else if (ft_nickname_exist(client_list, params[1]))
+	{
+		//ft_error(433);
+		std::cout << "Error : nick : 433" << std::endl;
+	}
+	else
+	{
+		client->setNickname(params[1]);
+		std::string tmp("Your new nickname is ");
+		tmp += client->getNickname() + "\n";
+		send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
+		//send reply ?
+	}
 }
 
 void Commands::user(CMD_PARAM)
