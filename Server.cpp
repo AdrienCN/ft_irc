@@ -381,5 +381,5 @@ void Server::manage_substr(std::string message, Client* client)
 		}
 		
 		// 2. Gestion du message
-		_command_list.find_command(inputs, client, *this);
+		_command_list.find_command(inputs, client, _all_clients, _all_channels);
 }
