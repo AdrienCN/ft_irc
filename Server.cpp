@@ -331,41 +331,55 @@ void Server::analyzeMessage(std::string message, Client* client)
 		return;
 	}
 
-	std::vector<std::string> inputs;
-	std::istringstream str(message);
-	std::string tmp;
-	bool part = 0;
-
-	//1. Split du message par les whitespaces dans un vector
-	while (part == 0 && std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
+	int i = 0;
+	int init = 0;
+	while (message[i] && message[i+1])
 	{
-		if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
+		if (message[i] ==  '\r' && message[i + 1] == '\n')
 		{
-				tmp.erase(tmp.length() - 1);
-				tmp.erase(tmp.length() - 1);
-				part = 1;
+			manage_substr(message.substr(init, i - init), client);
+			init = i + 2;
+			i += 2;
 		}
-		if (tmp != "\0") // si je suis pas une chaine vide
-		{
-			inputs.push_back(tmp);
-			tmp.clear(); // on enleve tout le contenu et size = 0
-		}
+		else
+			i++;
 	}
-
-	// Juste pour imprimer le vector crée si besoin
-	std::cout << "print vector:" << std::endl;
-	std::vector<std::string>::iterator it =  inputs.begin();
-	std::vector<std::string>::iterator ite=  inputs.end();
-	int nb = 0;
-	while (it != ite)
-	{
-		std::cout << nb << "|" << *it << "|" << std::endl;
-		it++;
-		nb++;
-	}
-	
-	// 2. Gestion du message
-	_command_list.find_command(inputs, client);
-	part = 0;
 }
 
+void Server::manage_substr(std::string message, Client* client)
+{	
+		Commands _command_list; // A REFORMATER POUR GERER LES COMMANDES TRANQUILLES 
+		std::vector<std::string> inputs;
+		std::istringstream str(message);
+		std::string tmp;
+
+		//1. Split du sub_str message par les whitespaces dans un vector
+		while (std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
+		{
+			if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
+			{
+					tmp.erase(tmp.length() - 1);
+					//tmp.erase(tmp.length() - 1); //en fonction de /r /n
+			}
+			if (tmp != "\0") // si je suis pas une chaine vide
+			{
+				inputs.push_back(tmp);
+				tmp.clear(); // on enleve tout le contenu et size = 0
+			}
+		}
+
+		// Juste pour imprimer le vector crée si besoin
+		std::cout << "print vector:" << std::endl;
+		std::vector<std::string>::iterator it =  inputs.begin();
+		std::vector<std::string>::iterator ite=  inputs.end();
+		int nb = 0;
+		while (it != ite)
+		{
+			std::cout << nb << "|" << *it << "|" << std::endl;
+			it++;
+			nb++;
+		}
+		
+		// 2. Gestion du message
+		_command_list.find_command(inputs, client, *this);
+}

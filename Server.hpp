@@ -12,6 +12,8 @@
 #define MAX_CLIENT 2
 #define PORT_SERVER "6667"
 
+class Commands;
+
 class Server
 {
 
@@ -52,6 +54,7 @@ class Server
         void removeClient();
         void receiveMessage(Client* client);
         void analyzeMessage(std::string message, Client* client);
+        void manage_substr(std::string message, Client* client);
 
         Client* find_client_from_fd(int fd);
         
@@ -71,7 +74,8 @@ class Server
         std::string _password; // const?
         int _server_socket;
         int _nbClients;
-        Commands _command_list;
+        
+       // Commands _command_list;
 
         std::vector<Client*> _all_clients;
         std::vector<Channel*> _all_channels;
