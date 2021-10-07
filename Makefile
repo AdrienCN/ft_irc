@@ -1,7 +1,9 @@
 SRCS = 	main.cpp \
 		Server.cpp \
 		Client.cpp \
-		Commands.cpp
+		Commands.cpp \
+		ft_errors.cpp \
+		ft_reply.cpp
 
 OBJ = $(SRCS:.cpp=.o)
 

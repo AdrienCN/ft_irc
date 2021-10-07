@@ -3,13 +3,13 @@
 #define Commands_hpp
 
 #include "headers.hpp"
+#include "Grammar.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Server.hpp"
 
-#define CMD_PARAM std::vector<std::string> params, Client* client, std::vector<Client *> client_list, std::vector<Channel*> channel_list
+# define CMD_PARAM std::vector<std::string> params, Client* client, std::vector<Client *> client_list, std::vector<Channel*> channel_list
 
-class Server;
 
 class Commands
 {
@@ -40,7 +40,5 @@ class Commands
         // std::string _prefix; // optionnel dans notre cas sans la com server server
 };
 
-void ft_error(int nb, CMD_PARAM);
-void ft_reply(int nb, CMD_PARAM);
 
 #endif

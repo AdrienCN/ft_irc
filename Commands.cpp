@@ -170,5 +170,3 @@ void Commands::quit(std::vector<std::string> params)
     std::cout << "Hello from quit function!" << std::endl;
 }
 */
-
-
