@@ -379,7 +379,14 @@ void Server::manage_substr(std::string message, Client* client)
 			it++;
 			nb++;
 		}
-		
+		if (client->getGreetings() == 2)
+			this->sendGreetings(client);
 		// 2. Gestion du message
 		_command_list.find_command(inputs, client, _all_clients, _all_channels);
+}
+
+void	Server::sendGreetings(Client* client)
+{
+	std::cout<< "Greetings to you[" << client->getNickname() << "@" << client->getUsername() << "." << client->getHostname() << "]" << std::endl;
+	client->incrGreetings();
 }

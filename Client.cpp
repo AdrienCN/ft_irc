@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client() : _message_status(true)
+Client::Client() : _message_status(true), _greetings(0), _hostname("defaultconstructorHOSTNAMEvalue")
 {
     return;
 }
@@ -91,4 +91,14 @@ void Client::init(int const & socket)
     this->_poll.fd = _socket;
     this->_poll.events = POLLIN | POLLHUP;
     this->_poll.revents = 0;
+}
+
+int	const &	Client::getGreetings()
+{
+	return this->_greetings;
+}
+
+void	Client::incrGreetings()
+{
+	this->greetings++;
 }
