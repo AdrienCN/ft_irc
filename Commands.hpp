@@ -40,4 +40,7 @@ class Commands
         // std::string _prefix; // optionnel dans notre cas sans la com server server
 };
 
+void ft_error(int nb, CMD_PARAM);
+void ft_reply(int nb, CMD_PARAM);
+
 #endif
