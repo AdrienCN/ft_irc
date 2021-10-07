@@ -97,47 +97,6 @@ void Server::init()
 
 }
 
-void Server::poll_add_client(Client const& new_client)
-{
-	std::vector<struct pollfd>::iterator it = _fds.begin();
-	std::vector<struct pollfd>::iterator ite = _fds.end();
-	while (it != ite)
-	{
-		if (new_client.getSocket() == it->fd)
-		{
-			std::cout << "Error : Server : adding poll_fds client" << std::endl;
-			return;
-		}
-		it++;
-	}
-	_fds.push_back(new_client.getPoll());
-		return;
-}
-
-void	Server::poll_remove_client(int const & fd)
-{
-	std::vector<struct pollfd>::iterator it = _fds.begin();
-	std::vector<struct pollfd>::iterator ite = _fds.end();
-
-	while(it != ite)
-	{
-
-		//if (old_client.getSocket() == it->fd)
-		if (fd == it->fd)
-		{
-			std::cout << "Erasing fd : " << it->fd << std::endl;
-			close(it->fd);
-			_fds.erase(it);
-			_nbClients--;
-			std::cout << "Client has disconnected succesfully" << std::endl;
-			return;
-		}
-		it++;
-	}
-	return;
-}
-
-
 void	Server::run() 
 {	
 	while (1)
@@ -176,7 +135,8 @@ void	Server::run()
 				std::cout << "Trying to disconnect .... fd = " << (*itb).fd << std::endl;
 				if ((*itb).fd != _server_socket)
 				{					
-					this->poll_remove_client((*itb).fd);
+					this->removeClient((*itb).fd);
+					//this->poll_remove_client((*itb).fd);
 					break;
 				}
 			}
@@ -242,6 +202,67 @@ void	Server::addClient()
 	std::cout << "New client added" <<std::endl;
 	send(new_client->getSocket(), "Hello to you NEW CLIENT JOANN\n", 30, 0);
 }
+
+void Server::poll_add_client(Client const& new_client)
+{
+	std::vector<struct pollfd>::iterator it = _fds.begin();
+	std::vector<struct pollfd>::iterator ite = _fds.end();
+	while (it != ite)
+	{
+		if (new_client.getSocket() == it->fd)
+		{
+			std::cout << "Error : Server : adding poll_fds client" << std::endl;
+			return;
+		}
+		it++;
+	}
+	_fds.push_back(new_client.getPoll());
+		return;
+}
+void	Server::removeClient(int const & fd)
+{
+	// Remove from Client List
+	std::vector<Client*>::iterator it = _all_clients.begin();
+	std::vector<Client*>::iterator ite = _all_clients.end();
+
+	Client* tmp = find_client_from_fd(fd);
+	if (tmp == NULL)
+		return;
+	while (it != ite)
+	{
+		if (*it == tmp)
+			_all_clients.erase(it);
+		it++;
+	}
+	// Remove from Poll Fds
+	this->poll_remove_client(fd);
+	//print_client_list(_all_clients);
+	return;	
+}
+
+void	Server::poll_remove_client(int const & fd)
+{
+	std::vector<struct pollfd>::iterator it = _fds.begin();
+	std::vector<struct pollfd>::iterator ite = _fds.end();
+
+	while(it != ite)
+	{
+		//if (old_client.getSocket() == it->fd)
+		if (fd == it->fd)
+		{
+			std::cout << "Erasing fd : " << it->fd << std::endl;
+			close(it->fd);
+			_fds.erase(it);
+			_nbClients--;
+			std::cout << "Client has disconnected succesfully" << std::endl;
+			return;
+		}
+		it++;
+	}
+	return;
+}
+
+
 
 Client* Server::find_client_from_fd(int fd)
 {

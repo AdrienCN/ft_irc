@@ -15,6 +15,9 @@ class Client
         Client(); 
         virtual ~Client(); 
 
+        // Presentation
+        void present();
+        
         // GETTERS
         std::string const &		getPassword() const;
         std::string const &		getNickname() const;
