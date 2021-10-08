@@ -101,6 +101,8 @@ void	Server::run()
 {	
 	while (1)
 	{
+		print_client_list(_all_clients);
+		
 		std::vector<pollfd>::iterator it = _fds.begin();
 //		std::cout << "Starting new poll ..." << std::endl;
 		int poll_count = poll(&(*it), _nbClients + 1, -1);
@@ -236,7 +238,7 @@ void	Server::removeClient(int const & fd)
 	}
 	// Remove from Poll Fds
 	this->poll_remove_client(fd);
-	//print_client_list(_all_clients);
+	print_client_list(_all_clients);
 	return;	
 }
 
@@ -306,7 +308,8 @@ void Server::receiveMessage(Client* client)
 	if (ret == 0)
 	{
 		std::cout << "ret = 0" << std::endl;
-		this->poll_remove_client(client->getSocket());
+		//this->poll_remove_client(client->getSocket());
+		this->removeClient(client->getSocket());
 		return;
 	}
 	else if (buf[0] == EOF) // --> ne marche pas car on doit avoir le end char pour sortir de la boucle
@@ -388,19 +391,8 @@ void Server::manage_substr(std::string message, Client* client)
 				tmp.clear(); // on enleve tout le contenu et size = 0
 			}
 		}
-
-		// Juste pour imprimer le vector crée si besoin
-		std::cout << "print vector:" << std::endl;
-		std::vector<std::string>::iterator it =  inputs.begin();
-		std::vector<std::string>::iterator ite=  inputs.end();
-		int nb = 0;
-		while (it != ite)
-		{
-			std::cout << nb << "|" << *it << "|" << std::endl;
-			it++;
-			nb++;
-		}
-		
+		print_vector(inputs);
+				
 		// 2. Gestion du message
 		_command_list.find_command(inputs, client, _all_clients, _all_channels);
 }
