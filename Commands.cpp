@@ -130,8 +130,8 @@ void Commands::nick(CMD_PARAM)
 		client->setNickname(params[1]);
 		if (client->getGreetings() > 2)
 		{
-			std::string tmp("Your new nickname is ");
-			tmp += client->getNickname() + "\n";
+			std::string tmp("NICK ");
+			tmp += client->getNickname() + "\r\n";
 			send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
 		}
 		else
@@ -162,15 +162,15 @@ void Commands::user(CMD_PARAM)
 	
 	if (params.size() == 1)
 		std::cout << "Error : username lack of params" << std::endl;
-	else if (ft_username_exist(params[0])
+	else if (ft_username_exist(client_list, params[0]))
 		std::cout << "Error : username exist already" << std::endl;
 	else
 	{
 		client->setUsername(params[1]);
-		if (client->getGreetings > 2)
+		if (client->getGreetings() > 2)
 		{
 			std::string tmp("Your new USERNAME is ");
-			tmp += client->getUSERname() + "\n";
+			tmp += client->getUsername() + "\n";
 			send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
 		}
 		else

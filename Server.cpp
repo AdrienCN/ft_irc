@@ -402,6 +402,6 @@ void Server::manage_substr(std::string message, Client* client)
 
 void	Server::sendGreetings(Client* client)
 {
-	std::cout<< "Greetings to you[" << client->getNickname() << "@" << client->getUsername() << "." << client->getHostname() << "]" << std::endl;
+	std::cout<< "Greetings to you[" << client->getNickname() << "@" << client->getUsername() << "." <<  "hostname_tochange" /*client->getHostname()*/ << "]" << std::endl;
 	client->incrGreetings();
 }
