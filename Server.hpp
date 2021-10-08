@@ -60,6 +60,9 @@ class Server
 
         Client* find_client_from_fd(int fd);
         
+		//Other
+		void	welcomeClient(Client* client);
+		void	executeCommand(Client *client);
         
         std::vector<struct pollfd > _fds;
 
