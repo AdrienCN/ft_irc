@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client() : _message_status(true), _greetings(0), _hostname("defaultconstructorHOSTNAMEvalue")
+Client::Client() : _hostname("defaultconstructorHOSTNAMEvalue"), _message_status(true),  _greetings(0)
 {
     return;
 }

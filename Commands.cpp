@@ -129,10 +129,6 @@ void Commands::nick(CMD_PARAM)
 	{
 		if (client->getGreetings() > 2)
 		{
-		/*	std::string tmp;
-			tmp += client->getNickname() + "\n";
-			send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
-		*/
 			std::string rpl;
 			rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
 			send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
