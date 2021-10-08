@@ -12,12 +12,26 @@ void ft_reply(int nb, CMD_PARAM)
     (void)client;
     (void)client_list;
     (void)channel_list;
-       /*
-    switch nb
+	std::string rpl;
+    switch(nb)
     {
-        case :
+		case 1:
+		{
+			rpl = "Welcome to the Internet Relay Network\n" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + "\r\n";
+		}
+		case 2:
+		{
 
-    }*/
+		}
+		case 3:
+		{
+		}
+		case 4:
+		{
+		}
+
+    }
+	send(client->getSocket(), rpl.c_str(), rpl.size(), 0);
     return;
 
 }
