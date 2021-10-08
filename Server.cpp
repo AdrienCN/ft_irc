@@ -97,51 +97,12 @@ void Server::init()
 
 }
 
-void Server::poll_add_client(Client const& new_client)
-{
-	std::vector<struct pollfd>::iterator it = _fds.begin();
-	std::vector<struct pollfd>::iterator ite = _fds.end();
-	while (it != ite)
-	{
-		if (new_client.getSocket() == it->fd)
-		{
-			std::cout << "Error : Server : adding poll_fds client" << std::endl;
-			return;
-		}
-		it++;
-	}
-	_fds.push_back(new_client.getPoll());
-		return;
-}
-
-void	Server::poll_remove_client(int const & fd)
-{
-	std::vector<struct pollfd>::iterator it = _fds.begin();
-	std::vector<struct pollfd>::iterator ite = _fds.end();
-
-	while(it != ite)
-	{
-
-		//if (old_client.getSocket() == it->fd)
-		if (fd == it->fd)
-		{
-			std::cout << "Erasing fd : " << it->fd << std::endl;
-			close(it->fd);
-			_fds.erase(it);
-			_nbClients--;
-			std::cout << "Client has disconnected succesfully" << std::endl;
-			return;
-		}
-		it++;
-	}
-	return;
-}
-
-
 void	Server::run() 
 {	
 	while (1)
 	{
+		print_client_list(_all_clients);
+		
 		std::vector<pollfd>::iterator it = _fds.begin();
 //		std::cout << "Starting new poll ..." << std::endl;
 		int poll_count = poll(&(*it), _nbClients + 1, -1);
@@ -176,7 +137,8 @@ void	Server::run()
 				std::cout << "Trying to disconnect .... fd = " << (*itb).fd << std::endl;
 				if ((*itb).fd != _server_socket)
 				{					
-					this->poll_remove_client((*itb).fd);
+					this->removeClient((*itb).fd);
+					//this->poll_remove_client((*itb).fd);
 					break;
 				}
 			}
@@ -243,6 +205,67 @@ void	Server::addClient()
 	send(new_client->getSocket(), "Hello to you NEW CLIENT JOANN\n", 30, 0);
 }
 
+void Server::poll_add_client(Client const& new_client)
+{
+	std::vector<struct pollfd>::iterator it = _fds.begin();
+	std::vector<struct pollfd>::iterator ite = _fds.end();
+	while (it != ite)
+	{
+		if (new_client.getSocket() == it->fd)
+		{
+			std::cout << "Error : Server : adding poll_fds client" << std::endl;
+			return;
+		}
+		it++;
+	}
+	_fds.push_back(new_client.getPoll());
+		return;
+}
+void	Server::removeClient(int const & fd)
+{
+	// Remove from Client List
+	std::vector<Client*>::iterator it = _all_clients.begin();
+	std::vector<Client*>::iterator ite = _all_clients.end();
+
+	Client* tmp = find_client_from_fd(fd);
+	if (tmp == NULL)
+		return;
+	while (it != ite)
+	{
+		if (*it == tmp)
+			_all_clients.erase(it);
+		it++;
+	}
+	// Remove from Poll Fds
+	this->poll_remove_client(fd);
+	print_client_list(_all_clients);
+	return;	
+}
+
+void	Server::poll_remove_client(int const & fd)
+{
+	std::vector<struct pollfd>::iterator it = _fds.begin();
+	std::vector<struct pollfd>::iterator ite = _fds.end();
+
+	while(it != ite)
+	{
+		//if (old_client.getSocket() == it->fd)
+		if (fd == it->fd)
+		{
+			std::cout << "Erasing fd : " << it->fd << std::endl;
+			close(it->fd);
+			_fds.erase(it);
+			_nbClients--;
+			std::cout << "Client has disconnected succesfully" << std::endl;
+			return;
+		}
+		it++;
+	}
+	return;
+}
+
+
+
 Client* Server::find_client_from_fd(int fd)
 {
 	std::vector<Client*>::iterator it = _all_clients.begin();
@@ -285,7 +308,8 @@ void Server::receiveMessage(Client* client)
 	if (ret == 0)
 	{
 		std::cout << "ret = 0" << std::endl;
-		this->poll_remove_client(client->getSocket());
+		//this->poll_remove_client(client->getSocket());
+		this->removeClient(client->getSocket());
 		return;
 	}
 	else if (buf[0] == EOF) // --> ne marche pas car on doit avoir le end char pour sortir de la boucle
@@ -368,19 +392,10 @@ void Server::manage_substr(std::string message, Client* client)
 			}
 		}
 
-		// Juste pour imprimer le vector crée si besoin
-		std::cout << "print vector:" << std::endl;
-		std::vector<std::string>::iterator it =  inputs.begin();
-		std::vector<std::string>::iterator ite=  inputs.end();
-		int nb = 0;
-		while (it != ite)
-		{
-			std::cout << nb << "|" << *it << "|" << std::endl;
-			it++;
-			nb++;
-		}
 		if (client->getGreetings() == 2)
 			this->sendGreetings(client);
+		print_vector(inputs);
+				
 		// 2. Gestion du message
 		_command_list.find_command(inputs, client, _all_clients, _all_channels);
 }

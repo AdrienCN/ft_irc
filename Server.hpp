@@ -6,6 +6,7 @@
 #include "Client.hpp"
 #include "Grammar.hpp"
 #include "Commands.hpp"
+#include "ft_print_help.hpp"
 
 //namespace ft
 //
@@ -51,7 +52,7 @@ class Server
        // void poll_remove_client(Client const& old_client);
         void poll_remove_client(int const& fd);
         void addClient();
-        void removeClient();
+        void removeClient(int const & fd);
         void receiveMessage(Client* client);
         void analyzeMessage(std::string message, Client* client);
         void manage_substr(std::string message, Client* client);
