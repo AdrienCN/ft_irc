@@ -157,6 +157,31 @@ void	Server::run()
 				//Je suis un client
 				else
 				{
+					// Propal de plan "propre"
+				/*
+					Client *client = this->find_client_from_fd();
+					std::string msg;
+					int	 ret;
+					// Si client se deconnecte, si le msg > 512, si le message est pas termine ?
+					ret = getMessage((&msg))
+					if (ret == 0)
+						disconnect_client();
+					else if(ret == 1)
+						client->save_partial_packet();
+					else
+					{
+						client->save_full_packet();
+						server.handleconnection(client):
+						{
+							std::vector<string> command;
+							command = analsyse_msg(msg)
+							if (client->is_registred == false)
+								welcome_client();
+							else
+								find.command(msg);
+						}
+					}
+					*/
 					this->receiveMessage(this->find_client_from_fd((*itb).fd));			
 				}
 			}
@@ -402,6 +427,6 @@ void Server::manage_substr(std::string message, Client* client)
 
 void	Server::sendGreetings(Client* client)
 {
-	std::cout<< "Greetings to you[" << client->getNickname() << "@" << client->getUsername() << "." << client->getHostname() << "]" << std::endl;
+	std::cout<< "Greetings to you[" << client->getNickname() << "@" << client->getUsername() << "." << "0"/*client->getHostname()*/ << "]" << std::endl;
 	client->incrGreetings();
 }

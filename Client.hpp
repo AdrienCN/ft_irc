@@ -52,10 +52,10 @@ class Client
         std::string _password;
         std::string _nickname;
         std::string _username;
-		std::string _hostname;
         std::string _message;
-		int			_greetings;
         bool        _message_status; // true finished , false not finished
+		int			_greetings;
+		std::string _hostname;
         
         //std::string _host;
         //std::string _servername;

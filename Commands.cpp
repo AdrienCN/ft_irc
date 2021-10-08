@@ -127,17 +127,21 @@ void Commands::nick(CMD_PARAM)
 	}
 	else
 	{
-		client->setNickname(params[1]);
 		if (client->getGreetings() > 2)
 		{
-			std::string tmp("Your new nickname is ");
+		/*	std::string tmp;
 			tmp += client->getNickname() + "\n";
 			send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
+		*/
+			std::string rpl;
+			rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
+			send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
 		}
 		else
 			client->incrGreetings();
 		//send reply ?
 	}
+	client->setNickname(params[1]);
 }
 
 int		ft_username_exist(std::vector<Client*> client_list, std::string username)
@@ -162,15 +166,15 @@ void Commands::user(CMD_PARAM)
 	
 	if (params.size() == 1)
 		std::cout << "Error : username lack of params" << std::endl;
-	else if (ft_username_exist(params[0])
+	else if (ft_username_exist(client_list, params[0]))
 		std::cout << "Error : username exist already" << std::endl;
 	else
 	{
 		client->setUsername(params[1]);
-		if (client->getGreetings > 2)
+		if (client->getGreetings() > 2)
 		{
 			std::string tmp("Your new USERNAME is ");
-			tmp += client->getUSERname() + "\n";
+			tmp += client->getUsername() + "\n";
 			send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
 		}
 		else

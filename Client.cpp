@@ -106,5 +106,5 @@ int	const &	Client::getGreetings()
 
 void	Client::incrGreetings()
 {
-	this->greetings++;
+	this->_greetings++;
 }
