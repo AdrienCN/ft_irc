@@ -17,9 +17,11 @@ void print_command(std::string prefix, std::string command, std::vector<std::str
 		it++;
 		nb++;
 	}
+	std::cout << "*****************************" << std::endl;
+
 }
 
-void print_client_lit(std::vector<Client*> client_list)
+void print_client_list(std::vector<Client*> client_list)
 {
 	std::cout << "**** Print Client List ******" << std::endl;
 	std::vector<Client*>::iterator it =  client_list.begin();
@@ -31,9 +33,11 @@ void print_client_lit(std::vector<Client*> client_list)
 		it++;
 		nb++;
 	}
+	std::cout << "*****************************" << std::endl;
+
 }
 /*
-void print_channel_lit(std::vector<Channel*> channel_list)
+void print_channel_list(std::vector<Channel*> channel_list)
 {
 	std::cout << "**** Print Channel List ******" << std::endl;
 	std::vector<Client*>::iterator it =  channel_list.begin();
@@ -45,4 +49,24 @@ void print_channel_lit(std::vector<Channel*> channel_list)
 		it++;
 		nb++;
 	}
+	std::cout << "*****************************" << std::endl;
+
 } */
+
+
+void print_vector(std::vector<std::string> inputs)
+{
+	std::cout << "****** Print vector ***********" << std::endl;
+	std::vector<std::string>::iterator it =  inputs.begin();
+	std::vector<std::string>::iterator ite=  inputs.end();
+	int nb = 0;
+	while (it != ite)
+	{
+		std::cout << nb << "|" << *it << "|" << std::endl;
+		it++;
+		nb++;
+	}
+	std::cout << "*******************************" << std::endl;
+
+}
+		
