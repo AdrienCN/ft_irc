@@ -56,6 +56,7 @@ class Server
         void receiveMessage(Client* client);
         void analyzeMessage(std::string message, Client* client);
         void manage_substr(std::string message, Client* client);
+		void sendGreetings(Client *client);
 
         Client* find_client_from_fd(int fd);
         
