@@ -63,22 +63,6 @@ void Commands::find_command(std::vector<std::string> input, Client* client, std:
 
 }
 
-void Commands::print_command(std::string prefix, std::string command, std::vector<std::string> params)
-{
-	std::cout << "**** Print Params ******" << std::endl;
-	std::cout << " - Prefix : |" << prefix << "|" << std::endl;
-	std::cout << " - Command : |" << command << "|" << std::endl;
-	std::cout << " - Params : " << std::endl;
-	std::vector<std::string>::iterator it =  params.begin();
-	std::vector<std::string>::iterator ite =  params.end();
-	int nb = 0;
-	while (it != ite)
-	{
-		std::cout << "    " << nb << "|" << *it << "|" << std::endl;
-		it++;
-		nb++;
-	}
-}
 
 void Commands::join(std::vector<std::string> params, Client *client, std::vector<Client*> client_list, std::vector<Channel*> channel_list)
 {

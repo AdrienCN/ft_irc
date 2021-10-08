@@ -10,6 +10,12 @@ Client::~Client()
     return;
 }
 
+void Client::present()
+{
+    std::cout << "CLIENT: user = " << getUsername() << " | nickname = " << getNickname() << std::endl; 
+
+}
+
 // GETTERS
 std::string const &		Client::getPassword() const
 {

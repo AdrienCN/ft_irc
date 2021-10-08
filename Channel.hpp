@@ -17,6 +17,8 @@ class Channel
         Channel(std::string name); 
         virtual ~Channel(); 
 
+        void present();
+        
         // GETTERS
         std::string const & getName() const;
 
