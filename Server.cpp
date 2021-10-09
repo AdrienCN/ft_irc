@@ -166,6 +166,7 @@ void	Server::run()
 					//Buff pas fini. Pas de CRCL
 					else if (client->getMessageStatus() == COMPLETE)
 					{
+						client->analyzeMessage();
 						if (client->isRegistered() == false)
 							welcomeClient(client);
 						else
@@ -423,7 +424,7 @@ void	Server::executeCommand(Client *client)
 {
 	Commands command;
 
-	command.find_command(client->getCommand(), client, _all_clients, _all_channels);
+	command.find_command(client->getCommand().front(), client, _all_clients, _all_channels);
 }
 
 void	Server::sendGreetings(Client* client)
@@ -436,7 +437,12 @@ void	Server::welcomeClient(Client *client)
 {
 	Commands command;
 	(void)client;
-
+	std::vector<std::string> tmp(client->getCommand());
+	while (tmp.empty() == false)
+	{
+		command.find_command(tmp.front(), client, _all_clients, _all_channels);
+		tmp.erase(tmp.begin());
+	}
 	std::cout << "WELCOME : NEW client registered " << std::endl;
 	client->setRegistration(true);
 }

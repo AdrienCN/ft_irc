@@ -158,6 +158,7 @@ void Client::recvMessage()
 		this->clearMessage();
 		return;
 	}
+	//A changer pour voir si cmd_lenght > 512
 	if (ret > 512)
 	{
 		std::cout << "Error : buff > 512" << std::endl;
@@ -167,11 +168,10 @@ void Client::recvMessage()
 	//Qq chose a lire :
 	this->_message  +=  buf;
 	//Si on trouve CRCL et qu'on est deja enregistre. Alors CRCL = fin de message.
+	
+	//Rajouter condiont CRCL DOIT etre LE last char (&& LAST_CHAR == END_CHAR)
 	if (std::strstr(buf, END_CHAR) != NULL) // END CHAR
-	{
-		this->analyzeMessage();
 		this->_message_status = COMPLETE;
-	}
 	//Si pas de CRCL - msg incomplet. Si CRCL mais pas registreded alors le premier msg qui contient plusieurs CRCL est peut etre scinde
 	else
 		this->_message_status = INCOMPLETE;
@@ -185,7 +185,8 @@ void Client::analyzeMessage()
 	{
 		if (_message[i] ==  '\r' && _message[i + 1] == '\n')
 		{
-			manage_substr(_message.substr(init, i - init));
+			this->_command.push_back(_message.substr(init, i - init));
+			//manage_substr(_message.substr(init, i - init));
 			init = i + 2;
 			i += 2;
 		}
@@ -193,12 +194,13 @@ void Client::analyzeMessage()
 			i++;
 	}
 }
-
-void Client::manage_substr(std::string message)
+/*
+void Client::analyzeCommand()
 {	
 		Commands tmp_cmd;
 		std::vector<Client *> tmp_c;
 		std::vector<Channel *> tmp_chan;
+		std::vector<std::string> input_tmp;
 		std::istringstream str(message);
 		std::string tmp;
 
@@ -220,6 +222,7 @@ void Client::manage_substr(std::string message)
 		if (this->_registration_status == false)
 		{
 			tmp_cmd.find_command(_command, this, tmp_c, tmp_chan);
-			this->clearCommand();
+		//	this->clearCommand();
 		}
 }
+*/
