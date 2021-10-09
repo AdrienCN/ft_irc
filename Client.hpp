@@ -5,6 +5,11 @@
 #include "Channel.hpp"
 
 class Channel;
+# define MAX_CHAR 512
+# define COMPLETE 1
+# define INCOMPLETE 0
+# define DISCONNECT -1
+# define END_CHAR "\r\n"
 
 //namespace ft
 
@@ -23,10 +28,12 @@ class Client
         std::string const &		getNickname() const;
         std::string const &		getUsername() const;
         std::string const &		getMessage() const;
-        bool        const &		getMessageStatus() const;
+        int         const &		getMessageStatus() const;
         int         const &     getSocket() const;
 		int			const &		getGreetings();
         struct pollfd   const & getPoll() const;
+		bool		const &		isRegistered() const;
+		std::vector<std::string> const & getCommand() const;
 
         //SETTERS
         void setPassword(std::string const& src);
@@ -34,14 +41,19 @@ class Client
         void setUsername(std::string const& src);
         void setMessage(std::string const& src);
         void setMessageStatus(bool const& src);
-		void incrGreetings();
-        void clearStr(std::string str);
-        void clearMessage();
+		void setRegistration(bool const& src);
         void init(int const & socket);
 
         //Others
+		void incrGreetings(); // to remove
+        void clearMessage();
+        void clearStr(std::string str);
+		void clearCommand();
         void joinChannel(Channel & src); // JOIN
         void quitChannel(Channel & src); // QUIT
+		void recvMessage();
+		void analyzeMessage();
+		void manage_substr(std::string message);
 
 
     private:
@@ -52,10 +64,11 @@ class Client
         std::string _password;
         std::string _nickname;
         std::string _username;
-		std::string _hostname;
         std::string _message;
-        bool        _message_status; // true finished , false not finished
+        int	        _message_status; // true finished , false not finished
 		int			_greetings;
+		std::string _hostname;
+
         
         //std::string _host;
         //std::string _servername;
@@ -64,6 +77,11 @@ class Client
 
         std::vector<Channel *> _channels; // liste des channels dans lesquels il est     
         int _socket;
+		std::vector<std::string> _command;
+		bool _registration_status;
+		std::vector<std::string> _cap;
+		std::vector<std::string> _nick;
+		std::vector<std::string> _user;
         //Input _input: // template pour analyser un message
 
 

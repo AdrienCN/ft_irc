@@ -15,18 +15,18 @@ Commands::~Commands()
 }
 
 
-void Commands::find_command(std::vector<std::string> input, Client* client, std::vector<Client*> client_list, std::vector<Channel*> channel_list) 
+void Commands::find_command(std::string input, Client* client, std::vector<Client*> client_list, std::vector<Channel*> channel_list) 
 {
 
 	(void)client;
     (void)client_list;
     (void)channel_list;
    
-	std::string key(input[0]);	
-
+	this->analyzeCommand(input);
+	std::string key(_parsed_cmd.front());
 	//std::map<std::string , void(Commands::*)(std::vector<std::string>)>::iterator it = _cmd_list.begin();
 	if (_cmd_list[key])
-		(this->*_cmd_list[key])(input, client, client_list, channel_list);
+		(this->*_cmd_list[key])(_parsed_cmd, client, client_list, channel_list);
 	else
 		std::cout << "Command not found(Adrien)" << std::endl;
 
@@ -60,7 +60,7 @@ void Commands::find_command(std::vector<std::string> input, Client* client, std:
     else
         std::cout << "Command not found" << std::endl;
 	*/
-
+	this->_parsed_cmd.clear();
 }
 
 
@@ -74,7 +74,7 @@ void Commands::join(std::vector<std::string> params, Client *client, std::vector
     std::cout << YELLOW << "Hello from join function!" << RESET << std::endl;
 }
 
-void Commands::pass(CMD_PARAM)
+void Commands::pass(CMD_PARAM_FT)
 {
 	(void)client;
     (void)client_list;
@@ -103,7 +103,7 @@ int		ft_nickname_exist(std::vector<Client*> client_list, std::string nickname)
 	return (0);
 }
 
-void Commands::nick(CMD_PARAM)
+void Commands::nick(CMD_PARAM_FT)
 {
 	(void)client;
     (void)client_list;
@@ -127,17 +127,14 @@ void Commands::nick(CMD_PARAM)
 	}
 	else
 	{
-		client->setNickname(params[1]);
-		if (client->getGreetings() > 2)
-		{
-			std::string tmp("NICK ");
-			tmp += client->getNickname() + "\r\n";
-			send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
-		}
-		else
-			client->incrGreetings();
+		std::string rpl;
+		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
+		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+		client->incrGreetings();
+
 		//send reply ?
 	}
+	client->setNickname(params[1]);
 }
 
 int		ft_username_exist(std::vector<Client*> client_list, std::string username)
@@ -153,7 +150,29 @@ int		ft_username_exist(std::vector<Client*> client_list, std::string username)
 	return (0);
 }
 
-void Commands::user(CMD_PARAM)
+void Commands::analyzeCommand(std::string command)
+{	
+		std::istringstream str(command);
+		std::string tmp;
+
+		//1. Split du sub_str message par les whitespaces dans un vector
+		while (std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
+		{
+			if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
+			{
+					tmp.erase(tmp.length() - 1);
+					//tmp.erase(tmp.length() - 1); //en fonction de /r /n
+			}
+			if (tmp != "\0") // si je suis pas une chaine vide
+			{
+				_parsed_cmd.push_back(tmp);
+				tmp.clear(); // on enleve tout le contenu et size = 0
+			}
+		}
+		print_vector(_parsed_cmd);
+}
+
+void Commands::user(CMD_PARAM_FT)
 {
     (void)client;
     (void)client_list;

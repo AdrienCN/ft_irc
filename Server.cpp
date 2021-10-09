@@ -157,8 +157,26 @@ void	Server::run()
 				//Je suis un client
 				else
 				{
-					this->receiveMessage(this->find_client_from_fd((*itb).fd));			
+					// Propal de plan "propre"
+					Client *client = this->find_client_from_fd((*itb).fd);
+					client->recvMessage();
+					//Deco
+					if (client->getMessageStatus() == DISCONNECT)
+						this->removeClient(client->getSocket());
+					//Buff pas fini. Pas de CRCL
+					else if (client->getMessageStatus() == COMPLETE)
+					{
+						client->analyzeMessage();
+						if (client->isRegistered() == false)
+							welcomeClient(client);
+						else
+							executeCommand(client);
+						client->clearMessage();
+						client->clearCommand();
+					}
 				}
+					//this->receiveMessage(this->find_client_from_fd((*itb).fd));			
+				//}
 			}
 			// Je suis un POLLOUT
 			
@@ -280,7 +298,7 @@ Client* Server::find_client_from_fd(int fd)
 	return NULL;
 }
 
-
+/*
 void Server::receiveMessage(Client* client)
 {
 	char buf[MAX_CHAR];
@@ -328,7 +346,7 @@ void Server::receiveMessage(Client* client)
 	memset(buf, 0, MAX_CHAR);
 	//renomme all_user par client_list ? 
 	//this->_all_clients[x].read_data();
-	/*
+	
 	
 	char buf[MAX_CHAR];
 	int ret;
@@ -344,8 +362,9 @@ void Server::receiveMessage(Client* client)
 		//if (std::strstr(buf, END_CHAR) != NULL) 
 		if (std::strstr(buf, "stop") != NULL) 
 			break;// tant que l'on ne trouve pas le end char
-	}*/
+	}
 }
+
 
 void Server::analyzeMessage(std::string message, Client* client)
 {
@@ -399,9 +418,31 @@ void Server::manage_substr(std::string message, Client* client)
 		// 2. Gestion du message
 		_command_list.find_command(inputs, client, _all_clients, _all_channels);
 }
+*/
+
+void	Server::executeCommand(Client *client)
+{
+	Commands command;
+
+	command.find_command(client->getCommand().front(), client, _all_clients, _all_channels);
+}
 
 void	Server::sendGreetings(Client* client)
 {
-	std::cout<< "Greetings to you[" << client->getNickname() << "@" << client->getUsername() << "." <<  "hostname_tochange" /*client->getHostname()*/ << "]" << std::endl;
+	std::cout<< "Greetings to you[" << client->getNickname() << "@" << client->getUsername() << "." << "0"/*client->getHostname()*/ << "]" << std::endl;
 	client->incrGreetings();
+}
+
+void	Server::welcomeClient(Client *client)
+{
+	Commands command;
+	(void)client;
+	std::vector<std::string> tmp(client->getCommand());
+	while (tmp.empty() == false)
+	{
+		command.find_command(tmp.front(), client, _all_clients, _all_channels);
+		tmp.erase(tmp.begin());
+	}
+	std::cout << "WELCOME : NEW client registered " << std::endl;
+	client->setRegistration(true);
 }
