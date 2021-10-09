@@ -101,7 +101,10 @@ void	Server::run()
 {	
 	while (1)
 	{
+		std::cout << "FROM MAIN SERVER" << std::endl;
 		print_client_list(_all_clients);
+		print_channel_list(_all_channels);
+
 		
 		std::vector<pollfd>::iterator it = _fds.begin();
 //		std::cout << "Starting new poll ..." << std::endl;
@@ -168,7 +171,7 @@ void	Server::run()
 						if (client->isRegistered() == false)
 							welcomeClient(client);
 						else
-							_command_book.find_command(client->getCommand().front(), client, _all_clients, _all_channels);
+							_command_book.find_command(client->getCommand().front(), client, _all_clients, &_all_channels);
 						client->clearMessage();
 						client->clearCommand();
 					}
@@ -307,7 +310,7 @@ void	Server::welcomeClient(Client *client)
 	while (tmp.empty() == false)
 	{
 		//command.find_command(tmp.front(), client, _all_clients, _all_channels);
-		_command_book.find_command(tmp.front(), client, _all_clients, _all_channels);
+		_command_book.find_command(tmp.front(), client, _all_clients, &_all_channels);
 		tmp.erase(tmp.begin());
 	}
 	std::cout << "WELCOME : NEW client registered " << std::endl;

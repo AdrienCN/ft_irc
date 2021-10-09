@@ -1,6 +1,7 @@
 #include "headers.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "ft_print_help.hpp"
 
 void print_command(std::string prefix, std::string command, std::vector<std::string> params)
 {
@@ -36,23 +37,22 @@ void print_client_list(std::vector<Client*> client_list)
 	std::cout << "*****************************" << std::endl;
 
 }
-/*
+
 void print_channel_list(std::vector<Channel*> channel_list)
 {
 	std::cout << "**** Print Channel List ******" << std::endl;
-	std::vector<Client*>::iterator it =  channel_list.begin();
-	std::vector<Client*>::iterator ite =  channel_list.end();
+	std::vector<Channel*>::iterator it =  channel_list.begin();
+	std::vector<Channel*>::iterator ite =  channel_list.end();
 	int nb = 0;
 	while (it != ite)
 	{
-		std::cout << (*it)->present() << std::endl;
+		(*it)->present();
 		it++;
 		nb++;
 	}
 	std::cout << "*****************************" << std::endl;
 
-} */
-
+} 
 
 void print_vector(std::vector<std::string> inputs)
 {

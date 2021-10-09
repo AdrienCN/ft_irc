@@ -55,6 +55,7 @@ class Client
 		void analyzeMessage();
         void add_channel(Channel* channel);
         void remove_channel(Channel* channel);
+        void leaveAllChannels();
 
 
     private:

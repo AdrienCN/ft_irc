@@ -1,7 +1,6 @@
 #include "headers.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
-#include "Server.hpp"
 
 void ft_error(int nb, std::vector<std::string> params, Client* client, std::vector<Client *> client_list, std::vector<Channel*> channel_list)
 {

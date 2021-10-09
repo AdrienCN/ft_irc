@@ -16,7 +16,7 @@ Commands::~Commands()
 
 //************ PARSING ET TRI DE LA STR COMMAND EN VECTOR ********************
 
-void Commands::find_command(std::string input, Client* client, std::vector<Client*> client_list, std::vector<Channel*> channel_list) 
+void Commands::find_command(std::string input, Client* client, std::vector<Client*> client_list, std::vector<Channel*>* channel_list) 
 {
 	// A verifier si on doit gérer les prefixes ":" en premier message (mais je pense pas)
 	(void)client;
@@ -181,18 +181,24 @@ void Commands::user(std::vector<std::string> params, CMD_PARAM)
 
 // ******** JOIN *************
 
-void  joinSplit(std::string str, std::vector<std::string> vector)
+int isValidChanName(std::string channel_name)
+{
+	if (channel_name == "\0") // + ajouter els regles d'un nom de channel
+		return (0);
+	else
+		return (1); 
+}
+
+void  joinSplit(std::string str, std::vector<std::string>* vector)
 {	
 		std::istringstream str2(str);
 		std::string tmp;
 
 		while (std::getline(str2, tmp,','))
 		{
-			//if (tmp != "\0") // si je suis pas une chaine vide
-		//	{
-				vector.push_back(tmp);
-				tmp.clear(); // on enleve tout le contenu et size = 0
-		//	}
+			if (isValidChanName(tmp))
+				vector->push_back(tmp);
+			tmp.clear(); // on enleve tout le contenu et size = 0
 		}
 }
 
@@ -211,52 +217,139 @@ Channel* ft_channel_exist(std::vector<Channel*> channel_list, std::string channe
 
 void Commands::join(std::vector<std::string> params, CMD_PARAM)
 {
-	print_vector(params);
-
+	std::cout << YELLOW << "Hello from JOIN function!" << RESET << std::endl;
     (void)client;
     (void)client_list;
     (void)channel_list;
 	(void)params;
 	
-	//Channel* tmp;
-	std::vector<std::string> channels_name;
-	joinSplit(params[1], channels_name);
-	std::vector<std::string> channels_key;
-	joinSplit(params[2], channels_key);
-	print_vector(channels_name);
-	print_vector(channels_key);
-
-	print_vector(params);
-
 	if (params.size() == 1)
 	{
 		std::cout << "Error : JOIN lack of params" << std::endl;
 		//ERR NEED MORE PARAMS
+		return;
 	}
-	/*
-	tmp = ft_channel_exist(channel_list, params[1]);
-	if (tmp) // channel already exist
+	
+	//On parse le 2e arg de params (channel name) et le 3e (les keys potentiellement)
+	std::vector<std::string>::iterator it = params.begin();
+	it++;
+	std::vector<std::string> channels_name;
+	joinSplit(*it, &channels_name);
+	it++;
+	std::vector<std::string> channels_key;
+	if (it != params.end())
+		joinSplit(*it, &channels_key);
+	print_vector(channels_name);
+	print_vector(channels_key);
+
+	//On s'occupe des noms de chan un a un
+
+	std::vector<std::string>::iterator itn = channels_name.begin();
+	std::vector<std::string>::iterator itne = channels_name.end();
+	std::vector<std::string>::iterator itk = channels_key.begin();
+	std::vector<std::string>::iterator itke = channels_key.end();
+	
+	while (itn != itne)
 	{
-		if (tmp->isUserBanned(client) == 1)
+		Channel* tmp = ft_channel_exist(*channel_list, *itn);
+		if (tmp) // channel already exist
 		{
-			//user banned
+			tmp->present();
+
+			std::cout << YELLOW << "Channel " << tmp->getName() << " already exist" << RESET << std::endl;
+			if (tmp->isUserBanned(client) == 1)
+			{
+				std::cout << RED << "You are banned from  channel" <<  tmp->getName() << RESET <<  std::endl;
+				//user banned
+			}
+			else if(tmp->isUserMember(client) == 1)
+			{
+				std::cout << RED << client->getNickname() << " is already a client of channel " <<  tmp->getName() << RESET << std::endl;
+			}
+			else
+			{
+				if (tmp->getStatusKey() == true)
+				{
+					if (itk != itke)
+					{
+						if (tmp->isKeyRight(*itk) == 0)
+						{
+							std::cout << RED <<  *itk << " is not the right key for channel " << tmp->getName() << RESET << std::endl;
+						}
+						else
+						{
+							std::cout << GREEN << *itk << " was the right key! Welcome to Channel " << tmp->getName() << RESET << std::endl;
+							client->add_channel(tmp);
+							tmp->addMember(client);
+						}	
+						itk++;
+					}
+					else
+					{
+						std::cout << RED <<  "The channel " << tmp->getName() << " needs a key"  << RESET << std::endl;
+					}
+				}
+				else
+				{
+					std::cout << GREEN << "Welcome to Channel " << tmp->getName() << RESET<< std::endl;
+					client->add_channel(tmp);
+					tmp->addMember(client);
+					std::string rpl;
+					rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " JOIN " + tmp->getName() + "\r\n";
+					send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+					//message to all members
+				}	
+			}	
 		}
-		else
+		else // create channel
 		{
-			//Welcome to Chan
-		}		
+			if (*itn == "0") // must be like a part command --> a revoir
+			{
+				std::cout << RED << client->getNickname() << " must leave all channels!" << RESET << std::endl;
+				client->leaveAllChannels();
+				std::vector<Channel*>::iterator itl = channel_list->begin();
+				std::vector<Channel*>::iterator itle = channel_list->end();
+				while (itl != itle)
+				{
+					if ((*itl)->isUserMember(client) == 1)
+						(*itl)->removeMember(client);
+						/*
+						if (*itl)->getNbMembers() == 0)
+						{
+							channel_list->removeChannel((*itl->getName());
+							delete *itl;
+						}
+						*/
+					itl++;
+				}
+				// Que faire dans le cas ou le client est l'operateur ?? a voir 
+				// Dans le cas ou le client est tout seul sur son cannal?
+			}
+			else
+			{
+				std::cout << GREEN << "Channel to create!" << RESET << std::endl;
+
+				Channel* new_chan = new Channel(*itn, client);
+				new_chan->present();
+
+				if (itk != itke)
+				{
+					new_chan->setKey(*itk);
+					itk++;
+				}
+				channel_list->push_back(new_chan);
+				client->add_channel(new_chan);
+
+				std::string rpl;
+				rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " JOIN " + new_chan->getName() + "\r\n";
+				send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+			}
+
+			//send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
+			//send RPL topic
+		}
+		itn++;
 	}
-	else // create channel
-	{
-		tmp* new_chan = Channel(param[0], client);
-		channel_list.push_back(new_chan);
-		client->add_channel(new_chan);
-
-		send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
-		//send RPL topic
-	}*/
-
-	std::cout << YELLOW << "Hello from JOIN function!" << RESET << std::endl;
 }
 
 

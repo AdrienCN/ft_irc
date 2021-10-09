@@ -21,6 +21,8 @@ class Channel
         std::string const & getName() const;
         std::vector<char> const & getMode() const;
         std::string const & getKey() const;
+        bool const & getStatusKey() const;
+        unsigned int const & getNbMembers() const;
         std::vector<Client*> const & getMemberList() const;
         std::vector<Client*> const & getOperatorList() const;
         std::vector<Client*> const & getBannedList() const;
@@ -34,6 +36,12 @@ class Channel
         int isUserOp(Client* client);
         int isUserMember(Client* client);
         int isKeyRight(std::string key);
+        void addMember(Client* client);
+        void removeMember(Client* client);
+        void addOp(Client* client);
+        void removeOp(Client* client);
+        void addBanned(Client* client);
+        void removeBanned(Client* client);
 
     private:
         Channel();
@@ -44,6 +52,7 @@ class Channel
         std::vector<char> _mode; // d = default
         std::string _key;
         bool _has_key;
+        unsigned int _nb_members;
         std::vector<Client*> _members;
         std::vector<Client*> _operators; // liste des operateurs du cannal
         std::vector<Client*> _banned;
