@@ -12,11 +12,12 @@
 #include "Grammar.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "ft_print_help.hpp"
 
 class Client;
 class Channel;
 
-# define CMD_PARAM Client* client, std::vector<Client *> client_list, std::vector<Channel*> channel_list
+# define CMD_PARAM Client* client, std::vector<Client *> client_list, std::vector<Channel*>* channel_list
 
 class Commands
 {

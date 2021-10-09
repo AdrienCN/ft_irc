@@ -3,7 +3,7 @@
 #include "Channel.hpp"
 #include "Server.hpp"
 
-void ft_reply(int nb, std::vector<std::string> params, Client* client, std::vector<Client *> client_list, std::vector<Channel*> channel_list)
+void ft_reply(int nb, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list)
 {
     (void)nb;
     (void)params;
@@ -19,11 +19,12 @@ void ft_reply(int nb, std::vector<std::string> params, Client* client, std::vect
 		}
 		case 331: //RPL_NOTOPIC
 		{
-			rpl = "<cannal>: to topic is set\r\n";
+			rpl = channel->getName() + " :No topic is set\r\n";
 		}
-		/*case 332: //RPL_TOPIC
-		{
-
+		
+		/*case 332: //RPL_TOPIC --> pas de topic dans Channel pour le moment
+		{			
+			rpl = channel->getName() +":" + channel.getTopic() + "\r\n";
 		}*/
 		
 		default:
@@ -36,3 +37,5 @@ void ft_reply(int nb, std::vector<std::string> params, Client* client, std::vect
     return;
 
 }
+
+

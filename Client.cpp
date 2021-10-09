@@ -14,7 +14,16 @@ Client::~Client()
 void Client::present()
 {
     std::cout << "CLIENT: user = " << getUsername() << " | nickname = " << getNickname() << std::endl; 
-
+	std::cout << "My channels are : ";
+	std::vector<Channel*>::iterator it = _channels.begin();
+	std::vector<Channel*>::iterator ite = _channels.end();
+	while (it != ite)
+	{
+		(*it)->present();
+		it++;	
+	}
+	std::cout << std::endl;
+	
 }
 
 // GETTERS
@@ -227,4 +236,9 @@ void Client::remove_channel(Channel* channel)
 		it++;
 	}
 	return;
+}
+
+void Client::leaveAllChannels()
+{
+	_channels.clear();
 }
