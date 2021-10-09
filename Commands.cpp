@@ -131,6 +131,7 @@ void Commands::nick(CMD_PARAM_FT)
 		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
 		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
 		client->incrGreetings();
+
 		//send reply ?
 	}
 	client->setNickname(params[1]);

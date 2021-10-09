@@ -3,6 +3,7 @@
 #include "Commands.hpp"
 
 Client::Client() : _message_status(DISCONNECT), _greetings(0), _hostname("defaultconstructorHOSTNAMEvalue"), _registration_status(false)
+
 {
     return;
 }
@@ -132,6 +133,7 @@ void	Client::incrGreetings()
 {
 	this->_greetings++;
 }
+
 void Client::recvMessage()
 {
 	char buf[MAX_CHAR];

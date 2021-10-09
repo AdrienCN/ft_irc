@@ -68,6 +68,7 @@ class Client
         int	        _message_status; // true finished , false not finished
 		int			_greetings;
 		std::string _hostname;
+
         
         //std::string _host;
         //std::string _servername;
