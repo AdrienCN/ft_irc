@@ -1,6 +1,4 @@
-#include "Channel.hpp"
 #include "Client.hpp"
-#include "Commands.hpp"
 
 Client::Client() : _message_status(DISCONNECT), _greetings(0), _hostname("defaultconstructorHOSTNAMEvalue"), _registration_status(false)
 
@@ -110,7 +108,6 @@ void Client::clearStr(std::string str)
     str.clear();
 }
 
-
 void Client::clearMessage()
 {
     _message.clear();
@@ -160,13 +157,15 @@ void Client::recvMessage()
 		this->clearMessage();
 		return;
 	}
-	//A changer pour voir si cmd_lenght > 512
+	//A changer pour voir si cmd_lenght > 512 --> dans Commands. analyze directement (requete complete)
+	/*
 	if (ret > 512)
 	{
 		std::cout << "Error : buff > 512" << std::endl;
 		this->_message_status = INCOMPLETE;
 		return;
 	}
+	*/
 	//Qq chose a lire :
 	this->_message  +=  buf;
 	//Si on trouve CRCL et qu'on est deja enregistre. Alors CRCL = fin de message.
@@ -179,7 +178,7 @@ void Client::recvMessage()
 		this->_message_status = INCOMPLETE;
 }
 
-void Client::analyzeMessage()
+void Client::analyzeMessage() // Parsing du END_CHAR
 {
 	int i = 0;
 	int init = 0;
@@ -196,35 +195,36 @@ void Client::analyzeMessage()
 			i++;
 	}
 }
-/*
-void Client::analyzeCommand()
-{	
-		Commands tmp_cmd;
-		std::vector<Client *> tmp_c;
-		std::vector<Channel *> tmp_chan;
-		std::vector<std::string> input_tmp;
-		std::istringstream str(message);
-		std::string tmp;
 
-		//1. Split du sub_str message par les whitespaces dans un vector
-		while (std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
-		{
-			if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
-			{
-					tmp.erase(tmp.length() - 1);
-					//tmp.erase(tmp.length() - 1); //en fonction de /r /n
-			}
-			if (tmp != "\0") // si je suis pas une chaine vide
-			{
-				_command.push_back(tmp);
-				tmp.clear(); // on enleve tout le contenu et size = 0
-			}
-		}
-		print_vector(_command);
-		if (this->_registration_status == false)
-		{
-			tmp_cmd.find_command(_command, this, tmp_c, tmp_chan);
-		//	this->clearCommand();
-		}
+void Client::add_channel(Channel* channel)
+{
+	std::vector<Channel*>::iterator it = _channels.begin();
+	std::vector<Channel*>::iterator ite = _channels.end();
+	
+	while(it != ite)
+	{
+		if (*it == channel)
+			return; // already exists
+		it++;
+	}
+	_channels.push_back(channel);
+	return;
 }
-*/
+
+
+void Client::remove_channel(Channel* channel)
+{
+	std::vector<Channel*>::iterator it = _channels.begin();
+	std::vector<Channel*>::iterator ite = _channels.end();
+	
+	while(it != ite)
+	{
+		if (*it == channel)
+		{
+			_channels.erase(it);
+			return;
+		}
+		it++;
+	}
+	return;
+}

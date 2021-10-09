@@ -2,6 +2,7 @@ SRCS = 	main.cpp \
 		Server.cpp \
 		Client.cpp \
 		Commands.cpp \
+		Channel.cpp \
 		ft_errors.cpp \
 		ft_reply.cpp \
 		ft_print_help.cpp

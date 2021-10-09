@@ -3,9 +3,7 @@
 #include "Channel.hpp"
 #include "Server.hpp"
 
-# define CMD_PARAM std::vector<std::string> params, Client* client, std::vector<Client *> client_list, std::vector<Channel*> channel_list
-
-void ft_reply(int nb, CMD_PARAM)
+void ft_reply(int nb, std::vector<std::string> params, Client* client, std::vector<Client *> client_list, std::vector<Channel*> channel_list)
 {
     (void)nb;
     (void)params;
@@ -19,15 +17,18 @@ void ft_reply(int nb, CMD_PARAM)
 		{
 			rpl = "Welcome to the Internet Relay Network\n" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + "\r\n";
 		}
-		case 2:
+		case 331: //RPL_NOTOPIC
+		{
+			rpl = "<cannal>: to topic is set\r\n";
+		}
+		/*case 332: //RPL_TOPIC
 		{
 
-		}
-		case 3:
+		}*/
+		
+		default:
 		{
-		}
-		case 4:
-		{
+			rpl = "No RPL set yet \r\n";
 		}
 
     }
