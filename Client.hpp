@@ -3,8 +3,10 @@
 
 #include "headers.hpp"
 #include "Channel.hpp"
+#include "Commands.hpp"
 
 class Channel;
+
 # define MAX_CHAR 512
 # define COMPLETE 1
 # define INCOMPLETE 0
@@ -49,11 +51,10 @@ class Client
         void clearMessage();
         void clearStr(std::string str);
 		void clearCommand();
-        void joinChannel(Channel & src); // JOIN
-        void quitChannel(Channel & src); // QUIT
 		void recvMessage();
 		void analyzeMessage();
-		void manage_substr(std::string message);
+        void add_channel(Channel* channel);
+        void remove_channel(Channel* channel);
 
 
     private:

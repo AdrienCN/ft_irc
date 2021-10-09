@@ -110,9 +110,7 @@ void	Server::run()
 			throw Server::ExceptErrno();
 
 		std::vector<pollfd>::iterator itb = _fds.begin();
-	
 		std::vector<pollfd>::iterator ite = _fds.end();
-
 		//for (int i = 0; i <= _nbClients; i++)
 		while (itb != ite)
 		{
@@ -170,7 +168,7 @@ void	Server::run()
 						if (client->isRegistered() == false)
 							welcomeClient(client);
 						else
-							executeCommand(client);
+							_command_book.find_command(client->getCommand().front(), client, _all_clients, _all_channels);
 						client->clearMessage();
 						client->clearCommand();
 					}
@@ -190,7 +188,6 @@ void	Server::run()
 
 void	Server::addClient()
 {
-
 	//struct sockaddr ?? 
 	struct sockaddr_storage client_addr;
 	socklen_t		addrlen;
@@ -237,7 +234,7 @@ void Server::poll_add_client(Client const& new_client)
 		it++;
 	}
 	_fds.push_back(new_client.getPoll());
-		return;
+	return;
 }
 void	Server::removeClient(int const & fd)
 {
@@ -282,8 +279,6 @@ void	Server::poll_remove_client(int const & fd)
 	return;
 }
 
-
-
 Client* Server::find_client_from_fd(int fd)
 {
 	std::vector<Client*>::iterator it = _all_clients.begin();
@@ -298,135 +293,6 @@ Client* Server::find_client_from_fd(int fd)
 	return NULL;
 }
 
-/*
-void Server::receiveMessage(Client* client)
-{
-	char buf[MAX_CHAR];
-	int ret; // sisze_t?
-
-	memset(buf, 0, MAX_CHAR);
-	if(client->getMessageStatus() == true)
-	{
-		client->clearMessage();
-		client->setMessageStatus(false);
-	}
-	ret = recv(client->getSocket(), buf, MAX_CHAR, 0);
-	if (ret == -1)
-		throw Server::ExceptErrno();
-	client->setMessage(client->getMessage() + buf);
-	if (std::strstr(buf, END_CHAR) != NULL) // END CHAR
-	{
-		std::cout << "Final message received : " << GREEN << client->getMessage() << RESET << std::endl; 
-		client->setMessageStatus(true);
-		analyzeMessage(client->getMessage(), client);
-		client->clearMessage();
-		memset(buf, 0, MAX_CHAR);
-		return;// tant que l'on ne trouve pas le end char
-	}
-	if (ret == 0)
-	{
-		std::cout << "ret = 0" << std::endl;
-		//this->poll_remove_client(client->getSocket());
-		this->removeClient(client->getSocket());
-		return;
-	}
-	else if (buf[0] == EOF) // --> ne marche pas car on doit avoir le end char pour sortir de la boucle
-	{
-		std::cout << "ret = EOF" << std::endl;
-		this->poll_remove_client(client->getSocket());
-		return;
-	}
-	std::cout << "Pollin recv :|";
-	for (int i = 0; buf[i] != '\0'; i++)
-	{
-		std::cout << buf[i];
-	}
-	std::cout << "|" << std::endl;
-	std::cout << "Message in construction : <<" << YELLOW << client->getMessage() << RESET << ">>" << std::endl;
-	memset(buf, 0, MAX_CHAR);
-	//renomme all_user par client_list ? 
-	//this->_all_clients[x].read_data();
-	
-	
-	char buf[MAX_CHAR];
-	int ret;
-
-	memset(buf, '\0', sizeof(buf));
-	ret = recv(fd, buf, MAX_CHAR, 0);
-	if (ret <= 0 || buf[0] == EOF)
-	{
-	this->poll_remove_client(fd);
-			break;
-		}
-		message = message + buf;
-		//if (std::strstr(buf, END_CHAR) != NULL) 
-		if (std::strstr(buf, "stop") != NULL) 
-			break;// tant que l'on ne trouve pas le end char
-	}
-}
-
-
-void Server::analyzeMessage(std::string message, Client* client)
-{
-	if (message.length() > 512)
-	{
-		//message trop long --> quelle erreur?
-		return;
-	}
-
-	int i = 0;
-	int init = 0;
-	while (message[i] && message[i+1])
-	{
-		if (message[i] ==  '\r' && message[i + 1] == '\n')
-		{
-			manage_substr(message.substr(init, i - init), client);
-			init = i + 2;
-			i += 2;
-		}
-		else
-			i++;
-	}
-}
-
-void Server::manage_substr(std::string message, Client* client)
-{	
-		Commands _command_list; // A REFORMATER POUR GERER LES COMMANDES TRANQUILLES 
-		std::vector<std::string> inputs;
-		std::istringstream str(message);
-		std::string tmp;
-
-		//1. Split du sub_str message par les whitespaces dans un vector
-		while (std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
-		{
-			if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
-			{
-					tmp.erase(tmp.length() - 1);
-					//tmp.erase(tmp.length() - 1); //en fonction de /r /n
-			}
-			if (tmp != "\0") // si je suis pas une chaine vide
-			{
-				inputs.push_back(tmp);
-				tmp.clear(); // on enleve tout le contenu et size = 0
-			}
-		}
-
-		if (client->getGreetings() == 2)
-			this->sendGreetings(client);
-		print_vector(inputs);
-				
-		// 2. Gestion du message
-		_command_list.find_command(inputs, client, _all_clients, _all_channels);
-}
-*/
-
-void	Server::executeCommand(Client *client)
-{
-	Commands command;
-
-	command.find_command(client->getCommand().front(), client, _all_clients, _all_channels);
-}
-
 void	Server::sendGreetings(Client* client)
 {
 	std::cout<< "Greetings to you[" << client->getNickname() << "@" << client->getUsername() << "." << "0"/*client->getHostname()*/ << "]" << std::endl;
@@ -435,12 +301,13 @@ void	Server::sendGreetings(Client* client)
 
 void	Server::welcomeClient(Client *client)
 {
-	Commands command;
+//	Commands command;
 	(void)client;
 	std::vector<std::string> tmp(client->getCommand());
 	while (tmp.empty() == false)
 	{
-		command.find_command(tmp.front(), client, _all_clients, _all_channels);
+		//command.find_command(tmp.front(), client, _all_clients, _all_channels);
+		_command_book.find_command(tmp.front(), client, _all_clients, _all_channels);
 		tmp.erase(tmp.begin());
 	}
 	std::cout << "WELCOME : NEW client registered " << std::endl;

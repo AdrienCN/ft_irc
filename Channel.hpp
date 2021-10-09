@@ -8,23 +8,32 @@
 
 class Client;
 
-//namespace ft
-
 class Channel
 {
 
     public:
-        Channel(std::string name); 
+        Channel(std::string name, Client* client); 
         virtual ~Channel(); 
 
         void present();
         
         // GETTERS
         std::string const & getName() const;
+        std::vector<char> const & getMode() const;
+        std::string const & getKey() const;
+        std::vector<Client*> const & getMemberList() const;
+        std::vector<Client*> const & getOperatorList() const;
+        std::vector<Client*> const & getBannedList() const;
 
-        //en public pour pouvoir utiliser les iterateurs facilement?
-        std::vector<Client *> _operators; // liste des operateurs du cannal
-        std::vector<Client *> _members;
+        //SETTERS
+        void setName(std::string const & src);
+        void setKey(std::string const & src);
+
+        //Others
+        int isUserBanned(Client* client);
+        int isUserOp(Client* client);
+        int isUserMember(Client* client);
+        int isKeyRight(std::string key);
 
     private:
         Channel();
@@ -32,7 +41,12 @@ class Channel
         Channel & operator=(Channel const& src); 
 
         std::string _name;
-
+        std::vector<char> _mode; // d = default
+        std::string _key;
+        bool _has_key;
+        std::vector<Client*> _members;
+        std::vector<Client*> _operators; // liste des operateurs du cannal
+        std::vector<Client*> _banned;
 
         //Modes
         // Des booleans a définir
