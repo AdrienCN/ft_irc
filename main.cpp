@@ -1,5 +1,6 @@
-#include "Server.hpp"
+#include "common_macro.hpp"
 #include "headers.hpp"
+#include "Server.hpp"
 
 int main()
 {

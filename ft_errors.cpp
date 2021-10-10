@@ -1,4 +1,5 @@
 #include "ft.hpp"
+#include "common_macro.hpp"
 
 void ft_error(int nb, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list)
 {

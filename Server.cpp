@@ -12,7 +12,7 @@ struct addrinfo
 	struct addrinfo *ai_next;
 };
 */
-Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _nbClients(0)
+Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _nbClients(0), _command_book(password)
 {
 	memset(&_hints, 0, sizeof(_hints));
 	//Prepare hints sur la stack pour getaddrinfo()

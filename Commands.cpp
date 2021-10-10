@@ -1,7 +1,18 @@
 #include "Commands.hpp"
+/*
+#define ERR_NONICKNAMEGIVEN 431
+#define ERR_ERRONEUSNICNAME 432
+#define ERR_NICKNAMEINUSE 433
+#define ERR_NICKCOLLISION 436
+#define ERR_UNAVAILABLERESOURCE 437
+#define ERR_NEEDMOREPARAMS 461
+#define ERR_ALREADYREGISTRED 462
+#define ERR_RESTRICTED 484
+*/
 
-Commands::Commands() 
+Commands::Commands(std::string const & password) 
 {
+	_server_password = password;
 	_cmd_list["PASS"] = &Commands::pass;
 	_cmd_list["NICK"] = &Commands::nick;
 	_cmd_list["USER"] = &Commands::user;
@@ -75,13 +86,18 @@ void Commands::pass(std::vector<std::string> params, CMD_PARAM)
     (void)client_list;
     (void)channel_list;
 	(void)params;
-	// do the action
-		//if success
-			//RPL_XXX
-		
-		//else
-			//ERR_XXX
     std::cout << YELLOW << "Hello from PASS function!" << RESET << std::endl;
+	if (client->isRegistered() == true)
+		return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
+	if (params.size() < 2)
+		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
+	//quid si le password est faux
+	//quid si le password est vide
+	if (params[1] == this->_server_password)
+	{
+		client->setPassword(params[1]);
+		client->setRegPass(true);
+	}
 }
 
 // ******** NICK *************
@@ -125,45 +141,24 @@ void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 	//Pas de pseudo donne
 	if (params.size() == 0 || params.size() == 1)
 	{
-		//ft_error(431);
-		std::cout << "Error : nick : 431" << std::endl;
-		return;
+		return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);
 	}
 		//Pseudo contient des chars non autorise 
 		//	ft_error(432)a coder ??
 		//Pseudo exist deja
-	else if (ft_nickname_exist(client_list, params[1]))
+	if (ft_nickname_exist(client_list, params[1]))
 	{
-		//ft_error(433);
-		std::cout << "Error : nick : 433" << std::endl;
-		return;
+		return ft_error(ERR_NICKNAMEINUSE, params, client, NULL, client_list, *channel_list);
 	}
-	else
-	{
-		std::string rpl;
-		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
-		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
-		client->incrGreetings();
-
-		//send reply ?
-	}
+	if (client->isRegistered() == false && client->getRegPass() == true)
+		client->setRegNick(true);
+	std::string rpl;
+	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
 	client->setNickname(params[1]);
+	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
 }
 
 // ******** USER *************
-
-int		ft_username_exist(std::vector<Client*> client_list, std::string username)
-{
-	std::vector<Client*>::iterator it = client_list.begin();
-
-	while (it != client_list.end())
-	{
-		if ((*it)->getUsername() == username)
-			return (1);
-		it++;
-	}
-	return (0);
-}
 
 void Commands::user(std::vector<std::string> params, CMD_PARAM)
 {
@@ -172,24 +167,19 @@ void Commands::user(std::vector<std::string> params, CMD_PARAM)
     (void)channel_list;
 	(void)params;
 	
+	std::cout << YELLOW << "Hello from USER function!" << RESET << std::endl;
+	if (client->isRegistered() == true)
+		return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
 	if (params.size() == 1)
-		std::cout << "Error : username lack of params" << std::endl;
-	else if (ft_username_exist(client_list, params[0]))
-		std::cout << "Error : username exist already" << std::endl;
+		return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);
 	else
 	{
+		client->setRegUser(true);
 		client->setUsername(params[1]);
-		if (client->getGreetings() > 2)
-		{
-			std::string tmp("Your new USERNAME is ");
-			tmp += client->getUsername() + "\n";
-			send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
-		}
-		else
-			client->incrGreetings();
+		std::string tmp("Your new USERNAME is ");
+		tmp += client->getUsername() + "\n";
+		send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
 	}
-
-	std::cout << YELLOW << "Hello from USER function!" << RESET << std::endl;
 }
 
 
