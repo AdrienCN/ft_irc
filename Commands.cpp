@@ -7,6 +7,7 @@ Commands::Commands()
 	_cmd_list["USER"] = &Commands::user;
 	_cmd_list["JOIN"] = &Commands::join;
 	_cmd_list["PART"] = &Commands::part;
+	_cmd_list["TOPIC"] = &Commands::topic;
     return;
 }
 
@@ -211,6 +212,9 @@ Channel* ft_channel_exist(std::vector<Channel*> channel_list, std::string channe
 {
 	std::vector<Channel*>::iterator it = channel_list.begin();
 
+	if (channel[0] == '#' || channel[0] == '&')  // HEXCHAT envoie le nom de channel avec ces args
+		channel.erase(0, 1);
+
 	while (it != channel_list.end())
 	{
 		if ((*it)->getName() == channel)
@@ -218,6 +222,21 @@ Channel* ft_channel_exist(std::vector<Channel*> channel_list, std::string channe
 		it++;
 	}
 	return (NULL);
+}
+
+void joinChannel(Channel* new_chan, std::vector<std::string> params, CMD_PARAM)
+{
+	client->add_channel(new_chan);
+	new_chan->addMember(client);
+
+	std::string rpl;
+	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " JOIN " + new_chan->getName() + "\r\n";
+	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+	if (new_chan->getStatusTopic() == false)
+		ft_reply(331, params, client, new_chan, client_list, *channel_list); // RPL_NOTOPIC
+	else
+		ft_reply(332, params, client, new_chan, client_list, *channel_list); // RPL_TOPIC
+	ft_reply(353, params, client, new_chan, client_list, *channel_list); // RPL_NAMEREPLY
 }
 
 void leaveChannel(Channel* channel, Client *client, std::string part_message)
@@ -310,18 +329,11 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 						{
 							std::cout << RED <<  *itk << " is not the right key for channel " << tmp->getName() << RESET << std::endl;
 							ft_error(475, params, client, tmp, client_list, *channel_list); // ERR_BADCHANNELKEY
-
 						}
 						else
 						{
 							std::cout << GREEN << *itk << " was the right key! Welcome to Channel " << tmp->getName() << RESET << std::endl;
-							client->add_channel(tmp);
-							tmp->addMember(client);
-							std::string rpl;
-							rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " JOIN " + tmp->getName() + "\r\n";
-							send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
-							ft_reply(331, params, client, tmp, client_list, *channel_list); // RPL_NOTOPIC
-							ft_reply(353, params, client, tmp, client_list, *channel_list); // RPL_NAMEREPLY
+							joinChannel(tmp, params, client, client_list, channel_list);
 						}	
 						itk++;
 					}
@@ -329,20 +341,12 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 					{
 						std::cout << RED <<  "The channel " << tmp->getName() << " needs a key"  << RESET << std::endl;
 						ft_error(461, params, client, tmp, client_list, *channel_list); //  ERR_NEEDMOREPARAMS (ou bad channel key?)
-
 					}
 				}
 				else
 				{
 					std::cout << GREEN << "Welcome to Channel " << tmp->getName() << RESET<< std::endl;
-					client->add_channel(tmp);
-					tmp->addMember(client);
-					std::string rpl;
-					rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " JOIN " + tmp->getName() + "\r\n";
-					send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
-					ft_reply(331, params, client, tmp, client_list, *channel_list); // RPL_NOTOPIC
-					ft_reply(353, params, client, tmp, client_list, *channel_list); // RPL_NAMEREPLY
-					//message to all members?
+					joinChannel(tmp, params, client, client_list, channel_list);
 				}	
 			}	
 		}
@@ -376,16 +380,8 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 					itk++;
 				}
 				channel_list->push_back(new_chan);
-				client->add_channel(new_chan);
-				std::string rpl;
-				rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " JOIN " + new_chan->getName() + "\r\n";
-				send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
-				ft_reply(331, params, client, new_chan, client_list, *channel_list); // RPL_NOTOPIC
-				ft_reply(353, params, client, new_chan, client_list, *channel_list); // RPL_NAMEREPLY
+				joinChannel(new_chan, params, client, client_list, channel_list);
 			}
-
-			//send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
-			//send RPL topic
 		}
 		itn++;
 	}
@@ -441,7 +437,6 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 			{
 				std::cout << RED << client->getNickname() << " is not a client of channel " <<  tmp->getName() << RESET << std::endl;
 				ft_error(442, params, client, NULL, client_list, *channel_list); //  ERR_NOTONCHANNEL
-
 			}
 			else
 			{
@@ -456,7 +451,69 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 	}
 }
 
+// ******** TOPIC *************
 
+void Commands::topic(std::vector<std::string> params, CMD_PARAM)
+{
+	std::cout << YELLOW << "Hello from TOPIC function!" << RESET << std::endl;
+	
+	if (params.size() == 1)
+	{
+		std::cout << "Error : TOPIC lack of params" << std::endl;
+		ft_error(461, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
+		return;
+	}
+	
+	std::vector<std::string>::iterator it = params.begin();
+	std::vector<std::string>::iterator ite = params.end();
+	it++;
+	Channel* tmp = ft_channel_exist(*channel_list, *it);
+	if (tmp) // channel exist
+	{
+		std::cout << GREEN << "The Channel \"" << tmp->getName() << "\" exists" << RESET << std::endl;
+
+		if (tmp->isUserMember(client) == 0) //si je ne suis pas membre du chat
+		{
+			ft_error(442, params, client, NULL, client_list, *channel_list); //  ERR_NOTONCHANNEL
+			return;
+		}
+		it++;
+		if (it == ite) // Voir le sujet du cannal
+		{
+			std::cout << YELLOW <<  "Just here to see the TOPIC of channel " << tmp->getName() << RESET << std::endl;
+			if (tmp->getStatusTopic() == false)
+			{
+				std::cout << RED <<  "This Channel has no topic"  << RESET << std::endl;
+				ft_reply(331, params, client, tmp, client_list, *channel_list); //  RPL_NOTOPIC
+			}
+			else
+			{
+				std::cout << YELLOW <<  "This Channel topic is "  << tmp->getTopic() << RESET << std::endl;
+				ft_reply(332, params, client, tmp, client_list, *channel_list); //  RPL_TOPIC
+			}
+		}
+		else // creer ou change le sujet du cannal
+		{
+			std::string topic = *it;
+			if (topic[0] == ':')
+				topic.erase(0,1);
+			std::cout << YELLOW <<  "I want to create or change the TOPIC of channel " << tmp->getName() <<  " to " << topic << RESET << std::endl;
+			if (tmp->getStatusTopic() == false) // creation
+			{
+				std::string rpl;
+				rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " TOPIC  #" + tmp->getName() + " :" + topic + "\r\n";
+				send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+			}
+			tmp->setTopic(topic);
+		}
+	}
+	else
+	{
+		std::cout << RED << "The Channel does not exists" << RESET << std::endl;
+		// AJOUT pas sure que ce soit a faire
+		ft_error(403, params, client, NULL, client_list, *channel_list); //  ERR_NOSUCHCHANNEL
+	}
+}
 
 /*
 void Commands::quit(std::vector<std::string> params)

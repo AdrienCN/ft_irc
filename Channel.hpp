@@ -23,6 +23,8 @@ class Channel
         std::string const & getKey() const;
         bool const & getStatusKey() const;
         unsigned int const & getNbMembers() const;
+        std::string const & getTopic() const;
+        bool const & getStatusTopic() const;
         std::vector<Client*> const & getMemberList() const;
         std::vector<Client*> const & getOperatorList() const;
         std::vector<Client*> const & getBannedList() const;
@@ -30,6 +32,7 @@ class Channel
         //SETTERS
         void setName(std::string const & src);
         void setKey(std::string const & src);
+        void setTopic(std::string const & src);
 
         //Others
         int isUserBanned(Client* client);
@@ -53,6 +56,8 @@ class Channel
         std::string _key;
         bool _has_key;
         unsigned int _nb_members;
+        std::string _topic;
+        bool _has_topic;
         std::vector<Client*> _members;
         std::vector<Client*> _operators; // liste des operateurs du cannal
         std::vector<Client*> _banned;

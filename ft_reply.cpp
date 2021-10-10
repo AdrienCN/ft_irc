@@ -22,10 +22,11 @@ void ft_reply(int nb, std::vector<std::string> params, Client* client, Channel* 
 			break;
 		}
 		
-		/*case 332: //RPL_TOPIC --> pas de topic dans Channel pour le moment
+		case 332: //RPL_TOPIC 
 		{			
-			rpl = channel->getName() +":" + channel.getTopic() + "\r\n";
-		}*/
+			rpl = channel->getName() + " :" + channel->getTopic() + "\r\n";
+			break;
+		}
 		
 		case 353: // RPL_NAMEREPLY
 		{
@@ -47,6 +48,7 @@ void ft_reply(int nb, std::vector<std::string> params, Client* client, Channel* 
 		default:
 		{
 			rpl = "No RPL set yet \r\n";
+			break;
 		}
 
     }
