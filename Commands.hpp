@@ -12,7 +12,7 @@
 #include "Grammar.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
-#include "ft_print_help.hpp"
+#include "ft.hpp"
 
 class Client;
 class Channel;
@@ -36,6 +36,7 @@ class Commands
 
         //Commandes à executer
 		void	join(std::vector<std::string> params, CMD_PARAM);
+		void	part(std::vector<std::string> params, CMD_PARAM);
 		void	nick(std::vector<std::string> params, CMD_PARAM);
 		void	user(std::vector<std::string> params, CMD_PARAM);
 		void	pass(std::vector<std::string> params, CMD_PARAM);

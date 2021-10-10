@@ -40,5 +40,5 @@
 #define YELLOW "\033[0;33m"
 #define RED "\033[0;31m"
 #define RESET "\033[0m"
-void print_vector(std::vector<std::string> inputs);
+
 #endif

@@ -1,7 +1,4 @@
-#include "headers.hpp"
-#include "Client.hpp"
-#include "Channel.hpp"
-#include "ft_print_help.hpp"
+#include "ft.hpp"
 
 void print_command(std::string prefix, std::string command, std::vector<std::string> params)
 {

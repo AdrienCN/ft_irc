@@ -6,7 +6,7 @@
 #include "Client.hpp"
 #include "Grammar.hpp"
 #include "Commands.hpp"
-#include "ft_print_help.hpp"
+#include "ft.hpp"
 
 //namespace ft
 //
