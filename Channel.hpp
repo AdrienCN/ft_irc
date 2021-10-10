@@ -25,9 +25,9 @@ class Channel
         unsigned int const & getNbMembers() const;
         std::string const & getTopic() const;
         bool const & getStatusTopic() const;
-        std::vector<Client*> const & getMemberList() const;
-        std::vector<Client*> const & getOperatorList() const;
-        std::vector<Client*> const & getBannedList() const;
+        std::vector<Client*> const & getMemberList() ;
+        std::vector<Client*> const & getOperatorList() ;
+        std::vector<Client*> const & getBannedList() ;
 
         //SETTERS
         void setName(std::string const & src);

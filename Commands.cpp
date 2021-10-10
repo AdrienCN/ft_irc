@@ -8,6 +8,7 @@ Commands::Commands()
 	_cmd_list["JOIN"] = &Commands::join;
 	_cmd_list["PART"] = &Commands::part;
 	_cmd_list["TOPIC"] = &Commands::topic;
+	_cmd_list["PRIVMSG"] = &Commands::privmsg;
     return;
 }
 
@@ -97,6 +98,19 @@ int		ft_nickname_exist(std::vector<Client*> client_list, std::string nickname)
 		it++;
 	}
 	return (0);
+}
+
+Client* 	ft_nickname_exist_return(std::vector<Client*> client_list, std::string nickname)
+{
+	std::vector<Client*>::iterator it = client_list.begin();
+
+	while (it != client_list.end())
+	{
+		if ((*it)->getNickname() == nickname)
+			return (*it);
+		it++;
+	}
+	return (NULL);
 }
 
 
@@ -515,10 +529,107 @@ void Commands::topic(std::vector<std::string> params, CMD_PARAM)
 	}
 }
 
-/*
-void Commands::quit(std::vector<std::string> params)
+// ******** PRIVMSG *************
+
+void send_privmsg_user(Client *client, std::string message, Client* user)
 {
-    (void)params;
-    std::cout << "Hello from quit function!" << std::endl;
+	// Comment faire pour afficher le message???
+	std::string rpl;
+	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG  #" + user->getNickname() + " :" + message + "\r\n";
+	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+	//ou 
+  //  send(user->getSocket(), (message.c_str()), message.size(), 0);;
 }
-*/
+
+void send_privmsg_channel(Client *client, std::string message, Channel* channel)
+{
+	std::vector<Client*> tmp = channel->getMemberList();
+	std::vector<Client*>::iterator it = tmp.begin();	
+	std::vector<Client*>::iterator ite = tmp.end();
+
+	std::string rpl;
+    while (it != ite)
+	{
+		// Comment faire pour afficher le message???
+
+       	// send((*it)->getSocket(), (message.c_str()), message.size(), 0);
+		//ou
+		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG  #" + (*it)->getNickname() + " :" + message + "\r\n";
+		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+		rpl.clear();
+		it++;
+	}
+}
+
+void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
+{
+	std::cout << YELLOW << "Hello from PRIVMSG function!" << RESET << std::endl;
+	
+	if (params.size() <= 2)
+	{
+		std::cout << "Error : PRIVMSG lack of params" << std::endl;
+		if (params.size() == 1)
+		    ft_error(461, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
+		else if (params.size() == 2)
+		    ft_error(412, params, client, NULL, client_list, *channel_list); //  ERR_NOTEXTTOSEND
+		return;
+	}
+
+	//On parse le 2e arg de params (destinataires)
+	std::vector<std::string>::iterator it = params.begin();
+	std::vector<std::string>::iterator ite = params.end();
+	it++;
+	std::vector<std::string> destinataires;
+	commaSplit(*it, &destinataires);
+	
+	//On cherche un potentiel message de départ&
+	it++;
+	std::string message;
+	while (it != ite)
+	{
+		message += (*it);
+		message += " ";
+		it++;
+	}
+	//Juste pour imprimer
+	print_vector(destinataires);
+	std::cout << "Message: " << message << std::endl;
+
+	//On s'occupe des noms de chan un a un
+	std::vector<std::string>::iterator itd = destinataires.begin();
+	std::vector<std::string>::iterator itde = destinataires.end();
+	while (itd != itde)
+	{
+		Client* tmp_client = ft_nickname_exist_return(client_list, *itd);
+		if (tmp_client) // si j'ai trouvé un client 
+		{
+		    std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_client->getNickname() <<  " : " << message << RESET << std::endl;
+		   	send_privmsg_user(client, message, tmp_client);
+	    }
+		else // si je suis un cannal
+		{
+			Channel* tmp_channel = ft_channel_exist(*channel_list, *itd);
+			if (tmp_channel) // si je suis un cannal
+			{
+				if (tmp_channel->isUserMember(client) == 0) //si je ne fais pas parti de ce cannal
+				{
+					std::cout << RED << client->getNickname() << " is not a member of " << tmp_channel->getName() << RESET << std::endl;
+					ft_error(404, params, client, tmp_channel, client_list, *channel_list); //  ERR_CANNOTSENDTOCHAN
+			        return;
+				}
+				else
+				{
+					std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_channel->getName() <<  " : " << message << RESET << std::endl;
+					send_privmsg_channel(client, message, tmp_channel);
+				}
+			}
+					else
+			{
+				std::cout << RED << "Not a client or a channel" << RESET << std::endl;
+			    ft_error(401, params, client, NULL, client_list, *channel_list); //ERR_NOSUCHNICK
+			}
+		}	
+		itd++;
+	}
+}
+

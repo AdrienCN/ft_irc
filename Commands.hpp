@@ -41,6 +41,7 @@ class Commands
 		void	nick(std::vector<std::string> params, CMD_PARAM);
 		void	user(std::vector<std::string> params, CMD_PARAM);
 		void	pass(std::vector<std::string> params, CMD_PARAM);
+		void	privmsg(std::vector<std::string> params, CMD_PARAM);
     
     protected:
         Commands	(Commands const& src);

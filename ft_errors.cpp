@@ -12,9 +12,31 @@ void ft_error(int nb, std::vector<std::string> params, Client* client, Channel* 
     
     switch (nb)
     {
+        case 401: //ERR_NOSUCHNICK
+        {
+            //comment faire pour afficher le bon nickname? quell param?
+            error = "<nickname> :No such nick/channel\r\n";
+            break;
+        }
         case 403: // ERR_NOSUCHCHANNEL
         {
             error = channel->getName() + " :No such channel\r\n";
+            break;
+        }
+        case 404: //ERR_CANNOTSENDTOCHAN
+        {
+            error = channel->getName() + " :Cannot send to channel\r\n";
+            break;
+        }
+        case 411: // ERR_NORECIPIENT
+        {
+            std::string command = params[0];
+            error = ":No recipient given (" + command + ")\r\n";
+            break;
+        }
+        case 412: // ERR_NOTEXTTOSEND
+        {
+            error = ":No text to send\r\n";
             break;
         }
         case 442: // ERR_NOTONCHANNEL

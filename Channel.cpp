@@ -56,17 +56,17 @@ std::vector<char> const &	Channel::getMode() const
     return this->_mode;
 }
 
-std::vector<Client*> const &	Channel::getMemberList() const
+std::vector<Client*> const &	Channel::getMemberList() 
 {
     return this->_members;
 }
 
-std::vector<Client*> const &	Channel::getOperatorList() const
+std::vector<Client*> const &	Channel::getOperatorList() 
 {
     return this->_members;
 }
 
-std::vector<Client*> const &	Channel::getBannedList() const
+std::vector<Client*> const &	Channel::getBannedList() 
 {
     return this->_members;
 }
