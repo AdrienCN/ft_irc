@@ -35,10 +35,16 @@ class Client
 		int			const &		getGreetings();
         struct pollfd   const & getPoll() const;
 		bool		const &		isRegistered() const;
+		bool		const &		getRegPass() const;
+		bool		const &		getRegNick() const;
+		bool		const &		getRegUser() const;
 		std::vector<std::string> const & getCommand() const;
 
         //SETTERS
-        void setPassword(std::string const& src);
+ 		void		setRegPass(bool const &src);
+		void		setRegNick(bool const &src);
+		void		setRegUser(bool const &src);       
+		void setPassword(std::string const& src);
         void setNickname(std::string const& src);
         void setUsername(std::string const& src);
         void setMessage(std::string const& src);
@@ -84,6 +90,9 @@ class Client
 		std::vector<std::string> _cap;
 		std::vector<std::string> _nick;
 		std::vector<std::string> _user;
+		bool _reg_pass;
+		bool _reg_nick;
+		bool _reg_user;
         //Input _input: // template pour analyser un message
 
 
