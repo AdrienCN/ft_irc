@@ -1,9 +1,8 @@
 #include "Channel.hpp"
 
-Channel::Channel(std::string name, Client* client) :_name(name), _nb_members(1)
+Channel::Channel(std::string name, Client* client) :_name(name), _nb_members(0), _has_topic(0)
 {
     _operators.push_back(client);
-    _members.push_back(client);
     return;
 }
 
@@ -42,6 +41,16 @@ unsigned int const &       Channel::getNbMembers() const
     return this->_nb_members;
 }
 
+std::string const &		Channel::getTopic() const
+{
+    return this->_topic;
+}
+
+bool const &	    	Channel::getStatusTopic() const
+{
+    return this->_has_topic;
+}
+
 std::vector<char> const &	Channel::getMode() const
 {
     return this->_mode;
@@ -73,6 +82,13 @@ void Channel::setKey(std::string const& src)
 {
     this->_key = src;
     this->_has_key = true;
+}
+
+void Channel::setTopic(std::string const& src)
+{
+    this->_topic = src;
+    this->_has_topic = true;
+
 }
 
 //OTHERS

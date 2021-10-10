@@ -37,6 +37,7 @@ class Commands
         //Commandes à executer
 		void	join(std::vector<std::string> params, CMD_PARAM);
 		void	part(std::vector<std::string> params, CMD_PARAM);
+		void	topic(std::vector<std::string> params, CMD_PARAM);
 		void	nick(std::vector<std::string> params, CMD_PARAM);
 		void	user(std::vector<std::string> params, CMD_PARAM);
 		void	pass(std::vector<std::string> params, CMD_PARAM);
