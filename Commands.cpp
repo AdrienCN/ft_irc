@@ -95,6 +95,7 @@ void Commands::pass(std::vector<std::string> params, CMD_PARAM)
 	//quid si le password est vide
 	if (params[1] == this->_server_password)
 	{
+		std::cout << "Password OK" << std::endl;
 		client->setPassword(params[1]);
 		client->setRegPass(true);
 	}
@@ -139,7 +140,7 @@ void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 
     std::cout << YELLOW << "Hello from NICK function!"<< RESET  << std::endl;
 	//Pas de pseudo donne
-	if (params.size() == 0 || params.size() == 1)
+	if (params.size() < 2)
 	{
 		return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);
 	}
@@ -151,7 +152,10 @@ void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 		return ft_error(ERR_NICKNAMEINUSE, params, client, NULL, client_list, *channel_list);
 	}
 	if (client->isRegistered() == false && client->getRegPass() == true)
+	{
+		std::cout << "NICK OK" << std::endl;
 		client->setRegNick(true);
+	}
 	std::string rpl;
 	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
 	client->setNickname(params[1]);
@@ -170,10 +174,17 @@ void Commands::user(std::vector<std::string> params, CMD_PARAM)
 	std::cout << YELLOW << "Hello from USER function!" << RESET << std::endl;
 	if (client->isRegistered() == true)
 		return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
-	if (params.size() == 1)
+	if (params.size() < 2)
 		return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);
-	else
+
+	
+	if (client->getRegPass() == true)
+		std::cout << "USER : reg_PASS true" << std::endl;
+	if (client->getRegNick() == true)
+		std::cout << "USER : reg_NICK true" << std::endl;
+	if (client->getRegPass() == true && client->getRegNick() == true)
 	{
+		std::cout << "USER OK" << std::endl;
 		client->setRegUser(true);
 		client->setUsername(params[1]);
 		std::string tmp("Your new USERNAME is ");

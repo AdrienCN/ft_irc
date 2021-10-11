@@ -304,15 +304,26 @@ void	Server::sendGreetings(Client* client)
 
 void	Server::welcomeClient(Client *client)
 {
-//	Commands command;
-	(void)client;
 	std::vector<std::string> tmp(client->getCommand());
 	while (tmp.empty() == false)
 	{
-		//command.find_command(tmp.front(), client, _all_clients, _all_channels);
 		_command_book.find_command(tmp.front(), client, _all_clients, &_all_channels);
 		tmp.erase(tmp.begin());
 	}
-	std::cout << "WELCOME : NEW client registered " << std::endl;
-	client->setRegistration(true);
+	if (client->getRegPass() == true && client->getRegNick() == true && client->getRegUser() == true)
+	{
+		std::cout << GREEN << "****************REGISTRATION SUCCESS************************" << RESET << std::endl;
+		client->setRegistration(true);
+		for (int i = 1; i < 5; i++)
+			ft_reply(i, tmp, client, NULL, _all_clients, _all_channels);
+	}
+	else
+	{
+		client->setRegPass(false);
+		client->setRegNick(false);
+		client->setRegUser(false);
+		std::string fail_reg("Registration failed. Please start registration from beginngin : PASS <pass>\nNICK <nickname>\nUSER <username>\r\n");
+		std::cout << RED << fail_reg << RESET << std::endl;
+		send(client->getSocket(), fail_reg.c_str(), fail_reg.size(), 0);
+	}
 }
