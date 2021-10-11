@@ -302,6 +302,23 @@ void	Server::sendGreetings(Client* client)
 	client->incrGreetings();
 }
 
+void	ft_registration_failed(Client *client)
+{
+	std::string tmp("Registration failed. Please restart the following commands:\r\n");
+	std::cout << RED << tmp << std::endl;
+//	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
+	tmp = "";
+	if (client->getRegPass() == false)
+		tmp += "/PASS <password>\n";
+	if (client->getRegNick() == false)
+		tmp += "/NICK <nickname>\n";
+	if (client->getRegUser() == false)
+		tmp += "/USER <username> <mode> <unused> :<realname>\n";
+	tmp += "\r\n";
+	std::cout << tmp << RESET <<std::endl;
+//	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
+}
+
 void	Server::welcomeClient(Client *client)
 {
 	std::vector<std::string> tmp(client->getCommand());
@@ -318,14 +335,8 @@ void	Server::welcomeClient(Client *client)
 			ft_reply(i, tmp, client, NULL, _all_clients, _all_channels);
 	}
 	else
-	{
-		//Retravailler l'output ici.
-		/*client->setRegPass(false);
-		client->setRegNick(false);
-		client->setRegUser(false);
-		*/
-		std::string fail_reg("Registration failed. Please start registration from beginngin : PASS <pass>\nNICK <nickname>\nUSER <username>\r\n");
-		std::cout << RED << fail_reg << RESET << std::endl;
-		send(client->getSocket(), fail_reg.c_str(), fail_reg.size(), 0);
-	}
+		ft_registration_failed(client);
 }
+
+
+

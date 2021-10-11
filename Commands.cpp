@@ -161,14 +161,17 @@ void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 	if (client->isRegistered() == true)
 	{
 		std::string rpl;
+		std::cout << rpl << std::endl;
 		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
 		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+		std::cout << rpl << std::endl;
+		client->setNickname(params[1]);
 	}
 	else
 	{
 		std::string tmp("Error: NICK : Client must be registered to change nickname\r\n");
 		std::cout << tmp << std::endl;
-		send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
+	//	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
 	}
 }
 

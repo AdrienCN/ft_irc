@@ -1,0 +1,5 @@
+-Reponse propre si welcome fail
+-Nick ne change plus jamais apres un welcome fail
+-Gerer welcome sans password
+
+
