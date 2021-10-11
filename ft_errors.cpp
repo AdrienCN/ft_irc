@@ -31,12 +31,13 @@ void ft_error(int nb, std::vector<std::string> params, Client* client, Channel* 
         }
 		case 405: //ERR_TOOMANYCHANNELS
 		{
-			error = ; 
+			error = channel->getName() + " :You have joined too many channels\r\n"; 
 			break;
 		}
 		case 407: //ERR_TOOMANYTARGETS
 		{
-			error = ;
+			//A voir
+			error = "<target> :<error code> recipients. <abort message>\r\n";
 			break;
 		}
         case 411: // ERR_NORECIPIENT
@@ -50,53 +51,55 @@ void ft_error(int nb, std::vector<std::string> params, Client* client, Channel* 
             error = ":No text to send\r\n";
             break;
         }
+		// mask param == ?? pour 413 - > 415 
 		case 413: //ERR_NOTOPLEVEL
 		{
-			error = ;
+			error = "<mask> :No toplevel domain specified\r\n";
 			break;
 		}
 		case 414: //ERR_WILDTOPLEVEL
 		{
-			error = ;
+			error = "<mask> :Wildcard in toplevel domain\r\n";
 			break;
 		}
 		case 415: //ERR_BADCHANMASK
 		{
-			error = ;
+			error = "<mask> :Bad Server/host mask\r\n";
 			break;
 		}
 
 		case 421: //ERR_UNKNOWNCOMMAND
 		{
-			error = ;
+			error = params[1]/*<command>*/ + " :Unknown command\r\n";
 			break;
 		}
-		case 431: //ERR_NONICKNAMEGIVEN
+		case 431: //ERR_NONICKNAMEGIVEN (deja gerer par hexchat?)
 		{
-			error = ;
+			error = ":No nickname given\r\n";
 			break;
 		}
 
 		case 432: //ERR_ERRONEOUSNICKNAME
 		{
-			error = ;
+			error = params[1]/*<nickname>*/ + " :Erroneous nicknamei\r\n";
 			break;
 		}
 
 		case 433: //ERR_NICKNAMEINUSE
 		{
-			error = ;
+			error = params[1] + " :Nickname is already in use\r\n";
 			break;
 		}
 
 		case 436: //ERR_NICKCOLLISION
 		{
-			error = ;
+			error = params[1] + " :Nickname collision KILL from" + client->getUsername() + "@" + client->getHostname() + "\r\n";
 			break;
 		}
+		// Avoir 
 		case 437: //ERR_UNAVAILABLERESSOURCE
 		{
-			error = ;
+			error = "<nick/channel> :Nick/channel is temporarily unavailable\r\n" ;
 			break;
 		}
 
@@ -113,17 +116,17 @@ void ft_error(int nb, std::vector<std::string> params, Client* client, Channel* 
         }
 		case 462: //ERR_ALREADYREGISTERED
 		{
-			error = ;
+			error = ":Unauthorized command (already registered)\r\n";
 			break;
 		}
 		case 471: //ERR_CHANNELISFULL
 		{
-			error = ;
+			error = channel->getName() + " :Cannot join channel (+1)\r\n";
 			break;
 		}
 		case 473: //ERR_INVITEONLYCHAN
 		{
-			error = ;
+			error = channel->getName() + " :Cannot join channel (+i)\r\n";
 			break;
 		}
         case 474: // ERR_BANNEDFROMCHANNEL
@@ -139,7 +142,7 @@ void ft_error(int nb, std::vector<std::string> params, Client* client, Channel* 
         }
 		case 484: //ERR_RESTRICTED
 		{
-			error = ;
+			error = ":Your connection is restricted\r\n";
 			break;
 		}
         default:
