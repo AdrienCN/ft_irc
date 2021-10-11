@@ -61,6 +61,16 @@ std::vector<Client*> const &	Channel::getMemberList()
     return this->_members;
 }
 
+void	Channel::showMembers() { // iterateur sur membres
+    std::vector<Client*>::iterator it = _members.begin();
+    std::vector<Client*>::iterator ite = _members.end();
+    
+	while (it != ite) {
+		std::cout << "user : " << (*it)->getUsername() << std::endl;
+		it++;
+	}
+}
+
 std::vector<Client*> const &	Channel::getOperatorList() 
 {
     return this->_members;

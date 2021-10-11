@@ -9,12 +9,13 @@ Commands::Commands()
 	_cmd_list["PART"] = &Commands::part;
 	_cmd_list["TOPIC"] = &Commands::topic;
 	_cmd_list["PRIVMSG"] = &Commands::privmsg;
-    return;
+	_cmd_list["WHO"] = &Commands::who;
+	return;
 }
 
 Commands::~Commands()
 {
-    return;
+	return;
 }
 
 //************ PARSING ET TRI DE LA STR COMMAND EN VECTOR ********************
@@ -23,9 +24,9 @@ void Commands::find_command(std::string input, Client* client, std::vector<Clien
 {
 	// A verifier si on doit gérer les prefixes ":" en premier message (mais je pense pas)
 	(void)client;
-    (void)client_list;
-    (void)channel_list;
-   
+	(void)client_list;
+	(void)channel_list;
+
 	this->analyzeCommand(input);
 	std::string key(_parsed_cmd.front());
 	//std::map<std::string , void(Commands::*)(std::vector<std::string>)>::iterator it = _cmd_list.begin();
@@ -38,31 +39,31 @@ void Commands::find_command(std::string input, Client* client, std::vector<Clien
 
 void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
 {	
-		std::istringstream str(command);
-		std::string tmp;
+	std::istringstream str(command);
+	std::string tmp;
 
-		/*
-		if (command.length() > 512) // 512 en incluant \r\n
-		{
-			//Commande trop longue, quelle erreur a manager?
-		}
-		*/
+	/*
+	   if (command.length() > 512) // 512 en incluant \r\n
+	   {
+	//Commande trop longue, quelle erreur a manager?
+	}
+	*/
 
-		//1. Split du sub_str message par les whitespaces dans un vector
-		while (std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
+	//1. Split du sub_str message par les whitespaces dans un vector
+	while (std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
+	{
+		if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
 		{
-			if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
-			{
-					tmp.erase(tmp.length() - 1);
-					//tmp.erase(tmp.length() - 1); //en fonction de /r /n
-			}
-			if (tmp != "\0") // si je suis pas une chaine vide
-			{
-				_parsed_cmd.push_back(tmp);
-				tmp.clear(); // on enleve tout le contenu et size = 0
-			}
+			tmp.erase(tmp.length() - 1);
+			//tmp.erase(tmp.length() - 1); //en fonction de /r /n
 		}
-		print_vector(_parsed_cmd);
+		if (tmp != "\0") // si je suis pas une chaine vide
+		{
+			_parsed_cmd.push_back(tmp);
+			tmp.clear(); // on enleve tout le contenu et size = 0
+		}
+	}
+	print_vector(_parsed_cmd);
 }
 
 //************ COMMANDES A EXECUTER ********************
@@ -72,16 +73,16 @@ void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
 void Commands::pass(std::vector<std::string> params, CMD_PARAM)
 {
 	(void)client;
-    (void)client_list;
-    (void)channel_list;
+	(void)client_list;
+	(void)channel_list;
 	(void)params;
 	// do the action
-		//if success
-			//RPL_XXX
-		
-		//else
-			//ERR_XXX
-    std::cout << YELLOW << "Hello from PASS function!" << RESET << std::endl;
+	//if success
+	//RPL_XXX
+
+	//else
+	//ERR_XXX
+	std::cout << YELLOW << "Hello from PASS function!" << RESET << std::endl;
 }
 
 // ******** NICK *************
@@ -117,11 +118,11 @@ Client* 	ft_nickname_exist_return(std::vector<Client*> client_list, std::string 
 void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 {
 	(void)client;
-    (void)client_list;
-    (void)channel_list;
+	(void)client_list;
+	(void)channel_list;
 	(void)params;
 
-    std::cout << YELLOW << "Hello from NICK function!"<< RESET  << std::endl;
+	std::cout << YELLOW << "Hello from NICK function!"<< RESET  << std::endl;
 	//Pas de pseudo donne
 	if (params.size() == 0 || params.size() == 1)
 	{
@@ -129,9 +130,9 @@ void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 		std::cout << "Error : nick : 431" << std::endl;
 		return;
 	}
-		//Pseudo contient des chars non autorise 
-		//	ft_error(432)a coder ??
-		//Pseudo exist deja
+	//Pseudo contient des chars non autorise 
+	//	ft_error(432)a coder ??
+	//Pseudo exist deja
 	else if (ft_nickname_exist(client_list, params[1]))
 	{
 		//ft_error(433);
@@ -167,11 +168,11 @@ int		ft_username_exist(std::vector<Client*> client_list, std::string username)
 
 void Commands::user(std::vector<std::string> params, CMD_PARAM)
 {
-    (void)client;
-    (void)client_list;
-    (void)channel_list;
+	(void)client;
+	(void)client_list;
+	(void)channel_list;
 	(void)params;
-	
+
 	if (params.size() == 1)
 		std::cout << "Error : username lack of params" << std::endl;
 	else if (ft_username_exist(client_list, params[0]))
@@ -207,19 +208,19 @@ int isValidChanName(std::string channel_name)
 
 void  commaSplit(std::string str, std::vector<std::string>* vector)
 {	
-		std::istringstream str2(str);
-		std::string tmp;
+	std::istringstream str2(str);
+	std::string tmp;
 
-		while (std::getline(str2, tmp,','))
+	while (std::getline(str2, tmp,','))
+	{
+		if (isValidChanName(tmp))
 		{
-			if (isValidChanName(tmp))
-			{
-				if (tmp[0] == '#' || tmp[0] == '&') // HEXCHAT envoie le nom de channel avec ces args
-					tmp.erase(0, 1);
-				vector->push_back(tmp);
-			}
-			tmp.clear(); // on enleve tout le contenu et size = 0
+			if (tmp[0] == '#' || tmp[0] == '&') // HEXCHAT envoie le nom de channel avec ces args
+				tmp.erase(0, 1);
+			vector->push_back(tmp);
 		}
+		tmp.clear(); // on enleve tout le contenu et size = 0
+	}
 }
 
 Channel* ft_channel_exist(std::vector<Channel*> channel_list, std::string channel)
@@ -259,21 +260,21 @@ void leaveChannel(Channel* channel, Client *client, std::string part_message)
 	channel->removeMember(client);
 
 	/* cas ou plus d'utilisateurs 
-	std::vector<Channel*>::iterator itl = channel_list->begin();
-	std::vector<Channel*>::iterator itle = channel_list->end();
-	while (itl != itle)
-	{
-		if ((*itl)->getName() == channel->getName())
-			break;
-		itl++;
-	}
-	if (*itl)->getNbMembers() == 0)
-	{
-		channel_list->removeChannel((*itl->getName());
-		delete *itl;
-	}
-	cas a faire : operateur is leaving
-	*/
+	   std::vector<Channel*>::iterator itl = channel_list->begin();
+	   std::vector<Channel*>::iterator itle = channel_list->end();
+	   while (itl != itle)
+	   {
+	   if ((*itl)->getName() == channel->getName())
+	   break;
+	   itl++;
+	   }
+	   if (*itl)->getNbMembers() == 0)
+	   {
+	   channel_list->removeChannel((*itl->getName());
+	   delete *itl;
+	   }
+	   cas a faire : operateur is leaving
+	   */
 	std::string rpl;
 	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PART " + channel->getName() + " :" + part_message + "\r\n";
 	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
@@ -285,18 +286,18 @@ void leaveChannel(Channel* channel, Client *client, std::string part_message)
 void Commands::join(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from JOIN function!" << RESET << std::endl;
-    (void)client;
-    (void)client_list;
-    (void)channel_list;
+	(void)client;
+	(void)client_list;
+	(void)channel_list;
 	(void)params;
-	
+
 	if (params.size() == 1)
 	{
 		std::cout << "Error : JOIN lack of params" << std::endl;
 		ft_error(461, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
 		return;
 	}
-	
+
 	//On parse le 2e arg de params (channel name) et le 3e (les keys potentiellement)
 	std::vector<std::string>::iterator it = params.begin();
 	it++;
@@ -315,7 +316,7 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 	std::vector<std::string>::iterator itne = channels_name.end();
 	std::vector<std::string>::iterator itk = channels_key.begin();
 	std::vector<std::string>::iterator itke = channels_key.end();
-	
+
 	while (itn != itne)
 	{
 		Channel* tmp = ft_channel_exist(*channel_list, *itn);
@@ -406,25 +407,25 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 void Commands::part(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from PART function!" << RESET << std::endl;
-    (void)client;
-    (void)client_list;
-    (void)channel_list;
+	(void)client;
+	(void)client_list;
+	(void)channel_list;
 	(void)params;
-	
+
 	if (params.size() == 1)
 	{
 		std::cout << "Error : PART lack of params" << std::endl;
 		ft_error(461, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
 		return;
 	}
-	
+
 	//On parse le 2e arg de params (channel name)
 	std::vector<std::string>::iterator it = params.begin();
 	std::vector<std::string>::iterator ite = params.end();
 	it++;
 	std::vector<std::string> channels_name;
 	commaSplit(*it, &channels_name);
-	
+
 	//On cherche un potentiel message de départ
 	it++;
 	std::string part_message;
@@ -432,7 +433,7 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 		part_message = (*it);
 	else
 		part_message = client->getNickname();
-	
+
 	//Juste pour imprimer
 	print_vector(channels_name);
 	std::cout << "Part message: " << part_message << std::endl;
@@ -470,14 +471,14 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 void Commands::topic(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from TOPIC function!" << RESET << std::endl;
-	
+
 	if (params.size() == 1)
 	{
 		std::cout << "Error : TOPIC lack of params" << std::endl;
 		ft_error(461, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
 		return;
 	}
-	
+
 	std::vector<std::string>::iterator it = params.begin();
 	std::vector<std::string>::iterator ite = params.end();
 	it++;
@@ -538,7 +539,7 @@ void send_privmsg_user(Client *client, std::string message, Client* user)
 	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG  #" + user->getNickname() + " :" + message + "\r\n";
 	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
 	//ou 
-  //  send(user->getSocket(), (message.c_str()), message.size(), 0);;
+	//  send(user->getSocket(), (message.c_str()), message.size(), 0);;
 }
 
 void send_privmsg_channel(Client *client, std::string message, Channel* channel)
@@ -548,11 +549,11 @@ void send_privmsg_channel(Client *client, std::string message, Channel* channel)
 	std::vector<Client*>::iterator ite = tmp.end();
 
 	std::string rpl;
-    while (it != ite)
+	while (it != ite)
 	{
 		// Comment faire pour afficher le message???
 
-       	// send((*it)->getSocket(), (message.c_str()), message.size(), 0);
+		// send((*it)->getSocket(), (message.c_str()), message.size(), 0);
 		//ou
 		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG  #" + (*it)->getNickname() + " :" + message + "\r\n";
 		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
@@ -564,14 +565,14 @@ void send_privmsg_channel(Client *client, std::string message, Channel* channel)
 void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from PRIVMSG function!" << RESET << std::endl;
-	
+
 	if (params.size() <= 2)
 	{
 		std::cout << "Error : PRIVMSG lack of params" << std::endl;
 		if (params.size() == 1)
-		    ft_error(461, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
+			ft_error(461, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
 		else if (params.size() == 2)
-		    ft_error(412, params, client, NULL, client_list, *channel_list); //  ERR_NOTEXTTOSEND
+			ft_error(412, params, client, NULL, client_list, *channel_list); //  ERR_NOTEXTTOSEND
 		return;
 	}
 
@@ -581,7 +582,7 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 	it++;
 	std::vector<std::string> destinataires;
 	commaSplit(*it, &destinataires);
-	
+
 	//On cherche un potentiel message de départ&
 	it++;
 	std::string message;
@@ -603,9 +604,9 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 		Client* tmp_client = ft_nickname_exist_return(client_list, *itd);
 		if (tmp_client) // si j'ai trouvé un client 
 		{
-		    std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_client->getNickname() <<  " : " << message << RESET << std::endl;
-		   	send_privmsg_user(client, message, tmp_client);
-	    }
+			std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_client->getNickname() <<  " : " << message << RESET << std::endl;
+			send_privmsg_user(client, message, tmp_client);
+		}
 		else // si je suis un cannal
 		{
 			Channel* tmp_channel = ft_channel_exist(*channel_list, *itd);
@@ -615,7 +616,7 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 				{
 					std::cout << RED << client->getNickname() << " is not a member of " << tmp_channel->getName() << RESET << std::endl;
 					ft_error(404, params, client, tmp_channel, client_list, *channel_list); //  ERR_CANNOTSENDTOCHAN
-			        return;
+					return;
 				}
 				else
 				{
@@ -623,13 +624,69 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 					send_privmsg_channel(client, message, tmp_channel);
 				}
 			}
-					else
+			else
 			{
 				std::cout << RED << "Not a client or a channel" << RESET << std::endl;
-			    ft_error(401, params, client, NULL, client_list, *channel_list); //ERR_NOSUCHNICK
+				ft_error(401, params, client, NULL, client_list, *channel_list); //ERR_NOSUCHNICK
 			}
 		}	
 		itd++;
 	}
 }
 
+
+/* ************************************WHO****************************************** */
+
+static int	match_channel(std::vector<std::string> params, CMD_PARAM) {
+	std::vector<Channel*>::iterator it = channel_list->begin();
+	int i = 0;
+	(void)client_list;
+	(void)client;
+
+	while (it != channel_list->end()) {
+		std::cout << "params[1] : " << params[1] << std::endl;
+		std::cout << "it : " << (*it)->getName() << std::endl;
+		if (!params[1].compare((*it)->getName())) {
+			return i;
+		}
+		i++;
+		it++;
+	}
+	return (-1);
+}
+
+void Commands::who(std::vector<std::string> params, CMD_PARAM) {
+	std::cout << YELLOW << "Hello from Who function!" << RESET << std::endl;
+	if (params.size() == 1) {
+		for (int i = 0; client_list[i]; i++) {
+			std::cout << "user [" << i << "] : " << client_list[i]->getUsername() << std::endl;
+		}
+		return ;
+	}
+
+	int num = match_channel(params, client, client_list, channel_list);
+	std::cout << "channel numero : " << num << std::endl;
+	if (num < 0) {
+		for (int i = 0; client_list[i]; i++) {
+			std::cout << "user [" << i << "] : " << client_list[i]->getUsername() << std::endl;
+		}
+		return ;
+	}
+	(*channel_list)[num]->showMembers();
+
+	/* for (int i = 0; i < channel_list[num]->getNbMembers(); i++) { */
+	/* 		std::cout << "user [" << i << "] : " << channel_list[i]->getMemberList() << std::endl; */
+	/* } */
+	/* 		std::string rpl; */
+	/* 		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " WHO " + params[1] + "\r\n"; */
+	/* 		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0); */
+	/* 		client->incrGreetings(); */
+	/* 		return ; */
+	std::cout << YELLOW << "GoodBye Who function!" << RESET << std::endl;
+	/* for (int i = 0; client_list[i].getSocket(); i++) { */
+	/* 	if (client_list[i].getSocket() == clien.getSocket()) { */
+	/* 		std::cout << "user [" << i << "] : " << client_list[i]->getUsername() << std::endl; */
+	/* 	} */
+	/* } */
+
+}
