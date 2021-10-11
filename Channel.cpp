@@ -15,7 +15,17 @@ void Channel::present()
 {
     std::cout << "Channel name = " << getName();
     if (_has_key == true)
-     std::cout << " and my key is " << getKey();
+     std::cout << " | my key is " << getKey();
+    if (_has_topic == true)
+        std::cout << " | my topic is " << getTopic();
+    std::cout << std::endl << "My members are : ";
+    std::vector<Client*>::iterator it = _members.begin();
+    std::vector<Client*>::iterator ite = _members.end();
+    while (it != ite)
+    {
+        std::cout << (*it)->getNickname() << " ";
+        it++;
+    }
     std::cout << std::endl;
 }
 
@@ -100,7 +110,7 @@ int Channel::isUserBanned(Client* client)
     
     while (it != ite)
     {
-        if ((*it)->getUsername() == client->getUsername())
+        if ((*it)->getNickname() == client->getNickname())
             return (1);
         it++;
     }
@@ -114,7 +124,7 @@ int Channel::isUserOp(Client* client)
     
     while (it != ite)
     {
-        if ((*it)->getUsername() == client->getUsername())
+        if ((*it)->getNickname() == client->getNickname())
             return (1);
         it++;
     }
@@ -128,7 +138,6 @@ int Channel::isUserMember(Client* client)
     
     while (it != ite)
     {
-       // if ((*it)->getUsername() == client->getUsername())
         if ((*it)->getNickname() == client->getNickname())
             return (1);
         it++;
@@ -167,7 +176,7 @@ void Channel::removeMember(Client *client)
     
     while (it != ite)
     {
-        if ((*it)->getUsername() == client->getUsername())
+        if ((*it)->getNickname() == client->getNickname())
         {
             _members.erase(it);
             _nb_members--;
@@ -184,7 +193,7 @@ void Channel::removeOp(Client *client)
     
     while (it != ite)
     {
-        if ((*it)->getUsername() == client->getUsername())
+        if ((*it)->getNickname() == client->getNickname())
         {
             _operators.erase(it);
             return;
@@ -200,7 +209,7 @@ void Channel::removeBanned(Client *client)
     
     while (it != ite)
     {
-        if ((*it)->getUsername() == client->getUsername())
+        if ((*it)->getNickname() == client->getNickname())
         {
             _banned.erase(it);
             return;

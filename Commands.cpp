@@ -453,7 +453,8 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 				ft_error(442, params, client, NULL, client_list, *channel_list); //  ERR_NOTONCHANNEL
 			}
 			else
-			{
+			{	
+				std::cout << YELLOW << client->getNickname() << " is leaving channel " <<  tmp->getName() << RESET << std::endl;
 				leaveChannel(tmp, client, part_message);
 			}	
 		}
@@ -477,7 +478,7 @@ void Commands::topic(std::vector<std::string> params, CMD_PARAM)
 		ft_error(461, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
 		return;
 	}
-	
+		
 	std::vector<std::string>::iterator it = params.begin();
 	std::vector<std::string>::iterator ite = params.end();
 	it++;
@@ -535,10 +536,12 @@ void send_privmsg_user(Client *client, std::string message, Client* user)
 {
 	// Comment faire pour afficher le message???
 	std::string rpl;
-	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG  #" + user->getNickname() + " :" + message + "\r\n";
-	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+	//rpl = client->getNickname() + message;
+	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG " + user->getNickname() + message;
+	//send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+//	send(user->getSocket(), (rpl.c_str()), rpl.size(), 0);
 	//ou 
-  //  send(user->getSocket(), (message.c_str()), message.size(), 0);;
+  	send(user->getSocket(), (rpl.c_str()), rpl.size(), 0);;
 }
 
 void send_privmsg_channel(Client *client, std::string message, Channel* channel)
@@ -548,16 +551,52 @@ void send_privmsg_channel(Client *client, std::string message, Channel* channel)
 	std::vector<Client*>::iterator ite = tmp.end();
 
 	std::string rpl;
+//	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG #" + channel->getName() + message;
+//	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " " + message;
+// envoie message sur mauvais socket
+//	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+			
     while (it != ite)
 	{
 		// Comment faire pour afficher le message???
+		if (*it != client) // si je ne suis pas l'envoyeur
+		{    
+			std::cout << "Messagse sent to " << (*it)->getNickname() << std::endl;
+			//message aux utilisateirs direct
+			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG " + (*it)->getNickname() + message;
+			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG " + message;
+			
+			//nothing happends
+			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG #" + channel->getName() + message;
+			//rpl = client->getNickname() + " " + message;
+			
+			//GARBAGE dans les deux quand 2 fenetres ouverts
+			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " #" + channel->getName() + message;
+			
+			//GARBAGE mais dans la convers privée
+			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0 " + (*it)->getNickname() + message;
+			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0 :" + (*it)->getNickname() + message;
 
-       	// send((*it)->getSocket(), (message.c_str()), message.size(), 0);
-		//ou
-		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG  #" + (*it)->getNickname() + " :" + message + "\r\n";
-		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
-		rpl.clear();
+
+			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " #" + channel->getName() + (*it)->getNickname() + message;
+			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " #" + channel->getName() + " PRIVMSG " +  (*it)->getNickname() + message;
+			rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " #" + channel->getName() + " PRIVMSG " + message;
+			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " " + message;
+			//rpl = ":" + client->getNickname() + " " + message;
+			
+
+			//rpl = ":" + client->getNickname() + message;
+
+
+			send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
+			
+			//rpl = client->getNickname() + message;
+			//send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
+			rpl.clear();
+
+		}
 		it++;
+
 	}
 }
 
@@ -585,15 +624,21 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 	//On cherche un potentiel message de départ&
 	it++;
 	std::string message;
+	message.clear();
+	message += " ";
 	while (it != ite)
 	{
+		std::cout << "str = " << *it << std::endl;
+		if (message.size() == 1 && (*it).c_str()[0] !=  ':')
+			message += ":";
 		message += (*it);
 		message += " ";
 		it++;
 	}
+	message += "\r\n";
 	//Juste pour imprimer
 	print_vector(destinataires);
-	std::cout << "Message: " << message << std::endl;
+	std::cout << "Message: |" << message << "|" << std::endl;
 
 	//On s'occupe des noms de chan un a un
 	std::vector<std::string>::iterator itd = destinataires.begin();
