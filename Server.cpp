@@ -319,9 +319,11 @@ void	Server::welcomeClient(Client *client)
 	}
 	else
 	{
-		client->setRegPass(false);
+		//Retravailler l'output ici.
+		/*client->setRegPass(false);
 		client->setRegNick(false);
 		client->setRegUser(false);
+		*/
 		std::string fail_reg("Registration failed. Please start registration from beginngin : PASS <pass>\nNICK <nickname>\nUSER <username>\r\n");
 		std::cout << RED << fail_reg << RESET << std::endl;
 		send(client->getSocket(), fail_reg.c_str(), fail_reg.size(), 0);

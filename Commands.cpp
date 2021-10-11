@@ -155,11 +155,21 @@ void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 	{
 		std::cout << "NICK OK" << std::endl;
 		client->setRegNick(true);
+		client->setNickname(params[1]);
+		return;
 	}
-	std::string rpl;
-	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
-	client->setNickname(params[1]);
-	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+	if (client->isRegistered() == true)
+	{
+		std::string rpl;
+		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
+		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+	}
+	else
+	{
+		std::string tmp("Error: NICK : Client must be registered to change nickname\r\n");
+		std::cout << tmp << std::endl;
+		send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
+	}
 }
 
 // ******** USER *************
@@ -192,9 +202,6 @@ void Commands::user(std::vector<std::string> params, CMD_PARAM)
 		send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
 	}
 }
-
-
-
 
 // ******** Channel Functions *************
 
