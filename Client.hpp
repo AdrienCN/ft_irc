@@ -33,7 +33,6 @@ class Client
         std::string const &		getMessage() const;
         int         const &		getMessageStatus() const;
         int         const &     getSocket() const;
-		int			const &		getGreetings();
         struct pollfd   const & getPoll() const;
 		bool		const &		isRegistered() const;
 		bool		const &		getRegPass() const;
@@ -54,7 +53,6 @@ class Client
         void init(int const & socket);
 
         //Others
-		void incrGreetings(); // to remove
         void clearMessage();
         void clearStr(std::string str);
 		void clearCommand();
@@ -73,10 +71,10 @@ class Client
         std::string _password;
         std::string _nickname;
         std::string _username;
+		std::string	_realname;
         std::string _message;
-        int	        _message_status; // true finished , false not finished
-		int			_greetings;
 		std::string _hostname;
+        int	        _message_status; // true finished , false not finished
 
         
         //std::string _host;
@@ -88,9 +86,6 @@ class Client
         int _socket;
 		std::vector<std::string> _command;
 		bool _registration_status;
-		std::vector<std::string> _cap;
-		std::vector<std::string> _nick;
-		std::vector<std::string> _user;
 		bool _reg_pass;
 		bool _reg_nick;
 		bool _reg_user;

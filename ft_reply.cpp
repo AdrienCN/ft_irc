@@ -12,8 +12,9 @@ void ft_reply(int nb, std::vector<std::string> params, Client* client, Channel* 
 	switch(nb)
     {
 		case 1:
-		{
-			rpl = "Welcome to the Internet Relay Network\n" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + "\r\n";
+		{		
+			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + "001" + " " + ": ""Welcome to the Internet Relay Network " + client->getNickname() + "\r\n";
+			rpl = ":127.0.0.1 001 " + client->getNickname() + " :Welcome to the Internet Relay Network " + client->getNickname() + "\r\n";
 			break;
 		}
 		case 331: //RPL_NOTOPIC
@@ -52,6 +53,7 @@ void ft_reply(int nb, std::vector<std::string> params, Client* client, Channel* 
 		}
 
     }
+	std::cout << YELLOW << "RPL : [" << rpl << "]" << RESET << std::endl;
 	send(client->getSocket(), rpl.c_str(), rpl.size(), 0);
     return;
 

@@ -13,6 +13,7 @@
 Commands::Commands(std::string const & password) 
 {
 	_server_password = password;
+	_cmd_list["CAP"] = &Commands::cap;
 	_cmd_list["PASS"] = &Commands::pass;
 	_cmd_list["NICK"] = &Commands::nick;
 	_cmd_list["USER"] = &Commands::user;
@@ -93,12 +94,17 @@ void Commands::pass(std::vector<std::string> params, CMD_PARAM)
 		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
 	//quid si le password est faux
 	//quid si le password est vide
-	if (params[1] == this->_server_password)
+//	if (params[1] == this->_server_password)
+//	{
+	if (client->getRegNick() == true || client->getRegUser() == true)
 	{
-		std::cout << "Password OK" << std::endl;
+		std::cout << RED << "Error : Pass : /Pass must be register before /NICK or /USER\r\n" << RESET << std::endl;
+		return;
+	}
+		std::cout << GREEN << "New password saved successfully" << RESET << std::endl;
 		client->setPassword(params[1]);
 		client->setRegPass(true);
-	}
+//	}
 }
 
 // ******** NICK *************
@@ -130,6 +136,17 @@ Client* 	ft_nickname_exist_return(std::vector<Client*> client_list, std::string 
 	return (NULL);
 }
 
+bool	ft_strRespectCharset(std::string str)
+{
+	std::string::iterator itb = str.begin();
+	while (itb != str.end())
+	{
+		if (std::isprint(*itb) == false)
+			return (false);
+		itb++;
+	}
+	return (true);
+}
 
 void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 {
@@ -144,35 +161,19 @@ void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 	{
 		return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);
 	}
-		//Pseudo contient des chars non autorise 
-		//	ft_error(432)a coder ??
-		//Pseudo exist deja
+	//Nickname contient des non_printables ou ne respect pas le charset 
+	if (ft_strRespectCharset(params[1]) == false)
+		return ft_error(ERR_ERRONEUSNICKNAME, params, client, NULL, client_list, *channel_list);
+			//Pseudo exist deja
 	if (ft_nickname_exist(client_list, params[1]))
 	{
 		return ft_error(ERR_NICKNAMEINUSE, params, client, NULL, client_list, *channel_list);
 	}
-	if (client->isRegistered() == false && client->getRegPass() == true)
-	{
-		std::cout << "NICK OK" << std::endl;
-		client->setRegNick(true);
-		client->setNickname(params[1]);
-		return;
-	}
-	if (client->isRegistered() == true)
-	{
-		std::string rpl;
-		std::cout << rpl << std::endl;
-		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
-		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
-		std::cout << rpl << std::endl;
-		client->setNickname(params[1]);
-	}
-	else
-	{
-		std::string tmp("Error: NICK : Client must be registered to change nickname\r\n");
-		std::cout << tmp << std::endl;
-	//	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
-	}
+	std::string rpl;
+	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
+	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+	client->setNickname(params[1]);
+	client->setRegNick(true);
 }
 
 // ******** USER *************
@@ -187,23 +188,22 @@ void Commands::user(std::vector<std::string> params, CMD_PARAM)
 	std::cout << YELLOW << "Hello from USER function!" << RESET << std::endl;
 	if (client->isRegistered() == true)
 		return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
-	if (params.size() < 2)
+	if (params.size() < 3)
 		return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);
 
 	
-	if (client->getRegPass() == true)
-		std::cout << "USER : reg_PASS true" << std::endl;
-	if (client->getRegNick() == true)
-		std::cout << "USER : reg_NICK true" << std::endl;
-	if (client->getRegPass() == true && client->getRegNick() == true)
+	if (client->getRegUser() == true)
 	{
-		std::cout << "USER OK" << std::endl;
-		client->setRegUser(true);
-		client->setUsername(params[1]);
-		std::string tmp("Your new USERNAME is ");
-		tmp += client->getUsername() + "\n";
-		send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
+		std::cout << RED << "Error: USER : Username already set\r\n" << RESET << std::endl;
+		return;
 	}
+//	if (client->getRegUSER() == true && client->getRegNick() == true)
+//	{
+//		
+		client->setUsername(params[1]);
+		std::cout << GREEN << "Username successfully registered\r\n" << RESET << std::endl;
+		client->setRegUser(true);
+//	}
 }
 
 // ******** Channel Functions *************
@@ -690,3 +690,15 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 	}
 }
 
+void	Commands::cap(std::vector<std::string> params, CMD_PARAM)
+{
+	(void)client;
+//	(void)channel;
+	(void)client_list;
+	(void)channel_list;
+	(void)params;
+	
+	std::string cap("CAP REPLY TO DO\r\n");
+	std::cout << cap  << std::endl;
+//	send(client->getSocket(), cap.c_str(), cap.size(), 0);
+}

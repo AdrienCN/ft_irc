@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client() : _message_status(DISCONNECT), _greetings(0), _hostname("defaultconstructorHOSTNAMEvalue"), _registration_status(false), _reg_pass(false), _reg_nick(false), _reg_user(false)
+Client::Client() : _nickname("Default_Nickname"), _username("Default_Username"), _hostname("defaultconstructorHOSTNAMEvalue"), _message_status(DISCONNECT),  _registration_status(false), _reg_pass(false), _reg_nick(false), _reg_user(false)
 
 {
     return;
@@ -162,16 +162,6 @@ void Client::init(int const & socket)
     this->_poll.fd = _socket;
     this->_poll.events = POLLIN | POLLHUP;
     this->_poll.revents = 0;
-}
-
-int	const &	Client::getGreetings()
-{
-	return this->_greetings;
-}
-
-void	Client::incrGreetings()
-{
-	this->_greetings++;
 }
 
 void Client::recvMessage()
