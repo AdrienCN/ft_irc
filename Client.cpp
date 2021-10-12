@@ -43,6 +43,11 @@ bool const &					 Client::getRegUser() const
 	return this->_reg_user;
 }
 
+std::string const &				Client::getHostname() const
+{
+	return this->_hostname;
+}
+
 std::vector<std::string> const & Client::getCommand() const
 {
 	return this->_command;

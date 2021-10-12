@@ -29,6 +29,7 @@ class Client
         std::string const &		getPassword() const;
         std::string const &		getNickname() const;
         std::string const &		getUsername() const;
+		std::string const &		getHostname() const;
         std::string const &		getMessage() const;
         int         const &		getMessageStatus() const;
         int         const &     getSocket() const;
