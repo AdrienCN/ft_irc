@@ -637,7 +637,13 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 
 /* ************************************WHO****************************************** */
 
-static int	match_channel(std::vector<std::string> params, CMD_PARAM) {
+//reste a definir : 
+//l utilisation de "o"
+//l exporation des variable du serveur pour enlever les parametres en dur de printWho
+//comprendre les operator a send
+//utilisation de real name
+
+static int	matchChannel(std::vector<std::string> params, CMD_PARAM) {
 	std::vector<Channel*>::iterator it = channel_list->begin();
 	int i = 0;
 	(void)client_list;
@@ -655,38 +661,64 @@ static int	match_channel(std::vector<std::string> params, CMD_PARAM) {
 	return (-1);
 }
 
+static void	printWho(std::vector<std::string> params, CMD_PARAM, Client* client_ref) {
+	std::string rpl;
+	(void)params;
+	(void)client_list;
+	(void)channel_list;
+	rpl += "*" + client_ref->getUsername() + " ";
+	rpl += "127.0.0.1";
+	rpl += " irc_90.com " + client_ref->getNickname();
+	// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
+	rpl += " H  :0\r\n"; // + real name
+	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+}
+
+static	int	matchOthers(std::vector<std::string> params, CMD_PARAM) {
+	std::vector<Client*>::iterator it = client_list.begin();
+	(void)channel_list;
+	(void)client;
+	int i = 0;
+
+	while (it != client_list.end()) {
+		if (!params[1].compare((*it)->getUsername())) {
+			printWho(params, client, client_list, channel_list, *it);
+			/* std::cout << "real name : " << (*it)->getUsername() << std::endl; */
+			i++;
+		}
+		if (!params[1].compare((*it)->getNickname())) {
+			printWho(params, client, client_list, channel_list, *it);
+			/* std::cout << "nick name : " << (*it)->getNickname() << std::endl; */
+			i++;
+		}
+		it++;
+	}
+	return i;
+}
+
+static void	printWhoAllClient(std::vector<std::string> params, CMD_PARAM) {
+	std::vector<Client*>::iterator it = client_list.begin();
+	while (it != client_list.end()) {
+		printWho(params, client, client_list, channel_list, *it);
+		std::cout << (*it)->getUsername() << std::endl;
+		it++;
+	}
+}
+
 void Commands::who(std::vector<std::string> params, CMD_PARAM) {
 	std::cout << YELLOW << "Hello from Who function!" << RESET << std::endl;
 	if (params.size() == 1) {
-		for (int i = 0; client_list[i]; i++) {
-			std::cout << "user [" << i << "] : " << client_list[i]->getUsername() << std::endl;
-		}
+		printWhoAllClient(params, client, client_list, channel_list);
 		return ;
 	}
 
-	int num = match_channel(params, client, client_list, channel_list);
-	std::cout << "channel numero : " << num << std::endl;
+	int num = matchChannel(params, client, client_list, channel_list);
 	if (num < 0) {
-		for (int i = 0; client_list[i]; i++) {
-			std::cout << "user [" << i << "] : " << client_list[i]->getUsername() << std::endl;
-		}
+		if (matchOthers(params, client, client_list, channel_list) == 0)
+			return ;
+		printWhoAllClient(params, client, client_list, channel_list);
 		return ;
 	}
 	(*channel_list)[num]->showMembers();
-
-	/* for (int i = 0; i < channel_list[num]->getNbMembers(); i++) { */
-	/* 		std::cout << "user [" << i << "] : " << channel_list[i]->getMemberList() << std::endl; */
-	/* } */
-	/* 		std::string rpl; */
-	/* 		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " WHO " + params[1] + "\r\n"; */
-	/* 		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0); */
-	/* 		client->incrGreetings(); */
-	/* 		return ; */
 	std::cout << YELLOW << "GoodBye Who function!" << RESET << std::endl;
-	/* for (int i = 0; client_list[i].getSocket(); i++) { */
-	/* 	if (client_list[i].getSocket() == clien.getSocket()) { */
-	/* 		std::cout << "user [" << i << "] : " << client_list[i]->getUsername() << std::endl; */
-	/* 	} */
-	/* } */
-
 }

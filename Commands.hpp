@@ -49,6 +49,7 @@ class Commands
         Commands&	operator=(Commands const& src); 
 		std::map	<std::string , void(Commands::*)(std::vector<std::string> params, CMD_PARAM)> _cmd_list;
 		std::vector<std::string>	_parsed_cmd;
+		
  
 };
 
