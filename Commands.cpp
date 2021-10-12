@@ -561,13 +561,13 @@ void send_privmsg_channel(Client *client, std::string message, Channel* channel)
 		// Comment faire pour afficher le message???
 		if (*it != client) // si je ne suis pas l'envoyeur
 		{    
-			std::cout << "Messagse sent to " << (*it)->getNickname() << std::endl;
+			std::cout << "Message sent to " << (*it)->getNickname() << std::endl;
 			//message aux utilisateirs direct
 			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG " + (*it)->getNickname() + message;
-			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG " + message;
+		//	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG " + message;
 			
 			//nothing happends
-			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG #" + channel->getName() + message;
+			rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG #" + channel->getName() + message;
 			//rpl = client->getNickname() + " " + message;
 			
 			//GARBAGE dans les deux quand 2 fenetres ouverts
@@ -580,14 +580,15 @@ void send_privmsg_channel(Client *client, std::string message, Channel* channel)
 
 			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " #" + channel->getName() + (*it)->getNickname() + message;
 			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " #" + channel->getName() + " PRIVMSG " +  (*it)->getNickname() + message;
-			rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " #" + channel->getName() + " PRIVMSG " + message;
+			//	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " #" + channel->getName() + " PRIVMSG " + message;
 			//rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " " + message;
 			//rpl = ":" + client->getNickname() + " " + message;
 			
 
 			//rpl = ":" + client->getNickname() + message;
 
-
+			//rpl = "PRIVMSG #" + channel->getName() + message;
+			std::cout << "rpl : |" << rpl << "|" << std::endl;
 			send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
 			
 			//rpl = client->getNickname() + message;
