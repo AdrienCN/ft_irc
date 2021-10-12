@@ -1,6 +1,7 @@
 #ifndef Server_hpp
 #define Server_hpp
 
+#include "common_macro.hpp"
 #include "headers.hpp"
 #include "Channel.hpp"
 #include "Client.hpp"

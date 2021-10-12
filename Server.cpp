@@ -12,7 +12,7 @@ struct addrinfo
 	struct addrinfo *ai_next;
 };
 */
-Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _nbClients(0)
+Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _nbClients(0), _command_book(password)
 {
 	memset(&_hints, 0, sizeof(_hints));
 	//Prepare hints sur la stack pour getaddrinfo()
@@ -302,17 +302,41 @@ void	Server::sendGreetings(Client* client)
 	client->incrGreetings();
 }
 
+void	ft_registration_failed(Client *client)
+{
+	std::string tmp("Registration failed. Please restart the following commands:\r\n");
+	std::cout << RED << tmp << std::endl;
+//	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
+	tmp = "";
+	if (client->getRegPass() == false)
+		tmp += "/PASS <password>\n";
+	if (client->getRegNick() == false)
+		tmp += "/NICK <nickname>\n";
+	if (client->getRegUser() == false)
+		tmp += "/USER <username> <mode> <unused> :<realname>\n";
+	tmp += "\r\n";
+	std::cout << tmp << RESET <<std::endl;
+//	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
+}
+
 void	Server::welcomeClient(Client *client)
 {
-//	Commands command;
-	(void)client;
 	std::vector<std::string> tmp(client->getCommand());
 	while (tmp.empty() == false)
 	{
-		//command.find_command(tmp.front(), client, _all_clients, _all_channels);
 		_command_book.find_command(tmp.front(), client, _all_clients, &_all_channels);
 		tmp.erase(tmp.begin());
 	}
-	std::cout << "WELCOME : NEW client registered " << std::endl;
-	client->setRegistration(true);
+	if (client->getRegPass() == true && client->getRegNick() == true && client->getRegUser() == true)
+	{
+		std::cout << GREEN << "****************REGISTRATION SUCCESS************************" << RESET << std::endl;
+		client->setRegistration(true);
+		for (int i = 1; i < 5; i++)
+			ft_reply(i, tmp, client, NULL, _all_clients, _all_channels);
+	}
+	else
+		ft_registration_failed(client);
 }
+
+
+

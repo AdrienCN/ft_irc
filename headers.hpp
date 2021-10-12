@@ -1,5 +1,7 @@
 #ifndef HEADERS_HPP
 #define HEADERS_HPP
+class Channel;
+class Client;
 
 // accept, bind, listen, socket, getaddrinfo
 #include <sys/types.h>
@@ -41,4 +43,19 @@
 #define RED "\033[0;31m"
 #define RESET "\033[0m"
 
+void ft_error(int nb, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list);
+void ft_reply(int nb, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list);
+
+/*#define 
+#define 
+#define 
+#define 
+#define 
+#define 
+#define 
+#define 
+#define 
+#define 
+#define 
+*/
 #endif

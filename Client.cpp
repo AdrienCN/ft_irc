@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client() : _message_status(DISCONNECT), _greetings(0), _hostname("defaultconstructorHOSTNAMEvalue"), _registration_status(false)
+Client::Client() : _message_status(DISCONNECT), _greetings(0), _hostname("defaultconstructorHOSTNAMEvalue"), _registration_status(false), _reg_pass(false), _reg_nick(false), _reg_user(false)
 
 {
     return;
@@ -27,6 +27,26 @@ void Client::present()
 }
 
 // GETTERS
+
+bool const &					 Client::getRegPass() const
+{
+	return this->_reg_pass;
+}
+
+bool const &					 Client::getRegNick() const
+{
+	return this->_reg_nick;
+}
+
+bool const &					 Client::getRegUser() const
+{
+	return this->_reg_user;
+}
+
+std::string const &				Client::getHostname() const
+{
+	return this->_hostname;
+}
 
 std::vector<std::string> const & Client::getCommand() const
 {
@@ -74,6 +94,20 @@ bool			const & Client::isRegistered() const
 }
 
 //SETTERS
+
+void Client::setRegPass(bool const & src)
+{
+	this->_reg_pass = src;
+}
+
+void Client::setRegNick(bool const & src)
+{
+	this->_reg_nick = src;
+}
+void Client::setRegUser(bool const & src)
+{
+	this->_reg_user = src;
+}
 void Client::setPassword(std::string const& src)
 {
     this->_password = src;
