@@ -21,7 +21,8 @@ void ft_error(int nb, std::vector<std::string> params, Client* client, Channel* 
         }
         case 403: // ERR_NOSUCHCHANNEL
         {
-            error = channel->getName() + " :No such channel\r\n";
+            //comment faire pour afficher le bon channel name? quell param?
+            error = params[1] + " :No such channel\r\n";
             break;
         }
         case 404: //ERR_CANNOTSENDTOCHAN
