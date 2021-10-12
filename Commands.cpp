@@ -10,6 +10,7 @@ Commands::Commands()
 	_cmd_list["TOPIC"] = &Commands::topic;
 	_cmd_list["PRIVMSG"] = &Commands::privmsg;
 	_cmd_list["WHO"] = &Commands::who;
+	_cmd_list["NAMES"] = &Commands::names;
 	return;
 }
 
@@ -29,6 +30,7 @@ void Commands::find_command(std::string input, Client* client, std::vector<Clien
 
 	this->analyzeCommand(input);
 	std::string key(_parsed_cmd.front());
+	std::cout << "key :" << key << std::endl;
 	//std::map<std::string , void(Commands::*)(std::vector<std::string>)>::iterator it = _cmd_list.begin();
 	if (_cmd_list[key])
 		(this->*_cmd_list[key])(_parsed_cmd, client, client_list, channel_list);
@@ -711,14 +713,41 @@ void Commands::who(std::vector<std::string> params, CMD_PARAM) {
 		printWhoAllClient(params, client, client_list, channel_list);
 		return ;
 	}
-
+	// on cheche si un cannal correspond au second parametre de who 
 	int num = matchChannel(params, client, client_list, channel_list);
 	if (num < 0) {
+		//on regarde si le parametre de who correspond a n importe quoi d autre
 		if (matchOthers(params, client, client_list, channel_list) == 0)
 			return ;
+		// on trouve rien on print tout
 		printWhoAllClient(params, client, client_list, channel_list);
 		return ;
 	}
-	(*channel_list)[num]->showMembers();
+	//on print tout les membres du cannal trouvé 
+	(*channel_list)[num]->printMembers();
 	std::cout << YELLOW << "GoodBye Who function!" << RESET << std::endl;
+}
+
+/* ************************************NAMES****************************************** */
+
+static void	printNamesAllChan(std::vector<Channel*>* channel_list) {
+	std::vector<Channel*>::iterator it = (*channel_list).begin();
+	while (it != (*channel_list).end()) {
+		(*it)->printMembersNick();
+		it++;
+	}
+}
+
+void Commands::names(std::vector<std::string> params, CMD_PARAM) {
+	std::cout << YELLOW << "Hello from Names function!" << RESET << std::endl;
+	(void)client;
+	(void)client_list;
+	(void)channel_list;
+	if (!params[1].compare("IRC_90's")) { //a changer avec la ref du num du serveur
+		//la commande NAMES seule est renvoyer par hexchat comme NAMES + IRC_90's 
+		printNamesAllChan(channel_list);
+		return ;
+	}
+	int num = matchChannel(params, client, client_list, channel_list);
+	(*channel_list)[num]->printMembersNick();
 }

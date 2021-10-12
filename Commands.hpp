@@ -43,6 +43,7 @@ class Commands
 		void	pass(std::vector<std::string> params, CMD_PARAM);
 		void	privmsg(std::vector<std::string> params, CMD_PARAM);
 		void	who(std::vector<std::string> params, CMD_PARAM);
+		void	names(std::vector<std::string> params, CMD_PARAM);
     
     protected:
         Commands	(Commands const& src);

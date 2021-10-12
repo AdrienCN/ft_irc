@@ -61,17 +61,33 @@ std::vector<Client*> const &	Channel::getMemberList()
 	return this->_members;
 }
 
-void	Channel::showMembers() { // iterateur sur membres
+void	Channel::printMembers() { // iterateur sur membres
 	std::vector<Client*>::iterator it = _members.begin();
 	std::vector<Client*>::iterator ite = _members.end();
 	std::string rpl;
-	std::cout << "showMembers function" << std::endl;
+	std::cout << "printMembers function" << std::endl;
 	while (it != ite) {
 		rpl += "*" + (*it)->getUsername() + " ";
 		rpl += "127.0.0.1";
 		rpl += " irc_90.com " + (*it)->getNickname();
 		// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
 		rpl += " H  :0\r\n"; // + real name
+		send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
+	//	std::cout << "user : " << (*it)->getUsername() << std::endl;
+		rpl = "";
+		it++;
+	}
+}
+
+void	Channel::printMembersNick() { // iterateur sur membres
+	std::vector<Client*>::iterator it = _members.begin();
+	std::vector<Client*>::iterator ite = _members.end();
+	std::string rpl;
+	std::cout << "printMembersNick function" << std::endl;
+	while (it != ite) {
+		rpl += "* User on @" + this->_name;
+		rpl += " : " + (*it)->getNickname();
+		rpl += "\r\n"; // + real name
 		send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
 	//	std::cout << "user : " << (*it)->getUsername() << std::endl;
 		rpl = "";
