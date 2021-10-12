@@ -11,7 +11,7 @@
 
 //namespace ft
 //
-#define MAX_CLIENT 2
+#define MAX_CLIENT 3
 #define PORT_SERVER "6667"
 
 //class Commands;
