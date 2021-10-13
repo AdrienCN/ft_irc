@@ -72,7 +72,17 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 
 		case 421: //ERR_UNKNOWNCOMMAND
 		{
-			error += (params[1]/*<command>*/ + " :Unknown command\r\n");
+			std::string cmd("[");
+			std::vector<std::string>::iterator itb = params.begin();
+			while (itb != params.end())
+			{
+				cmd += *itb;
+				itb++;
+				if (itb != params.end())
+					cmd += " ";
+			}
+			cmd += "]";
+			error += (cmd + " :Unknown command\r\n");
 			break;
 		}
 		case 431: //ERR_NONICKNAMEGIVEN (deja gerer par hexchat?)

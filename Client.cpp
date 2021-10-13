@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client() : _message_status(DISCONNECT), _greetings(0), _hostname("defaultconstructorHOSTNAMEvalue"), _registration_status(false), _reg_pass(false), _reg_nick(false), _reg_user(false)
+Client::Client() : _message_status(DISCONNECT),  _hostname("defaultconstructorHOSTNAMEvalue"), _username("Default_Username"), _nickname("Default_Nickname"), _realname("Default_realname"), _registration_status(false), _reg_pass(false), _reg_nick(false), _reg_user(false)
 
 {
     return;
@@ -68,6 +68,12 @@ std::string const &		Client::getUsername() const
     return this->_username;
 }
 
+std::string const &		Client::getRealname() const
+{
+    return this->_realname;
+}
+
+
 std::string const &		Client::getMessage() const
 {
     return this->_message;
@@ -128,6 +134,11 @@ void Client::setUsername(std::string const& src)
     this->_username = src;
 }
 
+void Client::setRealname(std::string const& src)
+{
+    this->_realname = src;
+}
+
 void Client::setMessage(std::string const& src)
 {
     this->_message = src;
@@ -167,16 +178,6 @@ void Client::init(int const & socket)
     this->_poll.fd = _socket;
     this->_poll.events = POLLIN | POLLHUP;
     this->_poll.revents = 0;
-}
-
-int	const &	Client::getGreetings()
-{
-	return this->_greetings;
-}
-
-void	Client::incrGreetings()
-{
-	this->_greetings++;
 }
 
 void Client::recvMessage()

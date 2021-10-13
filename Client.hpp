@@ -30,10 +30,10 @@ class Client
         std::string const &		getNickname() const;
         std::string const &		getUsername() const;
 		std::string const &		getHostname() const;
+		std::string const &		getRealname() const;
         std::string const &		getMessage() const;
         int         const &		getMessageStatus() const;
         int         const &     getSocket() const;
-		int			const &		getGreetings();
         struct pollfd   const & getPoll() const;
 		bool		const &		isRegistered() const;
 		bool		const &		getRegPass() const;
@@ -43,19 +43,19 @@ class Client
         int getNbChannels() const;
 
         //SETTERS
- 		void		setRegPass(bool const &src);
-		void		setRegNick(bool const &src);
-		void		setRegUser(bool const &src);       
-		void setPassword(std::string const& src);
-        void setNickname(std::string const& src);
-        void setUsername(std::string const& src);
-        void setMessage(std::string const& src);
-        void setMessageStatus(bool const& src);
-		void setRegistration(bool const& src);
-        void init(int const & socket);
+ 		void	setRegPass(bool const &src);
+		void	setRegNick(bool const &src);
+		void	setRegUser(bool const &src);
+        void	setMessageStatus(bool const& src);
+		void		setRegistration(bool const& src);
+		void		setRealname(std::string const& src);	
+		void		setPassword(std::string const& src);
+        void		setNickname(std::string const& src);
+        void		setUsername(std::string const& src);
+        void		setMessage(std::string const& src);
+        void			init(int const & socket);
 
         //Others
-		void incrGreetings(); // to remove
         void clearMessage();
         void clearStr(std::string str);
 		void clearCommand();
@@ -71,14 +71,13 @@ class Client
         Client & operator=(Client const& src); 
 
         struct pollfd _poll;
-        std::string _password;
-        std::string _nickname;
-        std::string _username;
-        std::string _message;
         int	        _message_status; // true finished , false not finished
-		int			_greetings;
 		std::string _hostname;
-
+        std::string _username;
+        std::string _nickname;
+		std::string _realname;
+        std::string _password;
+        std::string _message;
         
         //std::string _host;
         //std::string _servername;

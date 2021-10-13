@@ -13,7 +13,7 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 	int nb = atoi(nb_str.c_str());
 	rpl.clear();
 	if (nb <= 5)
-		rpl = "quelque chose";
+		rpl = ":127.0.0.1 00" + nb_str + " " + client->getNickname() + " :";
 	else
 	{
 		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + nb_str + " : ";
@@ -21,11 +21,29 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 	switch(nb)
     {
 		case 1:
-		{
-			rpl.clear();
-			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname() + " :";
-			//rpl = "Welcome to the Internet Relay Network " + client->getNickname() + "!" + client->getUsername() + "@" + "0" + "\r\n";
+		{			
 			rpl += "Welcome to the Internet Relay Network " + client->getNickname() + "\r\n";
+			break;
+		}
+		case 2:
+		{
+			rpl += "Your host is ***[>>>__IRC_90's__<<<]***, running version 42.42\r\n";
+			break;
+		}
+		case 3:
+		{
+			rpl += "This server was created <date>\r\n";
+			break;
+		}
+		case 4:
+		{
+			rpl += "<servername> 42.42 <available user modes> <available channel modes>\r\n";
+			break;
+		}
+		case 5:
+		{
+			//Remplacer cette reponse par "Sorry IRC90's user capacity is full. Please retry later\r\n" ?
+			rpl += "Try server <server name>, port <port number>\r\n";
 			break;
 		}
 		case 331: //RPL_NOTOPIC
