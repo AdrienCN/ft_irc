@@ -13,12 +13,11 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 	int nb = atoi(nb_str.c_str());
 	rpl.clear();
 	if (nb <= 5)
-	{
-		//Could be localhost
 		rpl = ":127.0.0.1 00" + nb_str + " " + client->getNickname() + " :";
-	}
 	else
+	{
 		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + nb_str + " : ";
+	}
 	switch(nb)
     {
 		case 1:
@@ -63,7 +62,8 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 		case 353: // RPL_NAMEREPLY
 		{
 			//<canal>:[[@|+]<pseudo>[[@|+]<pseudo>[...]]]
-			rpl += (channel->getName() + " :");
+			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname();
+			rpl += (" = " + channel->getName() + " :");
 			std::vector<Client*> tmp = channel->getMemberList();
 			std::vector<Client*>::iterator it = tmp.begin();
 			std::vector<Client*>::iterator ite = tmp.end();
@@ -73,6 +73,13 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 				it++;
 			}
 			rpl +=  "\r\n";
+			std::cout << "rpl: |" << rpl << "|" << std::endl;
+			break;	
+		}
+		case 366: // ENDOFNAMES
+		{
+			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname() + " ";
+			rpl += (channel->getName() + " :End of NAMES list\r\n");
 			break;	
 		}
 

@@ -64,7 +64,7 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 			error += "<mask> :Wildcard in toplevel domain\r\n";
 			break;
 		}
-		case 415: //ERR_BADCHANMASK
+		case 415: //ERR_BADMASK // return by PRIVMSG
 		{
 			error += "<mask> :Bad Server/host mask\r\n";
 			break;
@@ -152,6 +152,13 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
             error += (channel->getName() + " :Cannot join channel (+k)\r\n");
             break;
         }
+
+		case 476: // ERR_BADCHANMASK
+        {
+            error += ("<channel> :Bad Channel Mask (+k)\r\n"); // <channel a changer>
+            break;
+        }
+		
 		case 484: //ERR_RESTRICTED
 		{
 			error += ":Your connection is restricted\r\n";

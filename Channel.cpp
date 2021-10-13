@@ -21,6 +21,15 @@ void Channel::present()
     std::cout << std::endl << "My members are : ";
     std::vector<Client*>::iterator it = _members.begin();
     std::vector<Client*>::iterator ite = _members.end();
+
+    while (it != ite)
+    {
+        std::cout << (*it)->getNickname() << " ";
+        it++;
+    }
+    std::cout << std::endl << "My operator is : ";
+    it = _operators.begin();
+    ite = _operators.end();
     while (it != ite)
     {
         std::cout << (*it)->getNickname() << " ";
