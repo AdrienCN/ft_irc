@@ -12,8 +12,19 @@ struct addrinfo
 	struct addrinfo *ai_next;
 };
 */
-Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _nbClients(0), _command_book(password)
+Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password),  _server_ipaddress("127.0.0.1"), _server_creation_date("server_creation_date"), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
 {
+	_server_name += "[";
+	_server_name += EMO_ROBOT;
+	_server_name += EMO_ROBOT;
+	_server_name += EMO_ROBOT;
+	_server_name += "IRC_90S";
+	_server_name += EMO_ROBOT;
+	_server_name += EMO_ROBOT;
+	_server_name += EMO_ROBOT;
+	_server_name += "]";
+	//_command_book._server_name = _server_name;
+	std::cout << _server_name << std::endl;
 	memset(&_hints, 0, sizeof(_hints));
 	//Prepare hints sur la stack pour getaddrinfo()
 	_hints.ai_family = AF_UNSPEC; //Accept IPv4 & IPv6
@@ -214,13 +225,43 @@ void	Server::addClient()
 		return;
 	}
 
-	Client*			new_client = new Client();
+	Client*			new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
 	new_client->init(socket);
 	this->poll_add_client(*new_client);
 	_all_clients.push_back(new_client);
 	_nbClients++;
 	std::cout << "New client added" <<std::endl;
 	send(new_client->getSocket(), "Hello to you NEW CLIENT JOANN\n", 30, 0);
+}
+
+std::string const & Server::getServerName() const
+{
+	return this->_server_name;
+}
+
+std::string const & Server::getServerIpaddress() const
+{
+	return this->_server_ipaddress;
+}
+
+std::string const & Server::getServerCreationDate() const
+{
+	return this->_server_creation_date;
+}
+
+void  Server::setServerName(std::string const src)
+{
+	this->_server_name = src;
+}
+
+void  Server::setServerIpaddress(std::string const src)
+{
+	this->_server_ipaddress = src;
+}
+
+void  Server::setServerCreationDate(std::string const src)
+{
+	this->_server_creation_date = src;
 }
 
 void Server::poll_add_client(Client const& new_client)

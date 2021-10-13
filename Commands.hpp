@@ -24,7 +24,7 @@ class Commands
 {
 
     public:
-		Commands(std::string const & password);
+		Commands(std::string const & password, std::string server_name, std::string server_ipaddress, std::string server_creation_date); 
         virtual ~Commands(); 
 
         //General
@@ -43,6 +43,16 @@ class Commands
 		void	user(std::vector<std::string> params, CMD_PARAM);
 		void	pass(std::vector<std::string> params, CMD_PARAM);
 		void	privmsg(std::vector<std::string> params, CMD_PARAM);
+
+		std::string const & getServerName() const;
+		std::string const & getServerIpaddress() const;
+		std::string const & getServerCreationDate() const;
+
+		void  setServerName(std::string const src);
+		void  setServerIpaddress(std::string const src);
+		void  setServerCreationDate(std::string const src);
+
+
     
     protected:
         Commands();
@@ -51,6 +61,11 @@ class Commands
 		std::map	<std::string , void(Commands::*)(std::vector<std::string> params, CMD_PARAM)> _cmd_list;
 		std::vector<std::string>	_parsed_cmd;
 		std::string					_server_password;
+		std::string _server_name;
+		std::string _server_ipaddress;
+		std::string _server_creation_date;
+        
+
  
 };
 

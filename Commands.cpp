@@ -10,9 +10,9 @@
 #define ERR_RESTRICTED 484
 */
 
-Commands::Commands(std::string const & password) 
+Commands::Commands(std::string const & password, std::string server_name, std::string server_ipaddress, std::string server_creation_date): _server_password(password) , _server_name(server_name) , _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date) 
 {
-	_server_password = password;
+	
 	_cmd_list["PASS"] = &Commands::pass;
 	_cmd_list["NICK"] = &Commands::nick;
 	_cmd_list["USER"] = &Commands::user;
@@ -29,6 +29,36 @@ Commands::~Commands()
 }
 
 //************ PARSING ET TRI DE LA STR COMMAND EN VECTOR ********************
+
+std::string const & Commands::getServerName() const
+{
+	return this->_server_name;
+}
+
+std::string const & Commands::getServerIpaddress() const
+{
+	return this->_server_ipaddress;
+}
+
+std::string const & Commands::getServerCreationDate() const
+{
+	return this->_server_creation_date;
+}
+
+void  Commands::setServerName(std::string const src)
+{
+	this->_server_name = src;
+}
+
+void  Commands::setServerIpaddress(std::string const src)
+{
+	this->_server_ipaddress = src;
+}
+
+void  Commands::setServerCreationDate(std::string const src)
+{
+	this->_server_creation_date = src;
+}
 
 void Commands::find_command(std::string input, Client* client, std::vector<Client*> client_list, std::vector<Channel*>* channel_list) 
 {

@@ -1,6 +1,7 @@
 #ifndef COMMON_MACRO_H
 #define COMMON_MACRO_H
 
+#define EMO_ROBOT "\U0001F916"
 
 #define RPL_WELCOME				"1" //
 #define RPL_YOURHOST			"2" //

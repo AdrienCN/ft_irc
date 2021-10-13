@@ -27,17 +27,17 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 		}
 		case 2:
 		{
-			rpl += "Your host is ***[>>>__IRC_90's__<<<]***, running version 42.42\r\n";
+			rpl += "Your host is " + client->getServerName() + ", running version 42.42\r\n";
 			break;
 		}
 		case 3:
 		{
-			rpl += "This server was created <date>\r\n";
+			rpl += "This server was created " + client->getServerCreationDate() + "\r\n";
 			break;
 		}
 		case 4:
 		{
-			rpl += "<servername> 42.42 <available user modes> <available channel modes>\r\n";
+			rpl += client->getServerName() + " 42.42 <available user modes> <available channel modes>\r\n";
 			break;
 		}
 		case 5:
