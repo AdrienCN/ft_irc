@@ -10,6 +10,7 @@
 #define RPL_NOTOPIC				"331"// 
 #define RPL_TOPIC				"332"
 #define RPL_NAMEREPLY			"353"
+#define RPL_ENDOFNAMES  		"366"
 
 #define ERR_NOSUCHNICK			"401"
 #define ERR_NOSUCHCHANNEL		"403"

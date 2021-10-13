@@ -47,10 +47,24 @@ void Commands::find_command(std::string input, Client* client, std::vector<Clien
 	this->_parsed_cmd.clear();
 }
 
+std::string ft_uppercase(const char* str)
+{
+	std::string str2;
+	char c;
+
+	for (int i = 0; str[i]; i++)
+	{
+		c = std::toupper(str[i]);
+		str2 += &c;
+	}
+	return str2;
+}
+
 void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
 {	
 		std::istringstream str(command);
 		std::string tmp;
+		bool first = 1;
 
 		/*
 		if (command.length() > 512) // 512 en incluant \r\n
@@ -62,10 +76,19 @@ void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
 		//1. Split du sub_str message par les whitespaces dans un vector
 		while (std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
 		{
+			/* On en a plus besoin car fait a l'etape d'avant
 			if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
 			{
 					tmp.erase(tmp.length() - 1);
 					//tmp.erase(tmp.length() - 1); //en fonction de /r /n
+			}
+			*/
+			if (first == 1)
+			{
+				std::string tmp2 = ft_uppercase(tmp.c_str());
+				tmp.clear();
+				tmp = tmp2;
+				first = 0;
 			}
 			if (tmp != "\0") // si je suis pas une chaine vide
 			{
@@ -275,6 +298,7 @@ void joinChannel(Channel* new_chan, std::vector<std::string> params, CMD_PARAM)
 	else
 		ft_reply(RPL_TOPIC, params, client, new_chan, client_list, *channel_list); // RPL_TOPIC
 	ft_reply(RPL_NAMEREPLY, params, client, new_chan, client_list, *channel_list); // RPL_NAMEREPLY
+	ft_reply(RPL_ENDOFNAMES, params, client, new_chan, client_list, *channel_list); // RPL_NAMEREPLY
 	
 }
 
@@ -310,6 +334,7 @@ void leaveChannel(Channel* channel, Client *client, std::string part_message)
 		it++;
 	}
 	channel->removeMember(client);
+	channel->removeOp(client); // si jamais le client est Operateur
 	return;
 }
 
@@ -351,6 +376,7 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 	
 	while (itn != itne)
 	{
+		
 		Channel* tmp = ft_channel_exist(*channel_list, *itn);
 		if (tmp) // channel already exist
 		{
@@ -365,7 +391,15 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 			else if(tmp->isUserMember(client) == 1)
 			{
 				std::cout << RED << client->getNickname() << " is already a client of channel " <<  tmp->getName() << RESET << std::endl;
+				//pas d'erreurs retournée
 			}
+			else if (client->getNbChannels() == USER_MAXCHAN)
+				ft_error(ERR_TOOMANYCHANNELS, params, client, tmp, client_list, *channel_list); //a faire une fois au debute ou a chaque fois?
+			else if(tmp->getNbMembers() == CHAN_MAXCAPACITY)
+			{
+				ft_error(ERR_CHANNELISFULL, params, client, tmp, client_list, *channel_list); // ERR8CHANNELISFULL
+			}
+			
 			else
 			{
 				if (tmp->getStatusKey() == true)
@@ -416,11 +450,10 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 			}
 			else
 			{
-
 				if (isValidChanName(*itn) == 0) //not a channel name
 				{
 					std::cout << RED << *itn << " is not a valid Channel name" << RESET << std::endl;
-					//reply err?
+					ft_error(ERR_BADCHANMASK, params, client, tmp, client_list, *channel_list); //  ERR_BADCHANMASK			}
 				}
 				else
 				{
@@ -428,14 +461,21 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 
 					Channel* new_chan = new Channel(*itn, client);
 					new_chan->present();
-
-					if (itk != itke)
+					if (client->getNbChannels() == USER_MAXCHAN)
 					{
-						new_chan->setKey(*itk);
-						itk++;
+						ft_error(ERR_TOOMANYCHANNELS, params, client, new_chan, client_list, *channel_list); //a faire une fois au debute ou a c
+						delete new_chan;
 					}
-					channel_list->push_back(new_chan);
-					joinChannel(new_chan, params, client, client_list, channel_list);
+					else
+					{
+						if (itk != itke)
+						{
+							new_chan->setKey(*itk);
+							itk++;
+						}
+						channel_list->push_back(new_chan);
+						joinChannel(new_chan, params, client, client_list, channel_list);
+					}
 				}
 			}
 		}
@@ -476,8 +516,10 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 		part_message = client->getNickname();
 	
 	//Juste pour imprimer
+	/*
 	print_vector(channels_name);
 	std::cout << "Part message: " << part_message << std::endl;
+	*/
 
 	//On s'occupe des noms de chan un a un
 	std::vector<std::string>::iterator itn = channels_name.begin();

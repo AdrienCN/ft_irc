@@ -40,6 +40,7 @@ class Client
 		bool		const &		getRegNick() const;
 		bool		const &		getRegUser() const;
 		std::vector<std::string> const & getCommand() const;
+        int getNbChannels() const;
 
         //SETTERS
  		void		setRegPass(bool const &src);

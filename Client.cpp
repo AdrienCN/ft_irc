@@ -93,6 +93,11 @@ bool			const & Client::isRegistered() const
 	return this->_registration_status;
 }
 
+int Client::getNbChannels() const
+{
+	return this->_channels.size();
+}
+
 //SETTERS
 
 void Client::setRegPass(bool const & src)
