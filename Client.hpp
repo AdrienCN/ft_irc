@@ -19,13 +19,12 @@ class Client
 {
 
     public:
-        Client(); 
+        Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date); 
         virtual ~Client(); 
 
         // Presentation
         void present();
-        
-        // GETTERS
+        	        // GETTERS
         std::string const &		getPassword() const;
         std::string const &		getNickname() const;
         std::string const &		getUsername() const;
@@ -41,6 +40,10 @@ class Client
 		bool		const &		getRegUser() const;
 		std::vector<std::string> const & getCommand() const;
         int getNbChannels() const;
+		std::string const & getServerName() const;
+		std::string const & getServerIpaddress() const;
+		std::string const & getServerCreationDate() const;
+
 
         //SETTERS
  		void	setRegPass(bool const &src);
@@ -54,6 +57,11 @@ class Client
         void		setUsername(std::string const& src);
         void		setMessage(std::string const& src);
         void			init(int const & socket);
+		void  setServerName(std::string const src);
+		void  setServerIpaddress(std::string const src);
+		void  setServerCreationDate(std::string const src);
+
+
 
         //Others
         void clearMessage();
@@ -78,6 +86,9 @@ class Client
 		std::string _realname;
         std::string _password;
         std::string _message;
+		std::string _server_name;
+		std::string _server_ipaddress;
+		std::string _server_creation_date;
         
         //std::string _host;
         //std::string _servername;

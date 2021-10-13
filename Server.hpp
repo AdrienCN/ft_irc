@@ -39,12 +39,22 @@ class Server
     public:
         Server(std::string port, std::string password); 
         virtual ~Server(); 
-
         // GETTERS
         int const &				getSocket() const;
         std::string const &		getPort() const;
         std::string const &		getPassword() const;
         struct addrinfo*		getServInfo() const;
+		std::string const & getServerName() const;
+		std::string const & getServerIpaddress() const;
+		std::string const & getServerCreationDate() const;
+
+		//SETTERS
+		void  setServerName(std::string const src);
+		void  setServerIpaddress(std::string const src);
+		void  setServerCreationDate(std::string const src);
+
+
+
 
         // CONNECTIONS MANAGEMENT
         void    init();
@@ -74,6 +84,9 @@ class Server
         struct addrinfo*            _serv_info;        
         struct addrinfo             _hints; // to initialize the server
         std::string                 _password; // const?
+		std::string					_server_name;
+		std::string					_server_ipaddress;
+		std::string					_server_creation_date;
         int                         _server_socket;
         int                         _nbClients;
         Commands                    _command_book;
