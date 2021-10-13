@@ -296,49 +296,48 @@ Client* Server::find_client_from_fd(int fd)
 	return NULL;
 }
 
-void	Server::sendGreetings(Client* client)
-{
-	std::cout<< "Greetings to you[" << client->getNickname() << "@" << client->getUsername() << "." << "0"/*client->getHostname()*/ << "]" << std::endl;
-	client->incrGreetings();
-}
-
 void	ft_registration_failed(Client *client)
 {
-	std::string tmp("Registration failed. Please restart the following commands:\r\n");
-	std::cout << RED << tmp << std::endl;
-//	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
-	tmp = "";
-	if (client->getRegPass() == false)
-		tmp += "/PASS <password>\n";
+	std::string tmp("Command(s) needed to complete registration:\n");
 	if (client->getRegNick() == false)
-		tmp += "/NICK <nickname>\n";
+		tmp += "/NICK <nickname>\r";
 	if (client->getRegUser() == false)
-		tmp += "/USER <username> <mode> <unused> :<realname>\n";
+		tmp += "/USER <username> <mode> <unused> :<realname>\r";
 	tmp += "\r\n";
 	std::cout << tmp << RESET <<std::endl;
-//	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
+	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
 }
 
 void	Server::welcomeClient(Client *client)
 {
-	std::vector<std::string> tmp(client->getCommand());
+	std::vector<std::string> full_command(client->getCommand());
+	std::vector<std::string> tmp = full_command;
+	while (full_command.empty() == false)
+	{
+		_command_book.find_command(full_command.front(), client, _all_clients, &_all_channels);
+		full_command.erase(full_command.begin());
+	}
+	//Evite le msg d'erreur si CAP ou PASS
+	//Checker si les commandes NICK et USER sont presente dans les cmd
+
 	while (tmp.empty() == false)
 	{
-		_command_book.find_command(tmp.front(), client, _all_clients, &_all_channels);
+		//Si l'une des deux ou les deux sont presente checker l'etat de l'enregistrement
+		if (std::strstr(tmp.front().c_str(), "USER") || std::strstr(tmp.front().c_str(), "NICK"))
+		{
+			if (client->getRegNick() == true && client->getRegUser() == true)
+			{
+				std::cout << GREEN << "****************REGISTRATION SUCCESS************************" << RESET << std::endl;
+				client->setRegistration(true);
+			ft_reply("1", tmp, client, NULL, _all_clients, _all_channels);
+	    	ft_reply("2", tmp, client, NULL, _all_clients, _all_channels);
+	    	ft_reply("3", tmp, client, NULL, _all_clients, _all_channels);
+	    	ft_reply("4", tmp, client, NULL, _all_clients, _all_channels);
+			}
+			else
+				ft_registration_failed(client);
+			return;
+		}
 		tmp.erase(tmp.begin());
 	}
-	if (client->getRegPass() == true && client->getRegNick() == true && client->getRegUser() == true)
-	{
-		std::cout << GREEN << "****************REGISTRATION SUCCESS************************" << RESET << std::endl;
-		client->setRegistration(true);
-		ft_reply("1", tmp, client, NULL, _all_clients, _all_channels);
-		ft_reply("2", tmp, client, NULL, _all_clients, _all_channels);
-		ft_reply("3", tmp, client, NULL, _all_clients, _all_channels);
-		ft_reply("4", tmp, client, NULL, _all_clients, _all_channels);
-	}
-	else
-		ft_registration_failed(client);
 }
-
-
-

@@ -93,12 +93,10 @@ void Commands::pass(std::vector<std::string> params, CMD_PARAM)
 		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
 	//quid si le password est faux
 	//quid si le password est vide
-	if (params[1] == this->_server_password)
-	{
-		std::cout << "Password OK" << std::endl;
-		client->setPassword(params[1]);
-		client->setRegPass(true);
-	}
+	
+	std::cout << "Password OK" << std::endl;
+	client->setPassword(params[1]);
+	client->setRegPass(true);
 }
 
 // ******** NICK *************
@@ -151,28 +149,12 @@ void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 	{
 		return ft_error(ERR_NICKNAMEINUSE, params, client, NULL, client_list, *channel_list);
 	}
-	if (client->isRegistered() == false && client->getRegPass() == true)
-	{
-		std::cout << "NICK OK" << std::endl;
-		client->setRegNick(true);
-		client->setNickname(params[1]);
-		return;
-	}
-	if (client->isRegistered() == true)
-	{
-		std::string rpl;
-		std::cout << rpl << std::endl;
-		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
-		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
-		std::cout << rpl << std::endl;
-		client->setNickname(params[1]);
-	}
-	else
-	{
-		std::string tmp("Error: NICK : Client must be registered to change nickname\r\n");
-		std::cout << tmp << std::endl;
-	//	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
-	}
+	std::string rpl;
+	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
+	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+	std::cout << rpl << std::endl;
+	client->setNickname(params[1]);
+	client->setRegNick(true);
 }
 
 // ******** USER *************
@@ -211,14 +193,10 @@ void Commands::user(std::vector<std::string> params, CMD_PARAM)
 	if (client->isRegistered() == true)
 		return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
 	if (params.size() < 5)
-		return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);
-	
-	if (client->getRegPass() == true && client->getRegNick() == true)
-	{
-		client->setRegUser(true);
-		client->setRealname(ft_findUserRealname(params));
-		client->setUsername(params[1]);
-	}
+		return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);	
+	client->setRegUser(true);
+	client->setRealname(ft_findUserRealname(params));
+	client->setUsername(params[1]);
 }
 
 // ******** Channel Functions *************
