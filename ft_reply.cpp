@@ -11,9 +11,11 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 
 	std::string rpl;
 	int nb = atoi(nb_str.c_str());
-
 	rpl.clear();
-	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + nb_str + " : ";
+	if (code <= 5)
+		rpl = "quelque chose";
+	else
+		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + nb_str + " : ";
 	switch(nb)
     {
 		case 1:
