@@ -68,6 +68,12 @@ std::string const &		Client::getUsername() const
     return this->_username;
 }
 
+std::string const &		Client::getRealname() const
+{
+    return this->_realname;
+}
+
+
 std::string const &		Client::getMessage() const
 {
     return this->_message;
@@ -121,6 +127,11 @@ void Client::setNickname(std::string const& src)
 void Client::setUsername(std::string const& src)
 {
     this->_username = src;
+}
+
+void Client::setRealname(std::string const& src)
+{
+    this->_realname = src;
 }
 
 void Client::setMessage(std::string const& src)

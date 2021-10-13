@@ -43,7 +43,7 @@ void Commands::find_command(std::string input, Client* client, std::vector<Clien
 	if (_cmd_list[key])
 		(this->*_cmd_list[key])(_parsed_cmd, client, client_list, channel_list);
 	else
-		std::cout << "Command not found(Adrien)" << std::endl;
+		ft_error(ERR_UNKNOWNCOMMAND, _parsed_cmd, client, NULL, client_list, *channel_list);
 	this->_parsed_cmd.clear();
 }
 
@@ -177,6 +177,29 @@ void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 
 // ******** USER *************
 
+std::string ft_findUserRealname(std::vector<std::string> params)
+{
+	std::vector<std::string>::iterator itb = params.begin();
+	std::vector<std::string>::iterator ite = params.end();
+	std::string realname;
+	bool semicolon_found = false;
+
+	while(itb != ite)
+	{
+			
+		if (std::strstr((*itb).c_str(), ":"))
+			semicolon_found = true;
+
+		if (semicolon_found == true)
+			realname += *itb;
+		itb++;
+	}
+	//effacer le : de :realname
+	realname.erase(realname.begin());
+	std::cout << "realname = ["<< realname << std::endl;
+	return (realname);
+}
+
 void Commands::user(std::vector<std::string> params, CMD_PARAM)
 {
     (void)client;
@@ -187,22 +210,14 @@ void Commands::user(std::vector<std::string> params, CMD_PARAM)
 	std::cout << YELLOW << "Hello from USER function!" << RESET << std::endl;
 	if (client->isRegistered() == true)
 		return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
-	if (params.size() < 2)
+	if (params.size() < 5)
 		return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);
-
 	
-	if (client->getRegPass() == true)
-		std::cout << "USER : reg_PASS true" << std::endl;
-	if (client->getRegNick() == true)
-		std::cout << "USER : reg_NICK true" << std::endl;
 	if (client->getRegPass() == true && client->getRegNick() == true)
 	{
-		std::cout << "USER OK" << std::endl;
 		client->setRegUser(true);
+		client->setRealname(ft_findUserRealname(params));
 		client->setUsername(params[1]);
-		std::string tmp("Your new USERNAME is ");
-		tmp += client->getUsername() + "\n";
-		send(client->getSocket(), (tmp.c_str()), tmp.size(), 0);
 	}
 }
 
