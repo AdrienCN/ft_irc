@@ -4,6 +4,7 @@
 #include "headers.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "common_macro.hpp"
 
 //print
 class Client;
@@ -15,11 +16,11 @@ void print_channel_list(std::vector<Channel*> channel_list);
 void print_vector(std::vector<std::string> inputs);
 
 //error
-void ft_error(int nb, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list);
+void ft_error(std::string nb, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list);
 
 
 //reply
-void ft_reply(int nb, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list);
+void ft_reply(std::string nb, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list);
 
 
 #endif

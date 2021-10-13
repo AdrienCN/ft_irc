@@ -23,6 +23,9 @@ class Client;
 #include <stdio.h>
 #include <unistd.h> //write
 
+//atoi
+#include <stdlib.h>
+
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>

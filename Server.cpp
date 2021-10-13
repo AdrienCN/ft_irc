@@ -339,10 +339,11 @@ void	Server::welcomeClient(Client *client)
 			{
 				std::cout << GREEN << "****************REGISTRATION SUCCESS************************" << RESET << std::endl;
 				client->setRegistration(true);
-				for (int i = 1; i < 5; i++)
-					ft_reply(i, full_command, client, NULL, _all_clients, _all_channels);
-		//	std::string str = "NICK " + client->getNickname() + "test";
-		//	_command_book.find_command(str, client, _all_clients, &_all_channels);
+        ft_reply("1", tmp, client, NULL, _all_clients, _all_channels);
+	    	ft_reply("2", tmp, client, NULL, _all_clients, _all_channels);
+	    	ft_reply("3", tmp, client, NULL, _all_clients, _all_channels);
+	    	ft_reply("4", tmp, client, NULL, _all_clients, _all_channels);
+	    	ft_reply("5", tmp, client, NULL, _all_clients, _all_channels);
 			}
 			else
 				ft_registration_failed(client);
