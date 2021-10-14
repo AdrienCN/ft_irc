@@ -12,22 +12,13 @@ struct addrinfo
 	struct addrinfo *ai_next;
 };
 */
-Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password),  _server_ipaddress("127.0.0.1"), _server_creation_date(""), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
+Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _server_name("****>>>[IRC_90S]<<<****"), _server_ipaddress("127.0.0.1"), _server_creation_date(""), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
 {
 	time_t	raw_time;
 	time(&raw_time);
 	_server_creation_date = ctime(&raw_time);
 	//enlever le /n automatique de la fin
 	_server_creation_date.erase((_server_creation_date.end() - 1));
-	_server_name += "[";
-	_server_name += EMO_ROBOT;
-	_server_name += EMO_ROBOT;
-	_server_name += EMO_ROBOT;
-	_server_name += "IRC_90S";
-	_server_name += EMO_ROBOT;
-	_server_name += EMO_ROBOT;
-	_server_name += EMO_ROBOT;
-	_server_name += "]";
 	//_command_book._server_name = _server_name;
 	std::cout << _server_name << std::endl;
 	memset(&_hints, 0, sizeof(_hints));
