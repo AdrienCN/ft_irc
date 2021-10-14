@@ -132,7 +132,7 @@ void Server::init()
 	_poll.fd = _server_socket;
 	_poll.events = POLLIN;                                           
 	_fds.push_back(_poll);
-		std::cout << "fd = " << _poll.fd << std::endl;
+	std::cout << "fd = " << _poll.fd << std::endl;
 
 }
 
@@ -149,13 +149,31 @@ void	Server::pollInfo()
 
 void	Server::run() 
 {	
+	std::vector<struct pollfd>		tmp;
 	while (1)
 	{
 		std::cout << "FROM MAIN SERVER" << std::endl;
 		print_client_list(_all_clients);
 		print_channel_list(_all_channels);
-
 		
+
+		tmp.push_back(this->_poll);
+		for (std::vector<Client*>::iterator it = _all_clients.begin(); it != _all_clients.end(); it++)
+		{
+			tmp.push_back((*it)->getPoll());
+		}
+
+		std::vector<pollfd>::iterator it = tmp.begin();
+//		std::cout << "Starting new poll ..." << std::endl;
+		int poll_count = poll(&(*it), _nbClients + 1, -1);
+		if (poll_count == -1)
+			throw Server::ExceptErrno();
+		this->pollInfo();
+
+		std::vector<pollfd>::iterator itb = tmp.begin();
+		std::vector<pollfd>::iterator ite = tmp.end();
+		
+	/*	
 		std::vector<pollfd>::iterator it = _fds.begin();
 //		std::cout << "Starting new poll ..." << std::endl;
 		int poll_count = poll(&(*it), _nbClients + 1, -1);
@@ -165,6 +183,7 @@ void	Server::run()
 
 		std::vector<pollfd>::iterator itb = _fds.begin();
 		std::vector<pollfd>::iterator ite = _fds.end();
+		*/
 		while (itb != ite)
 		{
 			 if (((*itb).revents & POLLHUP) == POLLHUP)
@@ -208,7 +227,8 @@ void	Server::run()
 				}
 			}
 			itb++;
-		}	
+		}
+		tmp.clear();
 	}
 }
 
@@ -239,7 +259,8 @@ void	Server::addClient()
 
 	Client*			new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
 	new_client->init(socket);
-	this->poll_add_client(*new_client);
+	_fds.push_back(new_client->getPoll());
+	//this->poll_add_client(*new_client);
 	_all_clients.push_back(new_client);
 	_nbClients++;
 	std::cout << "New client added" <<std::endl;
