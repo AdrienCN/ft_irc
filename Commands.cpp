@@ -499,7 +499,9 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 				if (isValidChanName(*itn) == 0) //not a channel name
 				{
 					std::cout << RED << *itn << " is not a valid Channel name" << RESET << std::endl;
-					ft_error(ERR_BADCHANMASK, params, client, tmp, client_list, *channel_list); //  ERR_BADCHANMASK			}
+					std::vector<std::string> tmp_params;
+					tmp_params.push_back(*itn);
+					ft_error(ERR_BADCHANMASK, tmp_params, client, tmp, client_list, *channel_list); //  ERR_BADCHANMASK			}
 				}
 				else
 				{
@@ -685,7 +687,7 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 					else
 					{
 						std::cout << RED << " The  client does not exist" << RESET << std::endl;
-						ft_error(ERR_NOTONCHANNEL, params, client, tmp_channel, client_list, *channel_list); //  ERR_NOTONCHANNEL
+						ft_error(ERR_NOSUCHNICK, params, client, tmp_channel, client_list, *channel_list); //  ERR_NOTONCHANNEL
 
 					}
 					itu++;
