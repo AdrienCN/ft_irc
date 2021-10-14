@@ -80,17 +80,14 @@ void Commands::find_command(std::string input, Client* client, std::vector<Clien
 	this->_parsed_cmd.clear();
 }
 
-std::string ft_uppercase(const char* str)
+void	ft_uppercase(std::string & str)
 {
-	std::string str2;
-	char c;
-
-	for (int i = 0; str[i]; i++)
+	std::string::iterator  itb = str.begin();
+	while (itb != str.end())
 	{
-		c = std::toupper(str[i]);
-		str2 += &c;
+	 	*itb = std::toupper(*itb);
+		itb++;
 	}
-	return str2;
 }
 
 void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
@@ -118,9 +115,7 @@ void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
 			*/
 			if (first == 1)
 			{
-				std::string tmp2 = ft_uppercase(tmp.c_str());
-				tmp.clear();
-				tmp = tmp2;
+				ft_uppercase(tmp);
 				first = 0;
 			}
 			if (tmp != "\0") // si je suis pas une chaine vide

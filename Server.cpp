@@ -17,6 +17,7 @@ Server::Server(std::string port, std::string password) : _domain("NULL"), _port(
 	time_t	raw_time;
 	time(&raw_time);
 	_server_creation_date = ctime(&raw_time);
+	_command_book.setServerCreationDate(_server_creation_date);
 	//enlever le /n automatique de la fin
 	_server_creation_date.erase((_server_creation_date.end() - 1));
 	//_command_book._server_name = _server_name;
