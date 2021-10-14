@@ -46,6 +46,24 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 			rpl += "Try server <server name>, port <port number>\r\n";
 			break;
 		}
+		//RPL_AWAY
+		case 301:
+		{
+			rpl += client->getNickname() + " :" + client->getAwayMessage() + "\r\n";
+			break;
+		}
+		//RPL_UNAWAY
+		case 305:
+		{
+			rpl += "You are no longer marked as being away\r\n";
+			break;
+		}
+		//RPL_NOWAWAY
+		case 306:
+		{
+			rpl += "You have been marked as being away\r\n" ;
+			break;
+		}
 		case 331: //RPL_NOTOPIC
 		{
 			rpl += (channel->getName() + " :No topic is set\r\n");

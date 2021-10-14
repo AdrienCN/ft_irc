@@ -49,9 +49,9 @@ class Server
 		std::string const & getServerCreationDate() const;
 
 		//SETTERS
-		void  setServerName(std::string const src);
-		void  setServerIpaddress(std::string const src);
-		void  setServerCreationDate(std::string const src);
+		void  setServerName(std::string const & src);
+		void  setServerIpaddress(std::string const & src);
+		void  setServerCreationDate(std::string const & src);
 
 
 

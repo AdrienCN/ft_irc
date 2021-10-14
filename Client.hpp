@@ -33,22 +33,25 @@ class Client
         std::string const &		getMessage() const;
         int         const &		getMessageStatus() const;
         int         const &     getSocket() const;
+        int			getNbChannels() const;
         struct pollfd   const & getPoll() const;
 		bool		const &		isRegistered() const;
 		bool		const &		getRegPass() const;
 		bool		const &		getRegNick() const;
 		bool		const &		getRegUser() const;
+		bool		const &		getAway() const;
 		std::vector<std::string> const & getCommand() const;
-        int getNbChannels() const;
 		std::string const & getServerName() const;
 		std::string const & getServerIpaddress() const;
 		std::string const & getServerCreationDate() const;
+		std::string const & getAwayMessage() const;
+		
 
 
         //SETTERS
- 		void	setRegPass(bool const &src);
-		void	setRegNick(bool const &src);
-		void	setRegUser(bool const &src);
+ 		void	setRegPass(bool const& src);
+		void	setRegNick(bool const& src);
+		void	setRegUser(bool const& src);
         void	setMessageStatus(bool const& src);
 		void		setRegistration(bool const& src);
 		void		setRealname(std::string const& src);	
@@ -56,10 +59,12 @@ class Client
         void		setNickname(std::string const& src);
         void		setUsername(std::string const& src);
         void		setMessage(std::string const& src);
+		void		setAwayMessage(std::string const& src);
         void			init(int const & socket);
-		void  setServerName(std::string const src);
-		void  setServerIpaddress(std::string const src);
-		void  setServerCreationDate(std::string const src);
+		void  setServerName(std::string const & src);
+		void  setServerIpaddress(std::string const & src);
+		void  setServerCreationDate(std::string const & src);
+		void	setAway(bool const& src);
 
 
 
@@ -89,6 +94,7 @@ class Client
 		std::string _server_name;
 		std::string _server_ipaddress;
 		std::string _server_creation_date;
+		std::string _away_message;
         
         //std::string _host;
         //std::string _servername;
@@ -105,6 +111,7 @@ class Client
 		bool _reg_pass;
 		bool _reg_nick;
 		bool _reg_user;
+		bool _away;
         //Input _input: // template pour analyser un message
 
 

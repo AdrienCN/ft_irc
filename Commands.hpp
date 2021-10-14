@@ -46,13 +46,14 @@ class Commands
 		void	privmsg(std::vector<std::string> params, CMD_PARAM);
 		void	who(std::vector<std::string> params, CMD_PARAM);
 		void	names(std::vector<std::string> params, CMD_PARAM);
+		void	away(std::vector<std::string> params, CMD_PARAM);
 		std::string const & getServerName() const;
 		std::string const & getServerIpaddress() const;
 		std::string const & getServerCreationDate() const;
 
-		void  setServerName(std::string const src);
-		void  setServerIpaddress(std::string const src);
-		void  setServerCreationDate(std::string const src);
+		void  setServerName(std::string const & src);
+		void  setServerIpaddress(std::string const & src);
+		void  setServerCreationDate(std::string const & src);
 
 
     

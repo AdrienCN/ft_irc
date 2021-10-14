@@ -7,7 +7,11 @@
 #define RPL_YOURHOST			"2" //
 #define RPL_CREATED				"3" //
 #define RPL_MYINFO				"4" //
-#define RPL_BOUNCE				"5"// 
+#define RPL_BOUNCE				"5"//
+#define RPL_AWAY				"301"//
+#define RPL_UNAWAY				"305"
+#define RPL_UNAWAY				"305"
+#define RPL_NOWAWAY				"306"
 #define RPL_NOTOPIC				"331"// 
 #define RPL_TOPIC				"332"
 #define RPL_NAMEREPLY			"353"
