@@ -13,29 +13,29 @@ Channel::~Channel()
 
 void Channel::present()
 {
-    std::cout << "Channel name = " << getName();
-    if (_has_key == true)
-     std::cout << " | my key is " << getKey();
-    if (_has_topic == true)
-        std::cout << " | my topic is " << getTopic();
-    std::cout << std::endl << "My members are : ";
-    std::vector<Client*>::iterator it = _members.begin();
-    std::vector<Client*>::iterator ite = _members.end();
+	std::cout << "Channel name = " << getName();
+	if (_has_key == true)
+		std::cout << " | my key is " << getKey();
+	if (_has_topic == true)
+		std::cout << " | my topic is " << getTopic();
+	std::cout << std::endl << "My members are : ";
+	std::vector<Client*>::iterator it = _members.begin();
+	std::vector<Client*>::iterator ite = _members.end();
 
-    while (it != ite)
-    {
-        std::cout << (*it)->getNickname() << " ";
-        it++;
-    }
-    std::cout << std::endl << "My operator is : ";
-    it = _operators.begin();
-    ite = _operators.end();
-    while (it != ite)
-    {
-        std::cout << (*it)->getNickname() << " ";
-        it++;
-    }
-    std::cout << std::endl;
+	while (it != ite)
+	{
+		std::cout << (*it)->getNickname() << " ";
+		it++;
+	}
+	std::cout << std::endl << "My operator is : ";
+	it = _operators.begin();
+	ite = _operators.end();
+	while (it != ite)
+	{
+		std::cout << (*it)->getNickname() << " ";
+		it++;
+	}
+	std::cout << std::endl;
 }
 
 // GETTERS
@@ -86,13 +86,40 @@ void	Channel::printMembers() { // iterateur sur membres
 	std::string rpl;
 	std::cout << "printMembers function" << std::endl;
 	while (it != ite) {
-		rpl += "*" + (*it)->getUsername() + " ";
-		rpl += "127.0.0.1";
-		rpl += " irc_90.com " + (*it)->getNickname();
+		rpl = this->getName() + " ";
+		rpl += (*it)->getUsername() + " ";
+		rpl += (*it)->getServerIpaddress() + " ";
+		rpl += (*it)->getServerName() + " ";
+		rpl += (*it)->getNickname() + " ";
 		// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
-		rpl += " H  :0\r\n"; // + real name
+		rpl += "H";
+		if (isUserOp(*it))
+			rpl += "@";
+		rpl += " :0 " + (*it)->getRealname() + "\r\n"; // + real name
 		send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
-	//	std::cout << "user : " << (*it)->getUsername() << std::endl;
+		// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
+		// Adrien -> fait la fonction away qui va me donner les infos 
+		rpl = "";
+		it++;
+	}
+}
+
+void	Channel::printOperators() { // iterateur sur membres
+	std::vector<Client*>::iterator it = _operators.begin();
+	std::vector<Client*>::iterator ite = _operators.end();
+	std::string rpl;
+	std::cout << "printOperators function" << std::endl;
+	while (it != ite) {
+		rpl = this->getName() + " ";
+		rpl += (*it)->getUsername() + " ";
+		rpl += (*it)->getServerIpaddress() + " ";
+		rpl += (*it)->getServerName() + " ";
+		rpl += (*it)->getNickname() + " ";
+		// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
+		rpl += "H@ :0 " + (*it)->getRealname() + "\r\n"; // + real name
+		send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
+		// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
+		// Adrien -> fait la fonction away qui va me donner les infos 
 		rpl = "";
 		it++;
 	}
@@ -108,7 +135,7 @@ void	Channel::printMembersNick() { // iterateur sur membres
 		rpl += " : " + (*it)->getNickname();
 		rpl += "\r\n"; // + real name
 		send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
-	//	std::cout << "user : " << (*it)->getUsername() << std::endl;
+		//	std::cout << "user : " << (*it)->getUsername() << std::endl;
 		rpl = "";
 		it++;
 	}
@@ -149,45 +176,45 @@ void Channel::setTopic(std::string const& src)
 int Channel::isUserBanned(Client* client)
 {
 
-    std::vector<Client*>::iterator it = _banned.begin();
-    std::vector<Client*>::iterator ite = _banned.end();
-    
-    while (it != ite)
-    {
-        if ((*it)->getNickname() == client->getNickname())
-            return (1);
-        it++;
-    }
-    return (0);
+	std::vector<Client*>::iterator it = _banned.begin();
+	std::vector<Client*>::iterator ite = _banned.end();
+
+	while (it != ite)
+	{
+		if ((*it)->getNickname() == client->getNickname())
+			return (1);
+		it++;
+	}
+	return (0);
 }
 
 int Channel::isUserOp(Client* client)
 {
-    std::vector<Client*>::iterator it = _operators.begin();
-    std::vector<Client*>::iterator ite = _operators.end();
-    
-    while (it != ite)
-    {
-        if ((*it)->getNickname() == client->getNickname())
-            return (1);
-        it++;
-    }
-    return (0);
+	std::vector<Client*>::iterator it = _operators.begin();
+	std::vector<Client*>::iterator ite = _operators.end();
+
+	while (it != ite)
+	{
+		if ((*it)->getNickname() == client->getNickname())
+			return (1);
+		it++;
+	}
+	return (0);
 }
 
 int Channel::isUserMember(Client* client)
 {
 
-    std::vector<Client*>::iterator it = _members.begin();
-    std::vector<Client*>::iterator ite = _members.end();
-    
-    while (it != ite)
-    {
-        if ((*it)->getNickname() == client->getNickname())
-            return (1);
-        it++;
-    }
-    return (0);
+	std::vector<Client*>::iterator it = _members.begin();
+	std::vector<Client*>::iterator ite = _members.end();
+
+	while (it != ite)
+	{
+		if ((*it)->getNickname() == client->getNickname())
+			return (1);
+		it++;
+	}
+	return (0);
 }
 
 int Channel::isKeyRight(std::string key)
@@ -216,51 +243,51 @@ void Channel::addBanned(Client *client)
 
 void Channel::removeMember(Client *client)
 {
-    std::vector<Client*>::iterator it = _members.begin();
-    std::vector<Client*>::iterator ite = _members.end();
-    
-    while (it != ite)
-    {
-        if ((*it)->getNickname() == client->getNickname())
-        {
-            _members.erase(it);
-            _nb_members--;
-            return;
-        }
-        it++;
-    }
+	std::vector<Client*>::iterator it = _members.begin();
+	std::vector<Client*>::iterator ite = _members.end();
+
+	while (it != ite)
+	{
+		if ((*it)->getNickname() == client->getNickname())
+		{
+			_members.erase(it);
+			_nb_members--;
+			return;
+		}
+		it++;
+	}
 }
 
 void Channel::removeOp(Client *client)
 {   
 
-    std::vector<Client*>::iterator it = _operators.begin();
-    std::vector<Client*>::iterator ite = _operators.end();
-    
-    while (it != ite)
-    {
-        if ((*it)->getNickname() == client->getNickname())
-        {
-            _operators.erase(it);
-            return;
-        }
-        it++;
-    }
+	std::vector<Client*>::iterator it = _operators.begin();
+	std::vector<Client*>::iterator ite = _operators.end();
+
+	while (it != ite)
+	{
+		if ((*it)->getNickname() == client->getNickname())
+		{
+			_operators.erase(it);
+			return;
+		}
+		it++;
+	}
 }
 
 void Channel::removeBanned(Client *client)
 {
-    std::vector<Client*>::iterator it = _banned.begin();
-    std::vector<Client*>::iterator ite = _banned.end();
-    
-    while (it != ite)
-    {
-        if ((*it)->getNickname() == client->getNickname())
-        {
-            _banned.erase(it);
-            return;
-        }
-        it++;
-    }
+	std::vector<Client*>::iterator it = _banned.begin();
+	std::vector<Client*>::iterator ite = _banned.end();
+
+	while (it != ite)
+	{
+		if ((*it)->getNickname() == client->getNickname())
+		{
+			_banned.erase(it);
+			return;
+		}
+		it++;
+	}
 }
 

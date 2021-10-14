@@ -47,6 +47,7 @@ class Channel
         void removeBanned(Client* client);
 
 		void printMembers();
+		void printOperators();
 		void printMembersNick();
 
     private:
