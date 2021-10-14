@@ -796,16 +796,30 @@ static int	matchChannel(std::vector<std::string> params, CMD_PARAM) {
 	return (-1);
 }
 
-static void	printWho(std::vector<std::string> params, CMD_PARAM, Client* client_ref) {
+static void	printWho(std::vector<std::string> params, CMD_PARAM, Client* client_ref, int user) {
 	std::string rpl;
 	(void)params;
 	(void)client_list;
 	(void)channel_list;
-	rpl += "*" + client_ref->getUsername() + " ";
-	rpl += "127.0.0.1";
-	rpl += " irc_90.com " + client_ref->getNickname();
+	//if params[1] == nom -> * 
+	//if params[1] == channel -> #nom de channel
+	if (user)
+		rpl += "*";
+	else 
+		rpl += params[1];
+	rpl += " " + client_ref->getUsername() + " ";
+	rpl += client_ref->getServerIpaddress();
+	rpl += client_ref->getServerName() + client_ref->getNickname();
 	// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
+	// Adrien -> fait la fonction away qui va me donner les infos 
 	rpl += " H  :0\r\n"; // + real name
+	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+}
+
+static void	printWhoEnd(std::string param, Client* client) {
+	std::string rpl;
+	
+	rpl += param + ":End of WHO list" ;
 	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
 }
 
@@ -817,12 +831,12 @@ static	int	matchOthers(std::vector<std::string> params, CMD_PARAM) {
 
 	while (it != client_list.end()) {
 		if (!params[1].compare((*it)->getUsername())) {
-			printWho(params, client, client_list, channel_list, *it);
+			printWho(params, client, client_list, channel_list, *it, 1);
 			/* std::cout << "real name : " << (*it)->getUsername() << std::endl; */
 			i++;
 		}
 		if (!params[1].compare((*it)->getNickname())) {
-			printWho(params, client, client_list, channel_list, *it);
+			printWho(params, client, client_list, channel_list, *it, 1);
 			/* std::cout << "nick name : " << (*it)->getNickname() << std::endl; */
 			i++;
 		}
@@ -834,7 +848,7 @@ static	int	matchOthers(std::vector<std::string> params, CMD_PARAM) {
 static void	printWhoAllClient(std::vector<std::string> params, CMD_PARAM) {
 	std::vector<Client*>::iterator it = client_list.begin();
 	while (it != client_list.end()) {
-		printWho(params, client, client_list, channel_list, *it);
+		printWho(params, client, client_list, channel_list, *it, 1);
 		std::cout << (*it)->getUsername() << std::endl;
 		it++;
 	}
@@ -844,6 +858,7 @@ void Commands::who(std::vector<std::string> params, CMD_PARAM) {
 	std::cout << YELLOW << "Hello from Who function!" << RESET << std::endl;
 	if (params.size() == 1) {
 		printWhoAllClient(params, client, client_list, channel_list);
+		printWhoEnd(params[1], client);
 		return ;
 	}
 	// on cheche si un cannal correspond au second parametre de who 
@@ -852,13 +867,16 @@ void Commands::who(std::vector<std::string> params, CMD_PARAM) {
 		//on regarde si le parametre de who correspond a n importe quoi d autre
 		if (matchOthers(params, client, client_list, channel_list) == 0)
 			return ;
-		// on trouve rien on print tout
+		// on t
 		printWhoAllClient(params, client, client_list, channel_list);
+		printWhoEnd(params[1], client);
 		return ;
 	}
 	//on print tout les membres du cannal trouvé 
-	(*channel_list)[num]->printMembers();
+	(*channel_list)[num]->printMembers(); // complicado pour print params[1]
+	printWhoEnd(params[1], client);
 	std::cout << YELLOW << "GoodBye Who function!" << RESET << std::endl;
+	//si o imprimer les _operator sinon _members
 }
 
 /* ************************************NAMES****************************************** */
