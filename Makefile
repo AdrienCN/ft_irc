@@ -1,3 +1,5 @@
+NAME = IRC_90s
+
 SRCS = 	main.cpp \
 		Server.cpp \
 		Client.cpp \
@@ -7,37 +9,53 @@ SRCS = 	main.cpp \
 		ft_reply.cpp \
 		ft_print_help.cpp
 
-OBJ = $(SRCS:.cpp=.o)
+# OBJ = $(SRCS:.cpp=.o)
+OBJ_DIR   = objs/
+
+OBJS      = $(addprefix $(OBJ_DIR), ${SRCS:.cpp=.o})
+
+DIR		  = $(sort $(dir $(OBJS)))
 
 CXX = clang++
 
-CXXFLAGS = -Wall -Werror -Wextra -g3 -std=c++98 #-fsanitize=address 
+CXXFLAGS = -Wall -Werror -Wextra -g3 -std=c++98 -fsanitize=address 
 
-NAME = IRC_90s
+RM        = rm -rf
 
 INCLUDE = headers.hpp \
 		  Server.hpp \
-		  Client.hpp
+		  Client.hpp \
+		  Commands.hpp
 
-#$(subst cpp,hpp, $(SRCS))	
+MAKE	+= --no-print-directory
 
-%.o:%.cpp $(INCLUDE)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# %.o:%.cpp $(INCLUDE)
+# 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+all: 
+	@${MAKE} -j ${NAME}
 
-$(NAME): $(OBJ)
-	$(CXX) $(CXXFLAGS) -I . $(OBJ) -o $(NAME)
+$(NAME) :   ${OBJS}	
+			@${CXX} -o $@ ${OBJS} ${CXXFLAGS}
+			@printf "\033[32mAll done.\n\033[0m\n"
+
+$(DIR) :    
+	@mkdir -p $@
+
+$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp $(INCLUDE) | $(DIR)
+		$(CXX) -c $< -o $@ ${CXXFLAGS}
 
 echo :
 	@echo $(SRCS)
 	@echo $(INCLUDE)
 
-all: $(NAME)
 
 clean:
-	rm -rf $(OBJ)
+	@echo "Cleaning files..."
+	@${RM} ${OBJ_DIR}
 
 fclean: clean
-	rm -rf $(NAME)
+	@echo "Cleaning all files..."
+	@${RM} $(NAME)
 
 re: fclean all

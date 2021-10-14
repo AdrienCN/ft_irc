@@ -43,7 +43,8 @@ class Commands
 		void	user(std::vector<std::string> params, CMD_PARAM);
 		void	pass(std::vector<std::string> params, CMD_PARAM);
 		void	privmsg(std::vector<std::string> params, CMD_PARAM);
-
+		void	who(std::vector<std::string> params, CMD_PARAM);
+		void	names(std::vector<std::string> params, CMD_PARAM);
 		std::string const & getServerName() const;
 		std::string const & getServerIpaddress() const;
 		std::string const & getServerCreationDate() const;
@@ -60,12 +61,12 @@ class Commands
         Commands&	operator=(Commands const& src); 
 		std::map	<std::string , void(Commands::*)(std::vector<std::string> params, CMD_PARAM)> _cmd_list;
 		std::vector<std::string>	_parsed_cmd;
+
 		std::string					_server_password;
 		std::string _server_name;
 		std::string _server_ipaddress;
 		std::string _server_creation_date;
         
-
  
 };
 

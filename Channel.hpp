@@ -46,6 +46,9 @@ class Channel
         void addBanned(Client* client);
         void removeBanned(Client* client);
 
+		void printMembers();
+		void printMembersNick();
+
     private:
         Channel();
         Channel(Channel const& src);

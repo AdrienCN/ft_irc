@@ -20,12 +20,14 @@ Commands::Commands(std::string const & password, std::string server_name, std::s
 	_cmd_list["PART"] = &Commands::part;
 	_cmd_list["TOPIC"] = &Commands::topic;
 	_cmd_list["PRIVMSG"] = &Commands::privmsg;
-    return;
+	_cmd_list["WHO"] = &Commands::who;
+	_cmd_list["NAMES"] = &Commands::names;
+	return;
 }
 
 Commands::~Commands()
 {
-    return;
+	return;
 }
 
 //************ PARSING ET TRI DE LA STR COMMAND EN VECTOR ********************
@@ -64,11 +66,12 @@ void Commands::find_command(std::string input, Client* client, std::vector<Clien
 {
 	// A verifier si on doit gérer les prefixes ":" en premier message (mais je pense pas)
 	(void)client;
-    (void)client_list;
-    (void)channel_list;
-   
+	(void)client_list;
+	(void)channel_list;
+
 	this->analyzeCommand(input);
 	std::string key(_parsed_cmd.front());
+	std::cout << "key :" << key << std::endl;
 	//std::map<std::string , void(Commands::*)(std::vector<std::string>)>::iterator it = _cmd_list.begin();
 	if (_cmd_list[key])
 		(this->*_cmd_list[key])(_parsed_cmd, client, client_list, channel_list);
@@ -92,19 +95,19 @@ std::string ft_uppercase(const char* str)
 
 void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
 {	
+
 		std::istringstream str(command);
 		std::string tmp;
 		bool first = 1;
-
-		/*
-		if (command.length() > 512) // 512 en incluant \r\n
+	//1. Split du sub_str message par les whitespaces dans un vector
+	while (std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
+	{
+		if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
 		{
-			//Commande trop longue, quelle erreur a manager?
+			tmp.erase(tmp.length() - 1);
+			//tmp.erase(tmp.length() - 1); //en fonction de /r /n
 		}
-		*/
-
-		//1. Split du sub_str message par les whitespaces dans un vector
-		while (std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
+		if (tmp != "\0") // si je suis pas une chaine vide
 		{
 			/* On en a plus besoin car fait a l'etape d'avant
 			if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
@@ -126,7 +129,8 @@ void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
 				tmp.clear(); // on enleve tout le contenu et size = 0
 			}
 		}
-		print_vector(_parsed_cmd);
+	}
+	print_vector(_parsed_cmd);
 }
 
 //************ COMMANDES A EXECUTER ********************
@@ -136,9 +140,10 @@ void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
 void Commands::pass(std::vector<std::string> params, CMD_PARAM)
 {
 	(void)client;
-    (void)client_list;
-    (void)channel_list;
+	(void)client_list;
+	(void)channel_list;
 	(void)params;
+
     std::cout << YELLOW << "Hello from PASS function!" << RESET << std::endl;
 	if (client->isRegistered() == true)
 		return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
@@ -185,11 +190,11 @@ Client* 	ft_nickname_exist_return(std::vector<Client*> client_list, std::string 
 void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 {
 	(void)client;
-    (void)client_list;
-    (void)channel_list;
+	(void)client_list;
+	(void)channel_list;
 	(void)params;
 
-    std::cout << YELLOW << "Hello from NICK function!"<< RESET  << std::endl;
+	std::cout << YELLOW << "Hello from NICK function!"<< RESET  << std::endl;
 	//Pas de pseudo donne
 	if (params.size() < 2)
 	{
@@ -237,11 +242,11 @@ std::string ft_findUserRealname(std::vector<std::string> params)
 
 void Commands::user(std::vector<std::string> params, CMD_PARAM)
 {
-    (void)client;
-    (void)client_list;
-    (void)channel_list;
+	(void)client;
+	(void)client_list;
+	(void)channel_list;
 	(void)params;
-	
+
 	std::cout << YELLOW << "Hello from USER function!" << RESET << std::endl;
 	if (client->isRegistered() == true)
 		return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
@@ -266,16 +271,21 @@ int isValidChanName(std::string channel_name)
 
 void  commaSplit(std::string str, std::vector<std::string>* vector)
 {	
-		std::istringstream str2(str);
-		std::string tmp;
+	std::istringstream str2(str);
+	std::string tmp;
 
-		while (std::getline(str2, tmp,','))
+	while (std::getline(str2, tmp,','))
+	{
+		if (isValidChanName(tmp))
 		{
+
 			//if (tmp[0] == '#' || tmp[0] == '&') // HEXCHAT envoie le nom de channel avec ces args
 			//	tmp.erase(0, 1);
 			vector->push_back(tmp);
 			tmp.clear(); // on enleve tout le contenu et size = 0
 		}
+		tmp.clear(); // on enleve tout le contenu et size = 0
+	}
 }
 
 Channel* ft_channel_exist(std::vector<Channel*> channel_list, std::string channel)
@@ -328,8 +338,8 @@ void joinChannel(Channel* new_chan, std::vector<std::string> params, CMD_PARAM)
 void leaveChannel(Channel* channel, Client *client, std::string part_message)
 {
 	client->remove_channel(channel);
-
 	/* cas ou plus d'utilisateurs 
+
 	std::vector<Channel*>::iterator itl = channel_list->begin();
 	std::vector<Channel*>::iterator itle = channel_list->end();
 	while (itl != itle)
@@ -345,7 +355,6 @@ void leaveChannel(Channel* channel, Client *client, std::string part_message)
 	}
 	cas a faire : operateur is leaving
 	*/
-
 	std::string rpl;
 	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PART " + channel->getName() + " :" + part_message + "\r\n";
 	std::vector<Client*> tmp = channel->getMemberList();
@@ -366,18 +375,18 @@ void leaveChannel(Channel* channel, Client *client, std::string part_message)
 void Commands::join(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from JOIN function!" << RESET << std::endl;
-    (void)client;
-    (void)client_list;
-    (void)channel_list;
+	(void)client;
+	(void)client_list;
+	(void)channel_list;
 	(void)params;
-	
+
 	if (params.size() == 1)
 	{
 		std::cout << "Error : JOIN lack of params" << std::endl;
 		ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
 		return;
 	}
-	
+
 	//On parse le 2e arg de params (channel name) et le 3e (les keys potentiellement)
 	std::vector<std::string>::iterator it = params.begin();
 	it++;
@@ -396,7 +405,7 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 	std::vector<std::string>::iterator itne = channels_name.end();
 	std::vector<std::string>::iterator itk = channels_key.begin();
 	std::vector<std::string>::iterator itke = channels_key.end();
-	
+
 	while (itn != itne)
 	{
 		
@@ -511,25 +520,25 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 void Commands::part(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from PART function!" << RESET << std::endl;
-    (void)client;
-    (void)client_list;
-    (void)channel_list;
+	(void)client;
+	(void)client_list;
+	(void)channel_list;
 	(void)params;
-	
+
 	if (params.size() == 1)
 	{
 		std::cout << "Error : PART lack of params" << std::endl;
 		ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
 		return;
 	}
-	
+
 	//On parse le 2e arg de params (channel name)
 	std::vector<std::string>::iterator it = params.begin();
 	std::vector<std::string>::iterator ite = params.end();
 	it++;
 	std::vector<std::string> channels_name;
 	commaSplit(*it, &channels_name);
-	
+
 	//On cherche un potentiel message de départ
 	it++;
 	std::string part_message;
@@ -537,7 +546,7 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 		part_message = (*it);
 	else
 		part_message = client->getNickname();
-	
+
 	//Juste pour imprimer
 	/*
 	print_vector(channels_name);
@@ -578,14 +587,14 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 void Commands::topic(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from TOPIC function!" << RESET << std::endl;
-	
+
 	if (params.size() == 1)
 	{
 		std::cout << "Error : TOPIC lack of params" << std::endl;
 		ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
 		return;
 	}
-		
+
 	std::vector<std::string>::iterator it = params.begin();
 	std::vector<std::string>::iterator ite = params.end();
 	it++;
@@ -650,6 +659,7 @@ void Commands::topic(std::vector<std::string> params, CMD_PARAM)
 void send_privmsg_user(Client *client, std::string message, Client* user)
 {
 	std::string rpl;
+
 	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PRIVMSG " + user->getNickname() + message;
   	send(user->getSocket(), (rpl.c_str()), rpl.size(), 0);;
 }
@@ -674,7 +684,7 @@ void send_privmsg_channel(Client *client, std::string message, Channel* channel)
 void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from PRIVMSG function!" << RESET << std::endl;
-	
+
 	if (params.size() <= 2)
 	{
 		std::cout << "Error : PRIVMSG lack of params" << std::endl;
@@ -691,7 +701,7 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 	it++;
 	std::vector<std::string> destinataires;
 	commaSplit(*it, &destinataires);
-	
+
 	//On cherche un potentiel message de départ&
 	it++;
 	std::string message;
@@ -730,7 +740,7 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 				std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_client->getNickname() <<  " : " << message << RESET << std::endl;
 		   		send_privmsg_user(client, message, tmp_client);
 			}
-	    }
+	   }
 		else // si je suis un cannal
 		{
 			std::cout << "I am a channel" << std::endl;
@@ -742,14 +752,14 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 					std::cout << RED << client->getNickname() << " is not a member of " << tmp_channel->getName() << RESET << std::endl;
 					ft_error(ERR_CANNOTSENDTOCHAN, params, client, tmp_channel, client_list, *channel_list); //  ERR_CANNOTSENDTOCHAN
 			        return;
-				}
+        }
 				else
 				{
 					std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_channel->getName() <<  " : " << message << RESET << std::endl;
 					send_privmsg_channel(client, message, tmp_channel);
 				}
 			}
-					else
+			else
 			{
 				std::cout << RED << "Not a client or a channel" << RESET << std::endl;
 			    ft_error(ERR_NOSUCHNICK, params, client, NULL, client_list, *channel_list); //ERR_NOSUCHNICK
@@ -759,3 +769,118 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 	}
 }
 
+
+/* ************************************WHO****************************************** */
+
+//reste a definir : 
+//l utilisation de "o"
+//l exporation des variable du serveur pour enlever les parametres en dur de printWho
+//comprendre les operator a send
+//utilisation de real name
+
+static int	matchChannel(std::vector<std::string> params, CMD_PARAM) {
+	std::vector<Channel*>::iterator it = channel_list->begin();
+	int i = 0;
+	(void)client_list;
+	(void)client;
+
+	while (it != channel_list->end()) {
+		std::cout << "params[1] : " << params[1] << std::endl;
+		std::cout << "it : " << (*it)->getName() << std::endl;
+		if (!params[1].compare((*it)->getName())) {
+			return i;
+		}
+		i++;
+		it++;
+	}
+	return (-1);
+}
+
+static void	printWho(std::vector<std::string> params, CMD_PARAM, Client* client_ref) {
+	std::string rpl;
+	(void)params;
+	(void)client_list;
+	(void)channel_list;
+	rpl += "*" + client_ref->getUsername() + " ";
+	rpl += "127.0.0.1";
+	rpl += " irc_90.com " + client_ref->getNickname();
+	// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
+	rpl += " H  :0\r\n"; // + real name
+	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+}
+
+static	int	matchOthers(std::vector<std::string> params, CMD_PARAM) {
+	std::vector<Client*>::iterator it = client_list.begin();
+	(void)channel_list;
+	(void)client;
+	int i = 0;
+
+	while (it != client_list.end()) {
+		if (!params[1].compare((*it)->getUsername())) {
+			printWho(params, client, client_list, channel_list, *it);
+			/* std::cout << "real name : " << (*it)->getUsername() << std::endl; */
+			i++;
+		}
+		if (!params[1].compare((*it)->getNickname())) {
+			printWho(params, client, client_list, channel_list, *it);
+			/* std::cout << "nick name : " << (*it)->getNickname() << std::endl; */
+			i++;
+		}
+		it++;
+	}
+	return i;
+}
+
+static void	printWhoAllClient(std::vector<std::string> params, CMD_PARAM) {
+	std::vector<Client*>::iterator it = client_list.begin();
+	while (it != client_list.end()) {
+		printWho(params, client, client_list, channel_list, *it);
+		std::cout << (*it)->getUsername() << std::endl;
+		it++;
+	}
+}
+
+void Commands::who(std::vector<std::string> params, CMD_PARAM) {
+	std::cout << YELLOW << "Hello from Who function!" << RESET << std::endl;
+	if (params.size() == 1) {
+		printWhoAllClient(params, client, client_list, channel_list);
+		return ;
+	}
+	// on cheche si un cannal correspond au second parametre de who 
+	int num = matchChannel(params, client, client_list, channel_list);
+	if (num < 0) {
+		//on regarde si le parametre de who correspond a n importe quoi d autre
+		if (matchOthers(params, client, client_list, channel_list) == 0)
+			return ;
+		// on trouve rien on print tout
+		printWhoAllClient(params, client, client_list, channel_list);
+		return ;
+	}
+	//on print tout les membres du cannal trouvé 
+	(*channel_list)[num]->printMembers();
+	std::cout << YELLOW << "GoodBye Who function!" << RESET << std::endl;
+}
+
+/* ************************************NAMES****************************************** */
+
+static void	printNamesAllChan(std::vector<Channel*>* channel_list) {
+	std::vector<Channel*>::iterator it = (*channel_list).begin();
+	while (it != (*channel_list).end()) {
+		(*it)->printMembersNick();
+		it++;
+	}
+}
+
+void Commands::names(std::vector<std::string> params, CMD_PARAM) {
+	std::cout << YELLOW << "Hello from Names function!" << RESET << std::endl;
+	(void)client;
+	(void)client_list;
+	(void)channel_list;
+	if (!params[1].compare("IRC_90's")) { //a changer avec la ref du num du serveur
+		//la commande NAMES seule est renvoyer par hexchat comme NAMES + IRC_90's 
+		printNamesAllChan(channel_list);
+		return ;
+	}
+	int num = matchChannel(params, client, client_list, channel_list);
+	(*channel_list)[num]->printMembersNick();
+}
