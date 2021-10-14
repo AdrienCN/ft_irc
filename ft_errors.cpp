@@ -66,6 +66,7 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 		}
 		case 415: //ERR_BADMASK // return by PRIVMSG
 		{
+			//mask = channel invalid:
 			error += "<mask> :Bad Server/host mask\r\n";
 			break;
 		}

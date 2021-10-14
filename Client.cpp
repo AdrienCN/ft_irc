@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date) : _message_status(DISCONNECT),  _hostname("defaultconstructorHOSTNAMEvalue"), _username("Default_Username"), _nickname("Default_Nickname"), _realname("Default_realname"), _server_name(server_name), _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date), _registration_status(false), _reg_pass(false), _reg_nick(false), _reg_user(false)
+Client::Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date) : _message_status(DISCONNECT),  _hostname("defaultconstructorHOSTNAMEvalue"), _username("Default_Username"), _nickname("Default_Nickname"), _realname("Default_realname"), _server_name(server_name), _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date),  _away_message(""), _registration_status(false), _reg_pass(false), _reg_nick(false), _reg_user(false), _away(false)
 
 {
     return;
@@ -108,33 +108,49 @@ std::string const & Client::getServerCreationDate() const
 {
 	return this->_server_creation_date;
 }
-
-void  Client::setServerName(std::string const src)
-{
-	this->_server_name = src;
-}
-
-void  Client::setServerIpaddress(std::string const src)
-{
-	this->_server_ipaddress = src;
-}
-
-void  Client::setServerCreationDate(std::string const src)
-{
-	this->_server_creation_date = src;
-}
-
 bool			const & Client::isRegistered() const
 {
 	return this->_registration_status;
 }
 
-int Client::getNbChannels() const
+int  Client::getNbChannels() const
 {
 	return this->_channels.size();
 }
 
+bool const & Client::getAway() const
+{
+	return this->_away;
+}
+
+std::string const & Client::getAwayMessage() const
+{
+	return this->_away_message;
+}
+
+
 //SETTERS
+
+void  Client::setAwayMessage(std::string const & src)
+{
+	this->_away_message = src;
+}
+
+void  Client::setServerName(std::string const & src)
+{
+	this->_server_name = src;
+}
+
+void  Client::setServerIpaddress(std::string const & src)
+{
+	this->_server_ipaddress = src;
+}
+
+void  Client::setServerCreationDate(std::string const & src)
+{
+	this->_server_creation_date = src;
+}
+
 
 void Client::setRegPass(bool const & src)
 {
@@ -183,6 +199,12 @@ void	Client::setRegistration(bool const& src)
 {
 	this->_registration_status = src;
 }
+
+void	Client::setAway(bool const& src)
+{
+	this->_away = src;
+}
+
 
 //OTHERS
 

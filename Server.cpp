@@ -246,17 +246,17 @@ std::string const & Server::getServerCreationDate() const
 	return this->_server_creation_date;
 }
 
-void  Server::setServerName(std::string const src)
+void  Server::setServerName(std::string const & src)
 {
 	this->_server_name = src;
 }
 
-void  Server::setServerIpaddress(std::string const src)
+void  Server::setServerIpaddress(std::string const & src)
 {
 	this->_server_ipaddress = src;
 }
 
-void  Server::setServerCreationDate(std::string const src)
+void  Server::setServerCreationDate(std::string const & src)
 {
 	this->_server_creation_date = src;
 }
