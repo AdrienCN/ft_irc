@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client() : _message_status(DISCONNECT), _greetings(0), _hostname("defaultconstructorHOSTNAMEvalue"), _registration_status(false)
+Client::Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date) : _message_status(DISCONNECT),  _hostname("defaultconstructorHOSTNAMEvalue"), _username("Default_Username"), _nickname("Default_Nickname"), _realname("Default_realname"), _server_name(server_name), _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date), _registration_status(false), _reg_pass(false), _reg_nick(false), _reg_user(false)
 
 {
     return;
@@ -28,6 +28,26 @@ void Client::present()
 
 // GETTERS
 
+bool const &					 Client::getRegPass() const
+{
+	return this->_reg_pass;
+}
+
+bool const &					 Client::getRegNick() const
+{
+	return this->_reg_nick;
+}
+
+bool const &					 Client::getRegUser() const
+{
+	return this->_reg_user;
+}
+
+std::string const &				Client::getHostname() const
+{
+	return this->_hostname;
+}
+
 std::vector<std::string> const & Client::getCommand() const
 {
 	return this->_command;
@@ -47,6 +67,12 @@ std::string const &		Client::getUsername() const
 {
     return this->_username;
 }
+
+std::string const &		Client::getRealname() const
+{
+    return this->_realname;
+}
+
 
 std::string const &		Client::getMessage() const
 {
@@ -68,12 +94,61 @@ struct pollfd   const & Client::getPoll() const
     return this->_poll;
 }
 
+std::string const & Client::getServerName() const
+{
+	return this->_server_name;
+}
+
+std::string const & Client::getServerIpaddress() const
+{
+	return this->_server_ipaddress;
+}
+
+std::string const & Client::getServerCreationDate() const
+{
+	return this->_server_creation_date;
+}
+
+void  Client::setServerName(std::string const src)
+{
+	this->_server_name = src;
+}
+
+void  Client::setServerIpaddress(std::string const src)
+{
+	this->_server_ipaddress = src;
+}
+
+void  Client::setServerCreationDate(std::string const src)
+{
+	this->_server_creation_date = src;
+}
+
 bool			const & Client::isRegistered() const
 {
 	return this->_registration_status;
 }
 
+int Client::getNbChannels() const
+{
+	return this->_channels.size();
+}
+
 //SETTERS
+
+void Client::setRegPass(bool const & src)
+{
+	this->_reg_pass = src;
+}
+
+void Client::setRegNick(bool const & src)
+{
+	this->_reg_nick = src;
+}
+void Client::setRegUser(bool const & src)
+{
+	this->_reg_user = src;
+}
 void Client::setPassword(std::string const& src)
 {
     this->_password = src;
@@ -87,6 +162,11 @@ void Client::setNickname(std::string const& src)
 void Client::setUsername(std::string const& src)
 {
     this->_username = src;
+}
+
+void Client::setRealname(std::string const& src)
+{
+    this->_realname = src;
 }
 
 void Client::setMessage(std::string const& src)
@@ -128,16 +208,6 @@ void Client::init(int const & socket)
     this->_poll.fd = _socket;
     this->_poll.events = POLLIN | POLLHUP;
     this->_poll.revents = 0;
-}
-
-int	const &	Client::getGreetings()
-{
-	return this->_greetings;
-}
-
-void	Client::incrGreetings()
-{
-	this->_greetings++;
 }
 
 void Client::recvMessage()

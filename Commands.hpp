@@ -9,6 +9,7 @@
 #define Commands_hpp
 
 #include "headers.hpp"
+#include "common_macro.hpp"
 #include "Grammar.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
@@ -23,7 +24,7 @@ class Commands
 {
 
     public:
-        Commands();
+		Commands(std::string const & password, std::string server_name, std::string server_ipaddress, std::string server_creation_date); 
         virtual ~Commands(); 
 
         //General
@@ -44,13 +45,28 @@ class Commands
 		void	privmsg(std::vector<std::string> params, CMD_PARAM);
 		void	who(std::vector<std::string> params, CMD_PARAM);
 		void	names(std::vector<std::string> params, CMD_PARAM);
+		std::string const & getServerName() const;
+		std::string const & getServerIpaddress() const;
+		std::string const & getServerCreationDate() const;
+
+		void  setServerName(std::string const src);
+		void  setServerIpaddress(std::string const src);
+		void  setServerCreationDate(std::string const src);
+
+
     
     protected:
+        Commands();
         Commands	(Commands const& src);
         Commands&	operator=(Commands const& src); 
 		std::map	<std::string , void(Commands::*)(std::vector<std::string> params, CMD_PARAM)> _cmd_list;
 		std::vector<std::string>	_parsed_cmd;
-		
+
+		std::string					_server_password;
+		std::string _server_name;
+		std::string _server_ipaddress;
+		std::string _server_creation_date;
+        
  
 };
 

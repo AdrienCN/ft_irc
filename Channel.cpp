@@ -13,10 +13,29 @@ Channel::~Channel()
 
 void Channel::present()
 {
-	std::cout << "Channel name = " << getName();
-	if (_has_key == true)
-		std::cout << " and my key is " << getKey();
-	std::cout << std::endl;
+    std::cout << "Channel name = " << getName();
+    if (_has_key == true)
+     std::cout << " | my key is " << getKey();
+    if (_has_topic == true)
+        std::cout << " | my topic is " << getTopic();
+    std::cout << std::endl << "My members are : ";
+    std::vector<Client*>::iterator it = _members.begin();
+    std::vector<Client*>::iterator ite = _members.end();
+
+    while (it != ite)
+    {
+        std::cout << (*it)->getNickname() << " ";
+        it++;
+    }
+    std::cout << std::endl << "My operator is : ";
+    it = _operators.begin();
+    ite = _operators.end();
+    while (it != ite)
+    {
+        std::cout << (*it)->getNickname() << " ";
+        it++;
+    }
+    std::cout << std::endl;
 }
 
 // GETTERS
@@ -129,45 +148,46 @@ void Channel::setTopic(std::string const& src)
 
 int Channel::isUserBanned(Client* client)
 {
-	std::vector<Client*>::iterator it = _banned.begin();
-	std::vector<Client*>::iterator ite = _banned.end();
 
-	while (it != ite)
-	{
-		if ((*it)->getUsername() == client->getUsername())
-			return (1);
-		it++;
-	}
-	return (0);
+    std::vector<Client*>::iterator it = _banned.begin();
+    std::vector<Client*>::iterator ite = _banned.end();
+    
+    while (it != ite)
+    {
+        if ((*it)->getNickname() == client->getNickname())
+            return (1);
+        it++;
+    }
+    return (0);
 }
 
 int Channel::isUserOp(Client* client)
 {
-	std::vector<Client*>::iterator it = _operators.begin();
-	std::vector<Client*>::iterator ite = _operators.end();
-
-	while (it != ite)
-	{
-		if ((*it)->getUsername() == client->getUsername())
-			return (1);
-		it++;
-	}
-	return (0);
+    std::vector<Client*>::iterator it = _operators.begin();
+    std::vector<Client*>::iterator ite = _operators.end();
+    
+    while (it != ite)
+    {
+        if ((*it)->getNickname() == client->getNickname())
+            return (1);
+        it++;
+    }
+    return (0);
 }
 
 int Channel::isUserMember(Client* client)
 {
-	std::vector<Client*>::iterator it = _members.begin();
-	std::vector<Client*>::iterator ite = _members.end();
 
-	while (it != ite)
-	{
-		// if ((*it)->getUsername() == client->getUsername())
-		if ((*it)->getNickname() == client->getNickname())
-			return (1);
-		it++;
-	}
-	return (0);
+    std::vector<Client*>::iterator it = _members.begin();
+    std::vector<Client*>::iterator ite = _members.end();
+    
+    while (it != ite)
+    {
+        if ((*it)->getNickname() == client->getNickname())
+            return (1);
+        it++;
+    }
+    return (0);
 }
 
 int Channel::isKeyRight(std::string key)
@@ -196,50 +216,51 @@ void Channel::addBanned(Client *client)
 
 void Channel::removeMember(Client *client)
 {
-	std::vector<Client*>::iterator it = _members.begin();
-	std::vector<Client*>::iterator ite = _members.end();
-
-	while (it != ite)
-	{
-		if ((*it)->getUsername() == client->getUsername())
-		{
-			_members.erase(it);
-			_nb_members--;
-			return;
-		}
-		it++;
-	}
+    std::vector<Client*>::iterator it = _members.begin();
+    std::vector<Client*>::iterator ite = _members.end();
+    
+    while (it != ite)
+    {
+        if ((*it)->getNickname() == client->getNickname())
+        {
+            _members.erase(it);
+            _nb_members--;
+            return;
+        }
+        it++;
+    }
 }
 
 void Channel::removeOp(Client *client)
 {   
-	std::vector<Client*>::iterator it = _operators.begin();
-	std::vector<Client*>::iterator ite = _operators.end();
 
-	while (it != ite)
-	{
-		if ((*it)->getUsername() == client->getUsername())
-		{
-			_operators.erase(it);
-			return;
-		}
-		it++;
-	}
+    std::vector<Client*>::iterator it = _operators.begin();
+    std::vector<Client*>::iterator ite = _operators.end();
+    
+    while (it != ite)
+    {
+        if ((*it)->getNickname() == client->getNickname())
+        {
+            _operators.erase(it);
+            return;
+        }
+        it++;
+    }
 }
 
 void Channel::removeBanned(Client *client)
 {
-	std::vector<Client*>::iterator it = _banned.begin();
-	std::vector<Client*>::iterator ite = _banned.end();
-
-	while (it != ite)
-	{
-		if ((*it)->getUsername() == client->getUsername())
-		{
-			_banned.erase(it);
-			return;
-		}
-		it++;
-	}
+    std::vector<Client*>::iterator it = _banned.begin();
+    std::vector<Client*>::iterator ite = _banned.end();
+    
+    while (it != ite)
+    {
+        if ((*it)->getNickname() == client->getNickname())
+        {
+            _banned.erase(it);
+            return;
+        }
+        it++;
+    }
 }
 

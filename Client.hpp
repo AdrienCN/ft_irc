@@ -19,35 +19,51 @@ class Client
 {
 
     public:
-        Client(); 
+        Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date); 
         virtual ~Client(); 
 
         // Presentation
         void present();
-        
-        // GETTERS
+        	        // GETTERS
         std::string const &		getPassword() const;
         std::string const &		getNickname() const;
         std::string const &		getUsername() const;
+		std::string const &		getHostname() const;
+		std::string const &		getRealname() const;
         std::string const &		getMessage() const;
         int         const &		getMessageStatus() const;
         int         const &     getSocket() const;
-		int			const &		getGreetings();
         struct pollfd   const & getPoll() const;
 		bool		const &		isRegistered() const;
+		bool		const &		getRegPass() const;
+		bool		const &		getRegNick() const;
+		bool		const &		getRegUser() const;
 		std::vector<std::string> const & getCommand() const;
+        int getNbChannels() const;
+		std::string const & getServerName() const;
+		std::string const & getServerIpaddress() const;
+		std::string const & getServerCreationDate() const;
+
 
         //SETTERS
-        void setPassword(std::string const& src);
-        void setNickname(std::string const& src);
-        void setUsername(std::string const& src);
-        void setMessage(std::string const& src);
-        void setMessageStatus(bool const& src);
-		void setRegistration(bool const& src);
-        void init(int const & socket);
+ 		void	setRegPass(bool const &src);
+		void	setRegNick(bool const &src);
+		void	setRegUser(bool const &src);
+        void	setMessageStatus(bool const& src);
+		void		setRegistration(bool const& src);
+		void		setRealname(std::string const& src);	
+		void		setPassword(std::string const& src);
+        void		setNickname(std::string const& src);
+        void		setUsername(std::string const& src);
+        void		setMessage(std::string const& src);
+        void			init(int const & socket);
+		void  setServerName(std::string const src);
+		void  setServerIpaddress(std::string const src);
+		void  setServerCreationDate(std::string const src);
+
+
 
         //Others
-		void incrGreetings(); // to remove
         void clearMessage();
         void clearStr(std::string str);
 		void clearCommand();
@@ -63,14 +79,16 @@ class Client
         Client & operator=(Client const& src); 
 
         struct pollfd _poll;
-        std::string _password;
-        std::string _nickname;
-        std::string _username;
-        std::string _message;
         int	        _message_status; // true finished , false not finished
-		int			_greetings;
 		std::string _hostname;
-
+        std::string _username;
+        std::string _nickname;
+		std::string _realname;
+        std::string _password;
+        std::string _message;
+		std::string _server_name;
+		std::string _server_ipaddress;
+		std::string _server_creation_date;
         
         //std::string _host;
         //std::string _servername;
@@ -84,6 +102,9 @@ class Client
 		std::vector<std::string> _cap;
 		std::vector<std::string> _nick;
 		std::vector<std::string> _user;
+		bool _reg_pass;
+		bool _reg_nick;
+		bool _reg_user;
         //Input _input: // template pour analyser un message
 
 

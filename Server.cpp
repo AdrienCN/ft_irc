@@ -12,8 +12,24 @@ struct addrinfo
 	struct addrinfo *ai_next;
 };
 */
-Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _nbClients(0)
+Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password),  _server_ipaddress("127.0.0.1"), _server_creation_date(""), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
 {
+	time_t	raw_time;
+	time(&raw_time);
+	_server_creation_date = ctime(&raw_time);
+	//enlever le /n automatique de la fin
+	_server_creation_date.erase((_server_creation_date.end() - 1));
+	_server_name += "[";
+	_server_name += EMO_ROBOT;
+	_server_name += EMO_ROBOT;
+	_server_name += EMO_ROBOT;
+	_server_name += "IRC_90S";
+	_server_name += EMO_ROBOT;
+	_server_name += EMO_ROBOT;
+	_server_name += EMO_ROBOT;
+	_server_name += "]";
+	//_command_book._server_name = _server_name;
+	std::cout << _server_name << std::endl;
 	memset(&_hints, 0, sizeof(_hints));
 	//Prepare hints sur la stack pour getaddrinfo()
 	_hints.ai_family = AF_UNSPEC; //Accept IPv4 & IPv6
@@ -214,13 +230,43 @@ void	Server::addClient()
 		return;
 	}
 
-	Client*			new_client = new Client();
+	Client*			new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
 	new_client->init(socket);
 	this->poll_add_client(*new_client);
 	_all_clients.push_back(new_client);
 	_nbClients++;
 	std::cout << "New client added" <<std::endl;
 	send(new_client->getSocket(), "Hello to you NEW CLIENT JOANN\n", 30, 0);
+}
+
+std::string const & Server::getServerName() const
+{
+	return this->_server_name;
+}
+
+std::string const & Server::getServerIpaddress() const
+{
+	return this->_server_ipaddress;
+}
+
+std::string const & Server::getServerCreationDate() const
+{
+	return this->_server_creation_date;
+}
+
+void  Server::setServerName(std::string const src)
+{
+	this->_server_name = src;
+}
+
+void  Server::setServerIpaddress(std::string const src)
+{
+	this->_server_ipaddress = src;
+}
+
+void  Server::setServerCreationDate(std::string const src)
+{
+	this->_server_creation_date = src;
 }
 
 void Server::poll_add_client(Client const& new_client)
@@ -296,23 +342,48 @@ Client* Server::find_client_from_fd(int fd)
 	return NULL;
 }
 
-void	Server::sendGreetings(Client* client)
+void	ft_registration_failed(Client *client)
 {
-	std::cout<< "Greetings to you[" << client->getNickname() << "@" << client->getUsername() << "." << "0"/*client->getHostname()*/ << "]" << std::endl;
-	client->incrGreetings();
+	std::string tmp("Command(s) needed to complete registration:\n");
+	if (client->getRegNick() == false)
+		tmp += "/NICK <nickname>\r";
+	if (client->getRegUser() == false)
+		tmp += "/USER <username> <mode> <unused> :<realname>\r";
+	tmp += "\r\n";
+	std::cout << tmp << RESET <<std::endl;
+	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
 }
 
 void	Server::welcomeClient(Client *client)
 {
-//	Commands command;
-	(void)client;
-	std::vector<std::string> tmp(client->getCommand());
+	std::vector<std::string> full_command(client->getCommand());
+	std::vector<std::string> tmp = full_command;
+	while (full_command.empty() == false)
+	{
+		_command_book.find_command(full_command.front(), client, _all_clients, &_all_channels);
+		full_command.erase(full_command.begin());
+	}
+	//Evite le msg d'erreur si CAP ou PASS
+	//Checker si les commandes NICK et USER sont presente dans les cmd
+
 	while (tmp.empty() == false)
 	{
-		//command.find_command(tmp.front(), client, _all_clients, _all_channels);
-		_command_book.find_command(tmp.front(), client, _all_clients, &_all_channels);
+		//Si l'une des deux ou les deux sont presente checker l'etat de l'enregistrement
+		if (std::strstr(tmp.front().c_str(), "USER") || std::strstr(tmp.front().c_str(), "NICK"))
+		{
+			if (client->getRegNick() == true && client->getRegUser() == true)
+			{
+				std::cout << GREEN << "****************REGISTRATION SUCCESS************************" << RESET << std::endl;
+				client->setRegistration(true);
+			ft_reply("1", tmp, client, NULL, _all_clients, _all_channels);
+	    	ft_reply("2", tmp, client, NULL, _all_clients, _all_channels);
+	    	ft_reply("3", tmp, client, NULL, _all_clients, _all_channels);
+	    	ft_reply("4", tmp, client, NULL, _all_clients, _all_channels);
+			}
+			else
+				ft_registration_failed(client);
+			return;
+		}
 		tmp.erase(tmp.begin());
 	}
-	std::cout << "WELCOME : NEW client registered " << std::endl;
-	client->setRegistration(true);
 }
