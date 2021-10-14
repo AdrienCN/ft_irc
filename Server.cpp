@@ -58,6 +58,37 @@ std::string const & Server::getPassword() const
 	return _password;
 }
 
+std::string const & Server::getServerName() const
+{
+	return this->_server_name;
+}
+
+std::string const & Server::getServerIpaddress() const
+{
+	return this->_server_ipaddress;
+}
+
+std::string const & Server::getServerCreationDate() const
+{
+	return this->_server_creation_date;
+}
+
+void  Server::setServerName(std::string const & src)
+{
+	this->_server_name = src;
+}
+
+void  Server::setServerIpaddress(std::string const & src)
+{
+	this->_server_ipaddress = src;
+}
+
+void  Server::setServerCreationDate(std::string const & src)
+{
+	this->_server_creation_date = src;
+}
+
+
 //On catchera une erreur de construction dans le main au start
 void Server::init()
 {
@@ -105,6 +136,17 @@ void Server::init()
 
 }
 
+void	Server::pollInfo()
+{
+	std::vector<struct pollfd>::iterator it = _fds.begin();
+	while (it != _fds.end())
+	{
+		std::cout << "FD : " << it->fd  << " | EVENTS: " << it->events << " | REVENTS: "<< it->revents << std::endl;
+		it++;
+	}
+	return ;
+}
+
 void	Server::run() 
 {	
 	while (1)
@@ -119,42 +161,22 @@ void	Server::run()
 		int poll_count = poll(&(*it), _nbClients + 1, -1);
 		if (poll_count == -1)
 			throw Server::ExceptErrno();
+		this->pollInfo();
 
 		std::vector<pollfd>::iterator itb = _fds.begin();
 		std::vector<pollfd>::iterator ite = _fds.end();
-		//for (int i = 0; i <= _nbClients; i++)
 		while (itb != ite)
 		{
-			//JUST POUR CLARIFIER EVENTS
-			if ((*itb).revents == POLLIN)
-			{
-				std::cout << "itb.fd.revent " << (*itb).fd << " : POLLIN" << std::endl;
-			}
-			else if (itb->revents == POLLHUP)
-			{
-				std::cout << "itb.fd.revent " << (*itb).fd << " : POLLHUP" << std::endl;
-
-			}
-			else if (itb->revents == (POLLIN | POLLHUP))
-			{
-				std::cout << "itb.fd.revent " << (*itb).fd << " : POLLIN | POLLHUP" << std::endl;
-			}
-			else
-				std::cout << "itb.fd.revent " << (*itb).fd << " : OTHER" << std::endl;
 			 if (((*itb).revents & POLLHUP) == POLLHUP)
 			{
 				std::cout << "Trying to disconnect .... fd = " << (*itb).fd << std::endl;
 				if ((*itb).fd != _server_socket)
 				{					
 					this->removeClient((*itb).fd);
-					//this->poll_remove_client((*itb).fd);
-					break;
+					//break;
 				}
 			}
-			//END
-
 			//Event est un POLLIN
-			//if ou else if ?
 			if ((*itb).revents & POLLIN)
 			{
 				//Je suis le serveur
@@ -184,16 +206,9 @@ void	Server::run()
 						client->clearCommand();
 					}
 				}
-					//this->receiveMessage(this->find_client_from_fd((*itb).fd));			
-				//}
 			}
-			// Je suis un POLLOUT
-			
-	//		std::cout << "End of loop for fd = " << (*itb).fd << "..." << std::endl;
 			itb++;
-		}//if (fd_client == -1)
-		// error 
-	//	std::cout << "End of poll ..." << std::endl;
+		}	
 	}
 }
 
@@ -230,37 +245,6 @@ void	Server::addClient()
 	std::cout << "New client added" <<std::endl;
 	send(new_client->getSocket(), "Hello to you NEW CLIENT JOANN\n", 30, 0);
 }
-
-std::string const & Server::getServerName() const
-{
-	return this->_server_name;
-}
-
-std::string const & Server::getServerIpaddress() const
-{
-	return this->_server_ipaddress;
-}
-
-std::string const & Server::getServerCreationDate() const
-{
-	return this->_server_creation_date;
-}
-
-void  Server::setServerName(std::string const & src)
-{
-	this->_server_name = src;
-}
-
-void  Server::setServerIpaddress(std::string const & src)
-{
-	this->_server_ipaddress = src;
-}
-
-void  Server::setServerCreationDate(std::string const & src)
-{
-	this->_server_creation_date = src;
-}
-
 void Server::poll_add_client(Client const& new_client)
 {
 	std::vector<struct pollfd>::iterator it = _fds.begin();

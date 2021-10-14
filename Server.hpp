@@ -55,6 +55,7 @@ class Server
 
 
 
+		void	pollInfo();
 
         // CONNECTIONS MANAGEMENT
         void    init();
