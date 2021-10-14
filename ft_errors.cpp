@@ -66,7 +66,6 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 		}
 		case 415: //ERR_BADMASK // return by PRIVMSG
 		{
-			//mask = channel invalid:
 			error += "<mask> :Bad Server/host mask\r\n";
 			break;
 		}
@@ -129,7 +128,13 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
         }
 		case 462: //ERR_ALREADYREGISTERED
 		{
-			error += ":Unauthorized command (already registered)\r\n";
+			error += " :Unauthorized command (already registered)\r\n";
+			break;
+		}
+
+		case 464: //ERR_PASSWDMISMATCH
+		{
+			error += " :Password incorrect\r\n";
 			break;
 		}
 		case 471: //ERR_CHANNELISFULL
@@ -156,7 +161,8 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 
 		case 476: // ERR_BADCHANMASK
         {
-            error += ("<channel> :Bad Channel Mask (+k)\r\n"); // <channel a changer>
+			// !!!! PARAMS ==  TMP
+            error += (params[0] + " :Bad Channel Mask (+k)\r\n"); 
             break;
         }
 		case 482: //ERR_CHANOPRIVNEEDED
@@ -166,7 +172,13 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 		}
 		case 484: //ERR_RESTRICTED
 		{
-			error += ":Your connection is restricted\r\n";
+			error += " :Your connection is restricted\r\n";
+			break;
+		}
+
+		case 491: //ERR_RESTRICTED
+		{
+			error += " :No O-lines for your host\r\n";
 			break;
 		}
         default:
