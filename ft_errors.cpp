@@ -16,14 +16,14 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
     {
         case 401: //ERR_NOSUCHNICK
         {
-            //comment faire pour afficher le bon nickname? quell param?
-            error += "<nickname> :No such nick/channel\r\n";
+			// !!!! PARAMS ==  TMP
+            error += (params[0] + " :No such nick\r\n");
             break;
         }
         case 403: // ERR_NOSUCHCHANNEL
         {
-            //comment faire pour afficher le bon channel name? quell param?
-            error += (params[1] + " :No such channel\r\n");
+			// !!!! PARAMS ==  TMP
+            error += (params[0] + " :No such channel\r\n");
             break;
         }
         case 404: //ERR_CANNOTSENDTOCHAN
@@ -158,7 +158,11 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
             error += ("<channel> :Bad Channel Mask (+k)\r\n"); // <channel a changer>
             break;
         }
-		
+		case 482: //ERR_CHANOPRIVNEEDED
+		{
+			error += (channel->getName() + " :Your are not channel operator\r\n");
+			break;
+		}
 		case 484: //ERR_RESTRICTED
 		{
 			error += ":Your connection is restricted\r\n";

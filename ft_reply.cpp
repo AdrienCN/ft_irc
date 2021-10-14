@@ -69,6 +69,8 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 			std::vector<Client*>::iterator ite = tmp.end();
 			while (it != ite)
 			{
+				if (channel->isUserOp(*it) == 1)
+					rpl += "@";
 				rpl += ((*it)->getNickname() + " ");
 				it++;
 			}

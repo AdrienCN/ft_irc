@@ -38,11 +38,13 @@ class Commands
         //Commandes à executer
 		void	join(std::vector<std::string> params, CMD_PARAM);
 		void	part(std::vector<std::string> params, CMD_PARAM);
+		void	kick(std::vector<std::string> params, CMD_PARAM);
 		void	topic(std::vector<std::string> params, CMD_PARAM);
 		void	nick(std::vector<std::string> params, CMD_PARAM);
 		void	user(std::vector<std::string> params, CMD_PARAM);
 		void	pass(std::vector<std::string> params, CMD_PARAM);
 		void	privmsg(std::vector<std::string> params, CMD_PARAM);
+		void	notice(std::vector<std::string> params, CMD_PARAM);
 		void	who(std::vector<std::string> params, CMD_PARAM);
 		void	names(std::vector<std::string> params, CMD_PARAM);
 		std::string const & getServerName() const;
