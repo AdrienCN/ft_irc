@@ -82,6 +82,12 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 			rpl += (channel->getName() + " :End of NAMES list\r\n");
 			break;	
 		}
+		case 4242:
+		{
+			rpl ="[CAP] : IRC_90'S does not handle capabilities\r\n";
+			std::cout << GREEN << rpl << RESET <<std::endl;
+			break;
+		}
 
 		default:
 		{

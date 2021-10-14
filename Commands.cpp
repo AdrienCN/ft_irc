@@ -12,7 +12,8 @@
 
 Commands::Commands(std::string const & password, std::string server_name, std::string server_ipaddress, std::string server_creation_date): _server_password(password) , _server_name(server_name) , _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date) 
 {
-	
+
+	_cmd_list["CAP"] = &Commands::cap;
 	_cmd_list["PASS"] = &Commands::pass;
 	_cmd_list["NICK"] = &Commands::nick;
 	_cmd_list["USER"] = &Commands::user;
@@ -129,6 +130,12 @@ void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
 }
 
 //************ COMMANDES A EXECUTER ********************
+
+// *********CAP******
+void	Commands::cap(std::vector<std::string> params, CMD_PARAM)
+{
+	ft_reply(RPL_CUSTOMCAP, params, client, NULL, client_list, *channel_list);
+}
 
 // ******** PASS *************
 
