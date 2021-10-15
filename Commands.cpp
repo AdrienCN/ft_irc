@@ -187,7 +187,7 @@ void	Commands::kill(std::vector<std::string> params, CMD_PARAM)
 		reason += *it + " ";
 	}
 	std::string rpl;
-	rpl = "Operator(" + client->getNickname() + ") Killed you for : " + reason + "\r\n";
+	rpl = "Operator(" + client->getNickname() + ") KILLED you for " + reason + "\r\n";
 	send(client_to_kill->getSocket(), rpl.c_str(), rpl.size(), 0);
 	client_to_kill->setMessageStatus(DISCONNECT);
 }
@@ -1367,7 +1367,7 @@ void Commands::quit(std::vector<std::string> params, CMD_PARAM)
 		itl++;
 	}
 
-	client->setMessageStatus("DISCONNECT");
+	client->setMessageStatus(DISCONNECT);
 	//disconnect server
 	//close la socket? remove client?
 	
