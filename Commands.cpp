@@ -933,6 +933,13 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 			{
 				std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_client->getNickname() <<  " : " << message << RESET << std::endl;
 		   		send_privmsg_user(client, message, tmp_client);
+				if (client->getAway() == true)
+				{
+					std::vector<std::string> tmp_params;
+					tmp_params.push_back(client->getNickname());
+					tmp_params.push_back(client->getAwayMessage());
+					ft_reply(RPL_AWAY, tmp_params, client, NULL, client_list, *channel_list);
+				}
 			}
 	   }
 		else // si je suis un cannal

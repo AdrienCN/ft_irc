@@ -64,7 +64,8 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 		//RPL_AWAY
 		case 301:
 		{
-			rpl += client->getNickname() + " :" + client->getAwayMessage() + "\r\n";
+			// TMP != PARAMS
+			rpl += (params[0] +" :" + params[1] + "\r\n");
 			break;
 		}
 		//RPL_UNAWAY
