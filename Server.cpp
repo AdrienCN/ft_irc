@@ -213,12 +213,9 @@ void	Server::run()
 						else
 							_command_book.find_command(client->getCommand().front(), client, _all_clients, &_all_channels);
 						// JOANN pour QUIT: avoir
-						if (client->getMessageStatus() == DISCONNECT)
-							this->removeClient(client->getSocket());
 						client->clearMessage();
 						client->clearCommand();
-						if (client->getMessageStatus() == DISCONNECT)
-							this->removeClient(client->getSocket());
+						this->find_to_kill();
 					}
 				}
 			}
@@ -229,6 +226,27 @@ void	Server::run()
 	}
 }
 
+void	Server::find_to_kill()
+{
+	std::vector<Client*>::iterator it = _all_clients.begin();
+	std::vector<Client*>::iterator ite = _all_clients.end();
+	std::cout << YELLOW << "Hello from FIND_KILL" << RESET << std::endl;
+	while (it != ite)
+	{
+		if ((*it)->getMessageStatus() == DISCONNECT)
+		{
+			close((*it)->getSocket());
+			_all_clients.erase(it);
+			_nbClients--;
+			std::cout<< YELLOW  << "KILL SUCCESS" << RESET << std::endl;
+			return;
+		}
+		it++;
+	}
+	// Remove from Poll Fds
+//	this->poll_remove_client(fd);
+}
+	
 void	Server::refuseClient()
 {
 	struct sockaddr_storage client_addr;
@@ -312,7 +330,11 @@ void	Server::removeClient(int const & fd)
 	while (it != ite)
 	{
 		if (*it == tmp)
+		{
+			close((*it)->getSocket());
 			_all_clients.erase(it);
+			break;
+		}
 		it++;
 	}
 	_nbClients--;

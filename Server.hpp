@@ -63,6 +63,7 @@ class Server
         void    run();
         void    poll_add_client(Client const& new_client);
         void    poll_remove_client(int const& fd);
+		void	find_to_kill();
        // void    addClient();
 		struct pollfd const &    addClient();
         void    removeClient(int const & fd);
