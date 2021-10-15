@@ -10,10 +10,13 @@
 #define ERR_RESTRICTED 484
 */
 
+Client* 	ft_nickname_exist_return(std::vector<Client*> client_list, std::string nickname);
+
 Commands::Commands(std::string const & password, std::string server_name, std::string server_ipaddress, std::string server_creation_date): _server_password(password) , _server_name(server_name) , _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date) 
 {
 
 	_cmd_list["MODE"] = &Commands::mode;
+	_cmd_list["KILL"] = &Commands::kill;
 	_cmd_list["OPER"] = &Commands::oper;
 	_cmd_list["CAP"] = &Commands::cap;
 	_cmd_list["AWAY"] = &Commands::away;
@@ -160,6 +163,31 @@ void	Commands::oper(std::vector<std::string> params, CMD_PARAM)
 	client->setOper(true);
 	ft_reply(RPL_YOUREOPER, params, client, NULL, client_list, *channel_list);
 	ft_reply(RPL_UMODEIS, params, client, NULL, client_list, *channel_list);
+}
+
+//*****************KILL******* (Available for OPER only)
+
+void	Commands::kill(std::vector<std::string> params, CMD_PARAM)
+{
+    std::cout << YELLOW << "Hello from KILL function!" << RESET << std::endl;
+	if (params.size() < 3)
+		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
+	if (client->getOper() == false)
+		return (ft_error(ERR_NOPRIVILEGES, params, client, NULL, client_list, *channel_list));
+
+	Client *client_to_kill = ft_nickname_exist_return(client_list, params[1]);
+	if (client_to_kill == NULL)
+		return (ft_error(ERR_NOSUCHNICK, params, client, NULL, client_list, *channel_list));
+    std::cout << YELLOW << "Hello from KILL SUCCESS!" << RESET << std::endl;
+	std::string reason;
+	for (std::vector<std::string>::iterator it = params.begin() + 2; it != params.end(); it++)
+	{
+		reason += *it + " ";
+	}
+	std::string rpl;
+	rpl = "Operator(" + client->getNickname() + ") Killed you for : " + reason + "\r\n";
+	send(client_to_kill->getSocket(), rpl.c_str(), rpl.size(), 0);
+	client_to_kill->setMessageStatus(DISCONNECT);
 }
 
 // *********MODE**********(Ne peut s'utiliser que sur soit meme)

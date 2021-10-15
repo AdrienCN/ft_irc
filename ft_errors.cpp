@@ -166,6 +166,11 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
             error += (params[0] + " :Bad Channel Mask (+k)\r\n"); 
             break;
         }
+		case 481: //ERR_NOPRIVILEGES
+		{
+			error += " :Permission Denied- You're not an IRC operator\r\n";
+			break;
+		}
 		case 482: //ERR_CHANOPRIVNEEDED
 		{
 			error += (channel->getName() + " :Your are not channel operator\r\n");

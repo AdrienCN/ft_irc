@@ -199,7 +199,7 @@ void Client::setMessage(std::string const& src)
     this->_message = src;
 }
 
-void Client::setMessageStatus(bool const& src)
+void Client::setMessageStatus(int const& src)
 {
     this->_message_status = src;
 }

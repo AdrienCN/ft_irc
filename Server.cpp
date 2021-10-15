@@ -214,6 +214,8 @@ void	Server::run()
 							_command_book.find_command(client->getCommand().front(), client, _all_clients, &_all_channels);
 						client->clearMessage();
 						client->clearCommand();
+						if (client->getMessageStatus() == DISCONNECT)
+							this->removeClient(client->getSocket());
 					}
 				}
 			}
