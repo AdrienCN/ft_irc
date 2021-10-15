@@ -119,7 +119,7 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 			break;	
 		}
 
-		case 381: // YOUAREOPER
+		case 381: // YOUREOPER
 		{
 			rpl += " :You are now an IRC operator\r\n";
 			break;	

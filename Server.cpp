@@ -154,7 +154,7 @@ void	Server::run()
 
 		std::vector<pollfd>::iterator it = tmp.begin();
 //		std::cout << "Starting new poll ..." << std::endl;
-		int poll_count = poll(&(*it), _nbClients + 1, 10000);
+		int poll_count = poll(&(*it), _nbClients + 1, -1);
 		if (poll_count == -1)
 			throw Server::ExceptErrno();
 		this->pollInfo(tmp);
