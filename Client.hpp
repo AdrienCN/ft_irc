@@ -54,7 +54,7 @@ class Client
 		void	setRegNick(bool const& src);
 		void	setRegUser(bool const& src);
 		void	setOper(bool const& src);
-        void	setMessageStatus(bool const& src);
+        void	setMessageStatus(int const& src);
 		void		setRegistration(bool const& src);
 		void		setRealname(std::string const& src);	
 		void		setPassword(std::string const& src);
@@ -86,7 +86,7 @@ class Client
         Client & operator=(Client const& src); 
 
         struct pollfd _poll;
-        int	        _message_status; // true finished , false not finished
+        int	        _message_status; //COMPLETE - DISCONNECT - INCOMPLETE 
 		std::string _hostname;
         std::string _username;
         std::string _nickname;

@@ -217,6 +217,8 @@ void	Server::run()
 							this->removeClient(client->getSocket());
 						client->clearMessage();
 						client->clearCommand();
+						if (client->getMessageStatus() == DISCONNECT)
+							this->removeClient(client->getSocket());
 					}
 				}
 			}
