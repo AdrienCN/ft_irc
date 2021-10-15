@@ -212,6 +212,9 @@ void	Server::run()
 							welcomeClient(client);
 						else
 							_command_book.find_command(client->getCommand().front(), client, _all_clients, &_all_channels);
+						// JOANN pour QUIT: avoir
+						if (client->getMessageStatus() == DISCONNECT)
+							this->removeClient(client->getSocket());
 						client->clearMessage();
 						client->clearCommand();
 					}

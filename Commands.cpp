@@ -27,6 +27,8 @@ Commands::Commands(std::string const & password, std::string server_name, std::s
 	_cmd_list["NOTICE"] = &Commands::notice;
 	_cmd_list["WHO"] = &Commands::who;
 	_cmd_list["NAMES"] = &Commands::names;
+	_cmd_list["QUIT"] = &Commands::quit;
+	_cmd_list["MYHELP"] = &Commands::myhelp;
 	return;
 }
 
@@ -426,12 +428,12 @@ void joinChannel(Channel* new_chan, std::vector<std::string> params, CMD_PARAM)
 	
 }
 
-void leaveChannel(Channel* channel, Client *client, std::string kick_comment, std::vector<Channel*>* channel_list)
+void leaveChannel(Channel* channel, Client *client, std::string message, std::vector<Channel*>* channel_list)
 {
 	client->remove_channel(channel);
 	
 	std::string rpl;
-	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PART " + channel->getName() + " :" + kick_comment + "\r\n";
+	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PART " + channel->getName() + " :" + message + "\r\n";
 	std::vector<Client*> tmp = channel->getMemberList();
 	std::vector<Client*>::iterator it = tmp.begin();
 	std::vector<Client*>::iterator ite = tmp.end();
@@ -636,18 +638,24 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 
 	//On cherche un potentiel message de départ
 	it++;
-	std::string kick_comment;
+	std::string message;
 	if (it != ite)
-		kick_comment = (*it);
+	{
+		while (it != ite)
+		{
+			message += ((*it) + " ");
+			it++;
+		}
+		message.erase(message.size() - 1);
+	}
 	else
-		kick_comment = client->getNickname();
+		message = client->getNickname();
 
 	//Juste pour imprimer
 	
 	print_vector(channels_name);
-	std::cout << "Part message: " << kick_comment << std::endl;
+	std::cout << "Part message: " << message << std::endl;
 	
-
 	//On s'occupe des noms de chan un a un
 	std::vector<std::string>::iterator itn = channels_name.begin();
 	std::vector<std::string>::iterator itne = channels_name.end();
@@ -666,7 +674,7 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 			else
 			{	
 				std::cout << YELLOW << client->getNickname() << " is leaving channel " <<  tmp->getName() << RESET << std::endl;
-				leaveChannel(tmp, client, kick_comment, channel_list);
+				leaveChannel(tmp, client, message, channel_list);
 			}	
 		}
 		else // no such channel
@@ -681,6 +689,42 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 
 // ******** KICK *************
 
+//preque pareil que leave maus le message ets != --> KICK au lieu de PART
+void kickChannel(Channel* channel, Client *client, Client* to_kick, std::string message, std::vector<Channel*>* channel_list)
+{
+	to_kick->remove_channel(channel);
+	std::string rpl;
+	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " KICK " + channel->getName() + " " + to_kick->getNickname() + " :" + message + "\r\n";
+	std::vector<Client*> tmp = channel->getMemberList();
+	std::vector<Client*>::iterator it = tmp.begin();
+	std::vector<Client*>::iterator ite = tmp.end();
+	while (it != ite)
+	{
+		send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
+		it++;
+	}
+	channel->removeMember(to_kick);
+	channel->removeOp(to_kick); // si jamais le client est Operateur
+	
+	if (channel->getNbMembers() == 0) // si jamais je suis le dernier membre et que je m'autoexpulse
+	{	
+		std::cout << YELLOW << to_kick->getNickname() << " is the last member of this channel" << RESET << std::endl;
+		std::vector<Channel*>::iterator it = channel_list->begin();
+		std::vector<Channel*>::iterator ite = channel_list->end();
+		while (it != ite)
+		{
+			if ((*it)->getName() == channel->getName())
+			{
+				std::cout << RED << (*it)->getName() << " is deleted" << RESET << std::endl;
+				delete (*it);
+				channel_list->erase(it);
+				return; // pas de message a envoyer
+			}
+			it++;
+		}
+	}	
+	return;
+}
 void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from KICK function!" << RESET << std::endl;
@@ -710,14 +754,15 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 
 	//On cherche un potentiel commentaire
 	it++;
-	std::string kick_comment;
-	if (it != ite)
-		kick_comment = (*it);
-	else
-		kick_comment = "";
+	std::string kick_comment = "";
+	while (it != ite)
+	{
+		kick_comment += ((*it) + " ");
+		it++;
+	}
+	kick_comment.erase(kick_comment.size() - 1);
 
 	//Juste pour imprimer
-	
 	print_vector(channels_name);
 	print_vector(users_name);
 	std::cout << "Kick comment: " << kick_comment << std::endl;
@@ -755,19 +800,22 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 						if (tmp_channel->isUserMember(tmp_client) == 0) //
 						{
 								std::cout << RED << tmp_client->getNickname() << " is not a member  of channel " <<  tmp_channel->getName() << RESET << std::endl;
-								ft_error(ERR_NOTONCHANNEL, params, client, tmp_channel, client_list, *channel_list); //  ERR_NOTONCHANNEL
+								std::vector<std::string> tmp_params;
+								tmp_params.push_back(*itu);
+								ft_error(ERR_USERNOTINCHANNEL, tmp_params, client, tmp_channel, client_list, *channel_list); //  ERR_NOTONCHANNEL
 						}
 						else
 						{
 							std::cout << GREEN << client->getNickname() << " is forcing " << tmp_client->getNickname() << " to leave channel " <<  tmp_channel->getName() << RESET << std::endl;
-							leaveChannel(tmp_channel, tmp_client, kick_comment, channel_list);
+							kickChannel(tmp_channel, client, tmp_client, kick_comment, channel_list);
 						}
 					}
 					else
 					{
 						std::cout << RED << " The  client does not exist" << RESET << std::endl;
-						ft_error(ERR_NOSUCHNICK, params, client, tmp_channel, client_list, *channel_list); //  ERR_NOTONCHANNEL
-
+						std::vector<std::string> tmp_params;
+						tmp_params.push_back(*itu);
+						ft_error(ERR_USERNOTINCHANNEL, tmp_params, client, tmp_channel, client_list, *channel_list); //  ERR_NOTONCHANNEL
 					}
 					itu++;
 				}		
@@ -986,8 +1034,32 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 }
 
 // ******** NOTICE *************
+void send_notice_user(Client *client, std::string message, Client* user)
+{
+	std::string rpl;
 
+	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NOTICE " + user->getNickname() + message;
+  	send(user->getSocket(), (rpl.c_str()), rpl.size(), 0);;
+}
 // Meme chose que privmsg mais on n'envoie aucune erreur
+
+void send_notice_channel(Client *client, std::string message, Channel* channel)
+{
+	std::vector<Client*> tmp = channel->getMemberList();
+	std::vector<Client*>::iterator it = tmp.begin();	
+	std::vector<Client*>::iterator ite = tmp.end();
+
+	std::string rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NOTICE " + channel->getName() + message;
+	while (it != ite)
+	{
+		if (*it != client) // si je ne suis pas l'envoyeur
+		{    
+			send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
+		}
+		it++;
+	}
+}
+
 void Commands::notice(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from NOTICE function!" << RESET << std::endl;
@@ -1047,7 +1119,7 @@ void Commands::notice(std::vector<std::string> params, CMD_PARAM)
 			else
 			{
 				std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_client->getNickname() <<  " : " << message << RESET << std::endl;
-		   		send_privmsg_user(client, message, tmp_client);
+		   		send_notice_user(client, message, tmp_client);
 			}
 	   }
 		else // si je suis un cannal
@@ -1061,11 +1133,11 @@ void Commands::notice(std::vector<std::string> params, CMD_PARAM)
 					std::cout << RED << client->getNickname() << " is not a member of " << tmp_channel->getName() << RESET << std::endl;
 					//ft_error(ERR_CANNOTSENDTOCHAN, params, client, tmp_channel, client_list, *channel_list); //  ERR_CANNOTSENDTOCHAN
 			        return;
-        }
+    	    }
 				else
 				{
 					std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_channel->getName() <<  " : " << message << RESET << std::endl;
-					send_privmsg_channel(client, message, tmp_channel);
+					send_notice_channel(client, message, tmp_channel);
 				}
 			}
 			else
@@ -1197,3 +1269,58 @@ void Commands::names(std::vector<std::string> params, CMD_PARAM) {
 	(*channel_list)[num]->printMembersNick();
 }
 
+/* ************************************HELP****************************************** */
+void Commands::myhelp(std::vector<std::string> params, CMD_PARAM) 
+{
+
+	std::cout << YELLOW << "Hello from MYHELP function!" << RESET << std::endl;
+	if (params.size() != 1) 
+	{
+		ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list); //  ERR_NEEDMOREPARAMS
+		return ;
+	}
+	ft_reply(RPL_CUSTOMHELP, params, client, NULL, client_list, *channel_list);
+}
+
+/* ************************************QUIT****************************************** */
+void Commands::quit(std::vector<std::string> params, CMD_PARAM)
+{
+	(void)client_list;
+
+	std::cout << YELLOW << "Hello from QUIT function!" << RESET << std::endl;
+	std::string message; 
+	if (params.size() == 1) 
+		message = ""; 
+	else
+	{	
+		std::vector<std::string>::iterator it = params.begin();
+		std::vector<std::string>::iterator ite = params.end();
+		it++;
+		while(it != ite)
+		{
+			message += (*it + " ");
+			it++;
+		}
+		message.erase(message.end() - 1);
+	}	
+	
+	//leave all channels
+	std::cout << RED << client->getNickname() << " must leave all channels!" << RESET << std::endl;
+	client->leaveAllChannels();
+	std::vector<Channel*>::iterator itl = channel_list->begin();
+	std::vector<Channel*>::iterator itle = channel_list->end();
+	while (itl != itle)
+	{
+		if ((*itl)->isUserMember(client) == 1)
+		{
+			leaveChannel(*itl, client, message, channel_list);
+			//le quit message du channel se fait la
+		}
+		itl++;
+	}
+
+	client->setMessageStatus("DISCONNECT");
+	//disconnect server
+	//close la socket? remove client?
+	
+}
