@@ -135,12 +135,25 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 			rpl += client->getNickname() + ": sets mode " + params[2] + " on " + client->getNickname() + "\r\n";
 			break;
 		}
+		case 4244: // customhelp
+		{
+			// Liste des commandes a reverifier
+			rpl += "Available commands:\n";
+			rpl += "---> Globales: NICK | OPER | MODE | WHO | AWAY | HELP | KILL | QUIT \n";
+			rpl += "---> On Channels: JOIN | PART | TOPIC | NAMES | LIST | KICK\n";
+			rpl += "---> To send messages: PRIVMSG | NOTICE";
+			rpl += "\r\n";
+			break;
+		}
+		case 4245: //error for quit
+		{
+			
+		}
 		default:
 		{
 			rpl = "No RPL set yet \r\n";
 			break;
 		}
-
     }
 	send(client->getSocket(), rpl.c_str(), rpl.size(), 0);
     return;

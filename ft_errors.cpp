@@ -115,7 +115,12 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 			error += "<nick/channel> :Nick/channel is temporarily unavailable\r\n" ;
 			break;
 		}
-
+		case 441: // ERR_USERNOTINCHANNEL
+        {
+			//TMP != PARAM
+            error += (channel->getName() + " :" + params[0] + " is not that channel\r\n");
+            break;
+        }
         case 442: // ERR_NOTONCHANNEL
         {
             error += (channel->getName() + " :You're not on that channel\r\n");
