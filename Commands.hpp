@@ -37,6 +37,7 @@ class Commands
 
         //Commandes à executer
 		void	join(std::vector<std::string> params, CMD_PARAM);
+		void	oper(std::vector<std::string> params, CMD_PARAM);
 		void	cap(std::vector<std::string> params, CMD_PARAM);
 		void	part(std::vector<std::string> params, CMD_PARAM);
 		void	kick(std::vector<std::string> params, CMD_PARAM);

@@ -14,6 +14,7 @@ Commands::Commands(std::string const & password, std::string server_name, std::s
 {
 
 	_cmd_list["MODE"] = &Commands::mode;
+	_cmd_list["OPER"] = &Commands::oper;
 	_cmd_list["CAP"] = &Commands::cap;
 	_cmd_list["AWAY"] = &Commands::away;
 	_cmd_list["PASS"] = &Commands::pass;
@@ -141,6 +142,25 @@ void	Commands::cap(std::vector<std::string> params, CMD_PARAM)
 	ft_reply(RPL_CUSTOMCAP, params, client, NULL, client_list, *channel_list);
 }
 
+
+void	Commands::oper(std::vector<std::string> params, CMD_PARAM)
+{
+    std::cout << YELLOW << "Hello from OPER function!" << RESET << std::endl;
+	if (params.size() < 3)
+		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
+	
+	//If the client is not connecting from a valid host for the given name,
+	if (client->isRegistered() == false)
+		return (ft_error(ERR_NOOPERHOST, params, client, NULL, client_list, *channel_list));
+
+	//If the client does not send the correct password for the given name
+	if (params[2].compare(this->_server_password) != 0)
+		return (ft_error(ERR_PASSWDMISMATCH, params, client, NULL, client_list, *channel_list));
+    std::cout << YELLOW << "OPER success" << RESET << std::endl;
+	client->setOper(true);
+	ft_reply(RPL_YOUREOPER, params, client, NULL, client_list, *channel_list);
+	ft_reply(RPL_UMODEIS, params, client, NULL, client_list, *channel_list);
+}
 
 // *********MODE**********(Ne peut s'utiliser que sur soit meme)
 

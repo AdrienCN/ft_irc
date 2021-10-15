@@ -177,7 +177,7 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 			break;
 		}
 
-		case 491: //ERR_RESTRICTED
+		case 491: //ERR_NOOPERHOST
 		{
 			error += " :No O-lines for your host\r\n";
 			break;
