@@ -1,17 +1,4 @@
-  #include "Server.hpp"
-/*
-struct addrinfo 
-{
-    int              ai_flags; //Lots of flag options AI_PASSIVE is ours
-    int              ai_family;	  //Type of address (IP) AF_INET | AF_INET6 |AF_UNSPEC 
-    int              ai_socktype; // Type of socket
-    int              ai_protocol; //Type of protocol for socket 0 = anyprotocol
-    socklen_t        ai_addrlen;
-    struct sockaddr *ai_addr;
-    char            *ai_canonname;
-	struct addrinfo *ai_next;
-};
-*/
+#include "Server.hpp"
 Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _server_name("****>>>[IRC_90S]<<<****"), _server_ipaddress("127.0.0.1"), _server_creation_date(""), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
 {
 	time_t	raw_time;
