@@ -168,9 +168,8 @@ void Commands::pass(std::vector<std::string> params, CMD_PARAM)
 		return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
 	if (params.size() < 2)
 		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
-	//quid si le password est faux
-	//quid si le password est vide
-	
+	if (client->getRegUser() == true || client->getRegNick() == true)
+		return;
 	std::cout << "Password OK" << std::endl;
 	client->setPassword(params[1]);
 	client->setRegPass(true);

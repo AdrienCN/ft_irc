@@ -42,8 +42,9 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 		}
 		case 5:
 		{
-			//Remplacer cette reponse par "Sorry IRC90's user capacity is full. Please retry later\r\n" ?
-			rpl += "Try server <server name>, port <port number>\r\n";
+			rpl +="Sorry IRC_90's capacity is full. Please retry connection later\r\n";
+			//RPL OFFICIELLE
+			//rpl += "Try server <server name>, port <port number>\r\n";
 			break;
 		}
 		//RPL_AWAY

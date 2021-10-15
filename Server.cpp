@@ -189,12 +189,11 @@ void	Server::run()
 			{
 				//Je suis le serveur
 				if ((*itb).fd == _server_socket)
-				{	if (_nbClients == MAX_CLIENT)
+				{	
+					if (_nbClients == MAX_CLIENT)
 						this->refuseClient();
 					else
-						this->addClient();
-					//CETTE LIGNE fait tout bugger 
-						//tmp.push_back(this->addClient());
+						this->addClient(); //tmp.push_back(this->addClient()); //cette ligne de mort cause notre bug 
 				}
 				//Je suis un client
 				else
@@ -242,8 +241,13 @@ void	Server::refuseClient()
 	if (fcntl(socket, F_SETFL,  O_NONBLOCK) == -1)
 		throw Server::ExceptErrno();
 	
-	close(socket);
+	Client*			new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
+	new_client->init(socket);
+	std::vector<std::string> useless;
 	std::cout << "ERROR : refuseClient : Client already maximum" << std::endl;
+	ft_reply(RPL_BOUNCE,  useless, new_client, NULL,  _all_clients, _all_channels);
+	close(socket);
+	delete new_client;
 }
 
 //void	Server::addClient()
@@ -382,10 +386,18 @@ void	Server::welcomeClient(Client *client)
 			{
 				std::cout << GREEN << "****************REGISTRATION SUCCESS************************" << RESET << std::endl;
 				client->setRegistration(true);
-			ft_reply("1", tmp, client, NULL, _all_clients, _all_channels);
-	    	ft_reply("2", tmp, client, NULL, _all_clients, _all_channels);
-	    	ft_reply("3", tmp, client, NULL, _all_clients, _all_channels);
-	    	ft_reply("4", tmp, client, NULL, _all_clients, _all_channels);
+				ft_reply("1", tmp, client, NULL, _all_clients, _all_channels);
+				ft_reply("2", tmp, client, NULL, _all_clients, _all_channels);
+				ft_reply("3", tmp, client, NULL, _all_clients, _all_channels);
+				ft_reply("4", tmp, client, NULL, _all_clients, _all_channels);
+				if (client->getRegPass() == true)
+				{
+					if (client->getPassword() != this->_password)
+					{
+						ft_error(ERR_PASSWDMISMATCH, tmp, client, NULL, _all_clients, _all_channels);
+						client->setRegPass(false);
+					}
+				}
 			}
 			else
 				ft_registration_failed(client);
