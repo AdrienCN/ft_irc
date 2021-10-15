@@ -58,6 +58,37 @@ std::string const & Server::getPassword() const
 	return _password;
 }
 
+std::string const & Server::getServerName() const
+{
+	return this->_server_name;
+}
+
+std::string const & Server::getServerIpaddress() const
+{
+	return this->_server_ipaddress;
+}
+
+std::string const & Server::getServerCreationDate() const
+{
+	return this->_server_creation_date;
+}
+
+void  Server::setServerName(std::string const & src)
+{
+	this->_server_name = src;
+}
+
+void  Server::setServerIpaddress(std::string const & src)
+{
+	this->_server_ipaddress = src;
+}
+
+void  Server::setServerCreationDate(std::string const & src)
+{
+	this->_server_creation_date = src;
+}
+
+
 //On catchera une erreur de construction dans le main au start
 void Server::init()
 {
@@ -101,67 +132,82 @@ void Server::init()
 	_poll.fd = _server_socket;
 	_poll.events = POLLIN;                                           
 	_fds.push_back(_poll);
-		std::cout << "fd = " << _poll.fd << std::endl;
+	std::cout << "fd = " << _poll.fd << std::endl;
 
+}
+
+void	Server::pollInfo(std::vector<struct pollfd> const & src)
+{
+	std::vector<struct pollfd>::const_iterator it = src.begin();
+	while (it != src.end())
+	{
+		std::cout << "FD : " << it->fd  << " | EVENTS: " << it->events << " | REVENTS: "<< it->revents << std::endl;
+		it++;
+	}
+	return ;
 }
 
 void	Server::run() 
 {	
+	std::vector<struct pollfd>		tmp;
+	tmp.push_back(this->_poll);
 	while (1)
 	{
-		std::cout << "FROM MAIN SERVER" << std::endl;
+		std::cout << YELLOW << "FROM MAIN SERVER" << RESET << std::endl;
 		print_client_list(_all_clients);
 		print_channel_list(_all_channels);
-
 		
+
+		tmp.push_back(this->_poll);
+		for (std::vector<Client*>::iterator it = _all_clients.begin(); it != _all_clients.end(); it++)
+		{
+			tmp.push_back((*it)->getPoll());
+		}
+		
+
+		std::vector<pollfd>::iterator it = tmp.begin();
+//		std::cout << "Starting new poll ..." << std::endl;
+		int poll_count = poll(&(*it), _nbClients + 1, 10000);
+		if (poll_count == -1)
+			throw Server::ExceptErrno();
+		this->pollInfo(tmp);
+
+		std::vector<pollfd>::iterator itb = tmp.begin();
+		std::vector<pollfd>::iterator ite = tmp.end();
+		
+	/*	
 		std::vector<pollfd>::iterator it = _fds.begin();
 //		std::cout << "Starting new poll ..." << std::endl;
 		int poll_count = poll(&(*it), _nbClients + 1, -1);
 		if (poll_count == -1)
 			throw Server::ExceptErrno();
+		this->pollInfo();
 
 		std::vector<pollfd>::iterator itb = _fds.begin();
 		std::vector<pollfd>::iterator ite = _fds.end();
-		//for (int i = 0; i <= _nbClients; i++)
+		*/
 		while (itb != ite)
 		{
-			//JUST POUR CLARIFIER EVENTS
-			if ((*itb).revents == POLLIN)
-			{
-				std::cout << "itb.fd.revent " << (*itb).fd << " : POLLIN" << std::endl;
-			}
-			else if (itb->revents == POLLHUP)
-			{
-				std::cout << "itb.fd.revent " << (*itb).fd << " : POLLHUP" << std::endl;
-
-			}
-			else if (itb->revents == (POLLIN | POLLHUP))
-			{
-				std::cout << "itb.fd.revent " << (*itb).fd << " : POLLIN | POLLHUP" << std::endl;
-			}
-			else
-				std::cout << "itb.fd.revent " << (*itb).fd << " : OTHER" << std::endl;
 			 if (((*itb).revents & POLLHUP) == POLLHUP)
 			{
 				std::cout << "Trying to disconnect .... fd = " << (*itb).fd << std::endl;
 				if ((*itb).fd != _server_socket)
 				{					
 					this->removeClient((*itb).fd);
-					//this->poll_remove_client((*itb).fd);
-					break;
+					//break;
 				}
 			}
-			//END
-
 			//Event est un POLLIN
-			//if ou else if ?
-			if ((*itb).revents & POLLIN)
+			else if ((*itb).revents & POLLIN)
 			{
 				//Je suis le serveur
 				if ((*itb).fd == _server_socket)
-				{	
-					this->addClient();
-					//break; on comprends pas mais on copie github
+				{	if (_nbClients == MAX_CLIENT)
+						this->refuseClient();
+					else
+						this->addClient();
+					//CETTE LIGNE fait tout bugger 
+						//tmp.push_back(this->addClient());
 				}
 				//Je suis un client
 				else
@@ -184,20 +230,37 @@ void	Server::run()
 						client->clearCommand();
 					}
 				}
-					//this->receiveMessage(this->find_client_from_fd((*itb).fd));			
-				//}
 			}
-			// Je suis un POLLOUT
-			
-	//		std::cout << "End of loop for fd = " << (*itb).fd << "..." << std::endl;
 			itb++;
-		}//if (fd_client == -1)
-		// error 
-	//	std::cout << "End of poll ..." << std::endl;
+		}
+		tmp.clear();
+		std::cout << YELLOW << "LOOP END" << RESET << std::endl;
 	}
 }
 
-void	Server::addClient()
+void	Server::refuseClient()
+{
+	struct sockaddr_storage client_addr;
+	socklen_t		addrlen;
+	int				socket;
+
+	addrlen = sizeof(client_addr);
+	socket = accept(_server_socket, (struct sockaddr *)&client_addr, &addrlen);
+	if (socket == -1)
+	{
+		std::cout << "Pbm socket function" << std::endl;
+		throw Server::ExceptErrno();
+	}
+
+	if (fcntl(socket, F_SETFL,  O_NONBLOCK) == -1)
+		throw Server::ExceptErrno();
+	
+	close(socket);
+	std::cout << "ERROR : refuseClient : Client already maximum" << std::endl;
+}
+
+//void	Server::addClient()
+struct pollfd const &	Server::addClient()
 {
 	//struct sockaddr ?? 
 	struct sockaddr_storage client_addr;
@@ -215,52 +278,16 @@ void	Server::addClient()
 	if (fcntl(socket, F_SETFL,  O_NONBLOCK) == -1)
 		throw Server::ExceptErrno();
 
-	if (_nbClients == MAX_CLIENT)
-	{
-		std::cout << "Error : Client number already maximum" << std::endl;
-		close(socket);
-		return;
-	}
-
 	Client*			new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
 	new_client->init(socket);
-	this->poll_add_client(*new_client);
+	_fds.push_back(new_client->getPoll());
+	//this->poll_add_client(*new_client);
 	_all_clients.push_back(new_client);
 	_nbClients++;
 	std::cout << "New client added" <<std::endl;
 	send(new_client->getSocket(), "Hello to you NEW CLIENT JOANN\n", 30, 0);
+	return (new_client->getPoll());
 }
-
-std::string const & Server::getServerName() const
-{
-	return this->_server_name;
-}
-
-std::string const & Server::getServerIpaddress() const
-{
-	return this->_server_ipaddress;
-}
-
-std::string const & Server::getServerCreationDate() const
-{
-	return this->_server_creation_date;
-}
-
-void  Server::setServerName(std::string const & src)
-{
-	this->_server_name = src;
-}
-
-void  Server::setServerIpaddress(std::string const & src)
-{
-	this->_server_ipaddress = src;
-}
-
-void  Server::setServerCreationDate(std::string const & src)
-{
-	this->_server_creation_date = src;
-}
-
 void Server::poll_add_client(Client const& new_client)
 {
 	std::vector<struct pollfd>::iterator it = _fds.begin();
@@ -292,8 +319,9 @@ void	Server::removeClient(int const & fd)
 			_all_clients.erase(it);
 		it++;
 	}
+	_nbClients--;
 	// Remove from Poll Fds
-	this->poll_remove_client(fd);
+//	this->poll_remove_client(fd);
 	print_client_list(_all_clients);
 	return;	
 }

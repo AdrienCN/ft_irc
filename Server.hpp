@@ -54,14 +54,17 @@ class Server
 		void  setServerCreationDate(std::string const & src);
 
 
-
+		//Adrien_degub
+		void	pollInfo(std::vector<struct pollfd> const & src);
+		void	refuseClient();
 
         // CONNECTIONS MANAGEMENT
         void    init();
         void    run();
         void    poll_add_client(Client const& new_client);
         void    poll_remove_client(int const& fd);
-        void    addClient();
+       // void    addClient();
+		struct pollfd const &    addClient();
         void    removeClient(int const & fd);
         Client* find_client_from_fd(int fd);
 
