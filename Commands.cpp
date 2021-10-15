@@ -13,6 +13,7 @@
 Commands::Commands(std::string const & password, std::string server_name, std::string server_ipaddress, std::string server_creation_date): _server_password(password) , _server_name(server_name) , _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date) 
 {
 
+	_cmd_list["MODE"] = &Commands::mode;
 	_cmd_list["CAP"] = &Commands::cap;
 	_cmd_list["AWAY"] = &Commands::away;
 	_cmd_list["PASS"] = &Commands::pass;
@@ -140,18 +141,86 @@ void	Commands::cap(std::vector<std::string> params, CMD_PARAM)
 	ft_reply(RPL_CUSTOMCAP, params, client, NULL, client_list, *channel_list);
 }
 
+
+// *********MODE**********(Ne peut s'utiliser que sur soit meme)
+
+
+void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
+{
+	if (params.size() < 2)
+		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
+	if (params[1] != client->getNickname())
+		return (ft_error(ERR_USERSDONTMATCH, params, client, NULL, client_list, *channel_list));
+	//MODE <nickname> --> renvoie info sur user
+	if (params.size() == 2)
+		return (ft_reply(RPL_UMODEIS, params, client, NULL, client_list, *channel_list));
+	std::string mode = params[2];
+	if ((mode[0] != '-' && mode[0] != '+') || (mode.size() != 2))
+		return (ft_error(ERR_UMODEUNKNOWNFLAG, params, client, NULL, client_list, *channel_list));
+	if (mode[1] != 'a' && mode[1] != 'O')
+		return (ft_error(ERR_UMODEUNKNOWNFLAG, params, client, NULL, client_list, *channel_list));
+
+	//User attemps to bypass OPER command, IGNORE command
+	if (mode.compare("+O") == 0)
+		return;
+	else if (mode.compare("-O") == 0)
+		client->setOper(false);
+	else if (mode.compare("+a") == 0)
+	{
+		client->setAwayMessage("I'm busy");
+		client->setAway(true);
+		ft_reply(RPL_CUSTOMMODESUCCESS, params, client, NULL, client_list, *channel_list);
+		std::vector<std::string> tmp;
+		tmp.push_back("AWAY");
+		tmp.push_back(":I'm busy");
+		this->away(tmp, client, client_list, channel_list);
+	}
+	else if (mode.compare("-a") == 0)
+	{
+		client->setAway(false);
+		ft_reply(RPL_CUSTOMMODESUCCESS, params, client, NULL, client_list, *channel_list);
+		std::vector<std::string> tmp;
+		tmp.push_back("AWAY");
+		this->away(tmp, client, client_list, channel_list);
+	}
+	return (ft_reply(RPL_CUSTOMMODESUCCESS, params, client, NULL, client_list, *channel_list));
+	//quid de l'input MODE <nickname> +o qqchose qqchose || MODE <nickname> +oui
+}
+
+
 // ******** AWAY *************
 
 void	Commands::away(std::vector<std::string> params, CMD_PARAM)
 {
+	(void)client;
+	(void)client_list;
+	(void)channel_list;
+	(void)params;
+
+
+	//BACK instead
 	if (params.size() == 1)
-		return (ft_reply(RPL_UNAWAY, params, client, NULL, client_list, *channel_list));
-	else if (params.size() == 2)
 	{
-		client->setAwayMessage(params[2]);
+		client->setAway(false);
+		client->getAwayMessage();
+		return (ft_reply(RPL_UNAWAY, params, client, NULL, client_list, *channel_list));
+	
+	}
+	else if (params.size() > 2)
+	{
+		client->setAway(true);
+		//faux, message = concatene de params[1] -> params.end()
+		std::string away_msg;
+		for (std::vector<std::string>::iterator it = params.begin() + 1; it != params.end(); it++)
+		{
+			away_msg += *it + " ";
+		}
+		//delete ":"
+		away_msg.erase(away_msg.begin());
+		client->setAwayMessage(away_msg);
 		return (ft_reply(RPL_NOWAWAY, params, client, NULL, client_list, *channel_list));
 	}
-	
+//	*/
 
 }
 // ******** PASS *************

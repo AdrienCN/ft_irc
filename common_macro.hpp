@@ -8,6 +8,7 @@
 #define RPL_CREATED				"3" //
 #define RPL_MYINFO				"4" //
 #define RPL_BOUNCE				"5"//
+#define RPL_UMODEIS				"221"
 #define RPL_AWAY				"301"//
 #define RPL_UNAWAY				"305"
 #define RPL_UNAWAY				"305"
@@ -17,6 +18,7 @@
 #define RPL_NAMEREPLY			"353"
 #define RPL_ENDOFNAMES  		"366"
 #define RPL_CUSTOMCAP			"4242"
+#define RPL_CUSTOMMODESUCCESS	"4243"
 
 #define ERR_NOSUCHNICK			"401"
 #define ERR_NOSUCHCHANNEL		"403"
@@ -45,6 +47,8 @@
 #define ERR_BADCHANMASK 		"476"
 #define ERR_CHANOPRIVNEEDED     "482"
 #define ERR_RESTRICTED			"484"
+#define ERR_UMODEUNKNOWNFLAG	"501"
+#define ERR_USERSDONTMATCH		"502"
 
 
 #endif

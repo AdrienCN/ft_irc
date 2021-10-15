@@ -40,6 +40,7 @@ class Client
 		bool		const &		getRegNick() const;
 		bool		const &		getRegUser() const;
 		bool		const &		getAway() const;
+		bool		const &		getOper() const;
 		std::vector<std::string> const & getCommand() const;
 		std::string const & getServerName() const;
 		std::string const & getServerIpaddress() const;
@@ -52,6 +53,7 @@ class Client
  		void	setRegPass(bool const& src);
 		void	setRegNick(bool const& src);
 		void	setRegUser(bool const& src);
+		void	setOper(bool const& src);
         void	setMessageStatus(bool const& src);
 		void		setRegistration(bool const& src);
 		void		setRealname(std::string const& src);	
@@ -112,6 +114,7 @@ class Client
 		bool _reg_nick;
 		bool _reg_user;
 		bool _away;
+		bool _oper;
         //Input _input: // template pour analyser un message
 
 

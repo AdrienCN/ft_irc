@@ -47,6 +47,20 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 			//rpl += "Try server <server name>, port <port number>\r\n";
 			break;
 		}
+		//RPL_UMODEIS
+		case 221:
+		{
+			if (client->getAway() == false && client->getOper() == false)
+				rpl += client->getNickname() + " :no mode set"; 
+			else
+				rpl += client->getNickname() + " :active mode +";
+			if (client->getAway() == true)
+				rpl += "a";
+			if (client->getOper() == true)
+				rpl += "O";
+			rpl +="\r\n";
+			break;
+		}
 		//RPL_AWAY
 		case 301:
 		{
@@ -115,7 +129,11 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 			std::cout << GREEN << rpl << RESET <<std::endl;
 			break;
 		}
-
+		case 4243:
+		{
+			rpl += client->getNickname() + ": sets mode " + params[2] + " on " + client->getNickname() + "\r\n";
+			break;
+		}
 		default:
 		{
 			rpl = "No RPL set yet \r\n";
