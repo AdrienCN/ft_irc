@@ -147,6 +147,8 @@ void	Commands::cap(std::vector<std::string> params, CMD_PARAM)
 
 void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
 {
+    std::cout << YELLOW << "Hello from MODE function!" << RESET << std::endl;
+
 	if (params.size() < 2)
 		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
 	if (params[1] != client->getNickname())
@@ -164,7 +166,10 @@ void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
 	if (mode.compare("+O") == 0)
 		return;
 	else if (mode.compare("-O") == 0)
+	{
 		client->setOper(false);
+		return (ft_reply(RPL_CUSTOMMODESUCCESS, params, client, NULL, client_list, *channel_list));
+	}
 	else if (mode.compare("+a") == 0)
 	{
 		client->setAwayMessage("I'm busy");
@@ -183,7 +188,6 @@ void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
 		tmp.push_back("AWAY");
 		this->away(tmp, client, client_list, channel_list);
 	}
-	return (ft_reply(RPL_CUSTOMMODESUCCESS, params, client, NULL, client_list, *channel_list));
 	//quid de l'input MODE <nickname> +o qqchose qqchose || MODE <nickname> +oui
 }
 
@@ -192,6 +196,8 @@ void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
 
 void	Commands::away(std::vector<std::string> params, CMD_PARAM)
 {
+    std::cout << YELLOW << "Hello from AWAY function!" << RESET << std::endl;
+
 	(void)client;
 	(void)client_list;
 	(void)channel_list;
@@ -201,13 +207,17 @@ void	Commands::away(std::vector<std::string> params, CMD_PARAM)
 	//BACK instead
 	if (params.size() == 1)
 	{
+   		 std::cout << GREEN << "MODE 1" << RESET << std::endl;
+
 		client->setAway(false);
 		client->getAwayMessage();
 		return (ft_reply(RPL_UNAWAY, params, client, NULL, client_list, *channel_list));
 	
 	}
-	else if (params.size() > 2)
+	else if (params.size() >= 2)
 	{
+   		 std::cout << GREEN << "MODE 2" << RESET << std::endl;
+
 		client->setAway(true);
 		//faux, message = concatene de params[1] -> params.end()
 		std::string away_msg;
@@ -215,6 +225,7 @@ void	Commands::away(std::vector<std::string> params, CMD_PARAM)
 		{
 			away_msg += *it + " ";
 		}
+		away_msg.erase(away_msg.end() - 1);
 		//delete ":"
 		away_msg.erase(away_msg.begin());
 		client->setAwayMessage(away_msg);
@@ -933,11 +944,13 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 			{
 				std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_client->getNickname() <<  " : " << message << RESET << std::endl;
 		   		send_privmsg_user(client, message, tmp_client);
-				if (client->getAway() == true)
+				if (tmp_client->getAway() == true)
 				{
+					std::cout << YELLOW << "Dest is away" << RESET << std::endl;
+
 					std::vector<std::string> tmp_params;
-					tmp_params.push_back(client->getNickname());
-					tmp_params.push_back(client->getAwayMessage());
+					tmp_params.push_back(tmp_client->getNickname());
+					tmp_params.push_back(tmp_client->getAwayMessage());
 					ft_reply(RPL_AWAY, tmp_params, client, NULL, client_list, *channel_list);
 				}
 			}
