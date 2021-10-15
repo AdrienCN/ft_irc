@@ -1,6 +1,6 @@
 #include "Client.hpp"
 
-Client::Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date) : _message_status(DISCONNECT),  _hostname("defaultconstructorHOSTNAMEvalue"), _username("Default_Username"), _nickname("Default_Nickname"), _realname("Default_realname"), _server_name(server_name), _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date),  _away_message(""), _registration_status(false), _reg_pass(false), _reg_nick(false), _reg_user(false), _away(false)
+Client::Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date) : _message_status(DISCONNECT),  _hostname("defaultconstructorHOSTNAMEvalue"), _username("Default_Username"), _nickname("Default_Nickname"), _realname("Default_realname"), _server_name(server_name), _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date),  _away_message(""), _registration_status(false), _reg_pass(false), _reg_nick(false), _reg_user(false), _away(false), _oper(false)
 
 {
     return;
@@ -27,6 +27,10 @@ void Client::present()
 }
 
 // GETTERS
+bool const &		Client::getOper() const
+{
+	return this->_oper;
+}
 
 bool const &					 Client::getRegPass() const
 {
@@ -130,6 +134,11 @@ std::string const & Client::getAwayMessage() const
 
 
 //SETTERS
+
+void	Client::setOper(bool const & src)
+{
+	this->_oper = src;
+}
 
 void  Client::setAwayMessage(std::string const & src)
 {

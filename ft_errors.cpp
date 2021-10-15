@@ -10,7 +10,8 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 	int nb = atoi(nb_str.c_str());
 
     std::string error;
-    
+   
+	//Revoir syntax systematique des erreurs	
 	error = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + nb_str + " : ";
     switch (nb)
     {
@@ -179,6 +180,16 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 		case 491: //ERR_RESTRICTED
 		{
 			error += " :No O-lines for your host\r\n";
+			break;
+		}
+		case 501: //ERR_UMODEUNKNOWNFLAG
+		{
+			error += " :Unknown MODE flag\r\n";
+			break;
+		}
+		case 502: //ERR_USERDONTMATCH
+		{
+			error += " :Cant change mode for other users\r\n";
 			break;
 		}
         default:
