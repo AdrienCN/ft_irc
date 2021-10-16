@@ -2,10 +2,10 @@
 #define COMMON_MACRO_H
 
 #define EMO_ROBOT "\U0001F916"
-# define END_CHAR "\r\n"
-# define MAX_CHAR 512
-# define CHAN_MAXCAPACITY 2 // a revoir
-# define USER_MAXCHAN 2 // a revoir
+#define END_CHAR "\r\n"
+#define MAX_CHAR 4096
+#define CHAN_MAXCAPACITY 2 // a revoir
+#define USER_MAXCHAN 2 // a revoir
 
 #define RPL_WELCOME				"1" //
 #define RPL_YOURHOST			"2" //

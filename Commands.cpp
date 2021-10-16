@@ -474,10 +474,11 @@ void joinChannel(Channel* new_chan, std::vector<std::string> params, CMD_PARAM)
 	(void)params;
 
 	//A eclaircir si besoin ou pas	
-	if (new_chan->getStatusTopic() == false)
-		ft_reply(RPL_NOTOPIC, params, client, new_chan, client_list, *channel_list); // RPL_NOTOPIC
-	else
+	if (new_chan->getStatusTopic() == true)
 		ft_reply(RPL_TOPIC, params, client, new_chan, client_list, *channel_list); // RPL_TOPIC
+	//Mis en commentaire car libera chat n'envoie que si le topic existe
+	//else
+	//	ft_reply(RPL_NOTOPIC, params, client, new_chan, client_list, *channel_list); // RPL_NOTOPIC
 	ft_reply(RPL_NAMEREPLY, params, client, new_chan, client_list, *channel_list); // RPL_NAMEREPLY
 	ft_reply(RPL_ENDOFNAMES, params, client, new_chan, client_list, *channel_list); // RPL_NAMEREPLY
 	
@@ -488,7 +489,7 @@ void leaveChannel(Channel* channel, Client *client, std::string message, std::ve
 	client->remove_channel(channel);
 	
 	std::string rpl;
-	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PART " + channel->getName() + " :" + message + "\r\n";
+	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " PART " + channel->getName() + " " + message + "\r\n";
 	std::vector<Client*> tmp = channel->getMemberList();
 	std::vector<Client*>::iterator it = tmp.begin();
 	std::vector<Client*>::iterator ite = tmp.end();
@@ -749,7 +750,7 @@ void kickChannel(Channel* channel, Client *client, Client* to_kick, std::string 
 {
 	to_kick->remove_channel(channel);
 	std::string rpl;
-	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " KICK " + channel->getName() + " " + to_kick->getNickname() + " :" + message + "\r\n";
+	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " KICK " + channel->getName() + " " + to_kick->getNickname() + " " + message + "\r\n";
 	std::vector<Client*> tmp = channel->getMemberList();
 	std::vector<Client*>::iterator it = tmp.begin();
 	std::vector<Client*>::iterator ite = tmp.end();
