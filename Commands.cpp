@@ -80,6 +80,13 @@ void Commands::find_command(std::string input, Client* client, std::vector<Clien
 	(void)client_list;
 	(void)channel_list;
 
+	if (input.size() > 510) // 510 car \r\n deja parsé == 512
+	{
+		std::string rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " : command too long (512)\r\n";
+		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
+		return; 
+	}
+
 	this->analyzeCommand(input);
 	std::string key(_parsed_cmd.front());
 	std::cout << "key :" << key << std::endl;
@@ -346,7 +353,7 @@ void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 	//Pas de pseudo donne
 	if (params.size() < 2)
 	{
-		return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);
+		return ft_error(ERR_NONICKNAMEGIVEN, params, client, NULL, client_list, *channel_list);
 	}
 		//Pseudo contient des chars non autorise 
 		//	ft_error(432)a coder ??

@@ -2,6 +2,10 @@
 #define COMMON_MACRO_H
 
 #define EMO_ROBOT "\U0001F916"
+# define END_CHAR "\r\n"
+# define MAX_CHAR 512
+# define CHAN_MAXCAPACITY 2 // a revoir
+# define USER_MAXCHAN 2 // a revoir
 
 #define RPL_WELCOME				"1" //
 #define RPL_YOURHOST			"2" //
@@ -28,15 +32,11 @@
 #define ERR_TOOMANYTARGETS		"407" 
 #define ERR_NORECIPIENT			"411"
 #define ERR_NOTEXTTOSEND		"412"
-#define ERR_NOTOPLEVEL			"413"
-#define ERR_WILDTOPLEVEL		"414"
-#define ERR_BADMASK		    	"415"
 #define ERR_UNKNOWNCOMMAND		"421"
 #define ERR_NONICKNAMEGIVEN		"431"
 #define ERR_ERRONEUSNICKNAME	"432"
 #define ERR_NICKNAMEINUSE		"433"
 #define ERR_NICKCOLLISION		"436"
-#define ERR_UNAVAILABLERESOURCE "437"
 #define ERR_USERNOTINCHANNEL    "441"
 #define ERR_NOTONCHANNEL		"442"
 #define ERR_NEEDMOREPARAMS		"461"

@@ -54,23 +54,6 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
             error += ":No text to send\r\n";
             break;
         }
-		// mask param == ?? pour 413 - > 415 
-		case 413: //ERR_NOTOPLEVEL
-		{
-			error += "<mask> :No toplevel domain specified\r\n";
-			break;
-		}
-		case 414: //ERR_WILDTOPLEVEL
-		{
-			error += "<mask> :Wildcard in toplevel domain\r\n";
-			break;
-		}
-		case 415: //ERR_BADMASK // return by PRIVMSG
-		{
-			error += "<mask> :Bad Server/host mask\r\n";
-			break;
-		}
-
 		case 421: //ERR_UNKNOWNCOMMAND
 		{
 			std::string cmd("[");
@@ -109,12 +92,7 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 			error += (params[1] + " :Nickname collision KILL from" + client->getUsername() + "@" + client->getHostname() + "\r\n");
 			break;
 		}
-		// Avoir 
-		case 437: //ERR_UNAVAILABLERESSOURCE
-		{
-			error += "<nick/channel> :Nick/channel is temporarily unavailable\r\n" ;
-			break;
-		}
+		
 		case 441: // ERR_USERNOTINCHANNEL
         {
 			//TMP != PARAM
