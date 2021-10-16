@@ -43,7 +43,7 @@ class Client
 		bool		const &		getOper() const;
 		std::vector<std::string> const & getCommand() const;
 		std::string const & getServerName() const;
-		std::string const & getServerIpaddress() const;
+		std::string const & getServerIpAddress() const;
 		std::string const & getServerCreationDate() const;
 		std::string const & getAwayMessage() const;
 		

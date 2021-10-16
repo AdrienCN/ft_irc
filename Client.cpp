@@ -103,7 +103,7 @@ std::string const & Client::getServerName() const
 	return this->_server_name;
 }
 
-std::string const & Client::getServerIpaddress() const
+std::string const & Client::getServerIpAddress() const
 {
 	return this->_server_ipaddress;
 }

@@ -37,12 +37,6 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 			error += (channel->getName() + " :You have joined too many channels\r\n"); 
 			break;
 		}
-		case 407: //ERR_TOOMANYTARGETS
-		{
-			//A voir
-			error += "<target> :<error code> recipients. <abort message>\r\n";
-			break;
-		}
         case 411: // ERR_NORECIPIENT
         {
             std::string command = params[0];
@@ -86,13 +80,6 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 			error += (params[1] + " :Nickname is already in use\r\n");
 			break;
 		}
-
-		case 436: //ERR_NICKCOLLISION
-		{
-			error += (params[1] + " :Nickname collision KILL from" + client->getUsername() + "@" + client->getHostname() + "\r\n");
-			break;
-		}
-		
 		case 441: // ERR_USERNOTINCHANNEL
         {
 			//TMP != PARAM
