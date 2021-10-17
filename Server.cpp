@@ -266,9 +266,10 @@ void	Server::refuseClient()
 	
 	Client*			new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
 	new_client->init(socket);
-	std::vector<std::string> useless;
+	//std::vector<std::string> useless;
 	std::cout << "ERROR : refuseClient : Client already maximum" << std::endl;
-	ft_reply(RPL_BOUNCE,  useless, new_client, NULL,  _all_clients, _all_channels);
+	ft_reply(RPL_BOUNCE,  new_client, NULL, "");
+	//ft_reply(RPL_BOUNCE,  useless, new_client, NULL,  _all_clients, _all_channels);
 	close(socket);
 	delete new_client;
 }
@@ -302,6 +303,7 @@ struct pollfd const &	Server::addClient()
 	send(new_client->getSocket(), "Hello to you NEW CLIENT JOANN\n", 30, 0);
 	return (new_client->getPoll());
 }
+
 void Server::poll_add_client(Client const& new_client)
 {
 	std::vector<struct pollfd>::iterator it = _fds.begin();
@@ -413,15 +415,22 @@ void	Server::welcomeClient(Client *client)
 			{
 				std::cout << GREEN << "****************REGISTRATION SUCCESS************************" << RESET << std::endl;
 				client->setRegistration(true);
+				/*
 				ft_reply("1", tmp, client, NULL, _all_clients, _all_channels);
 				ft_reply("2", tmp, client, NULL, _all_clients, _all_channels);
 				ft_reply("3", tmp, client, NULL, _all_clients, _all_channels);
 				ft_reply("4", tmp, client, NULL, _all_clients, _all_channels);
+				*/
+				ft_reply("1", client, NULL, "");
+				ft_reply("2", client, NULL, "");
+				ft_reply("3", client, NULL, "");
+				ft_reply("4", client, NULL, "");
 				if (client->getRegPass() == true)
 				{
 					if (client->getPassword() != this->_password)
 					{
-						ft_error(ERR_PASSWDMISMATCH, tmp, client, NULL, _all_clients, _all_channels);
+						ft_error(ERR_PASSWDMISMATCH, client, NULL, "");
+						//ft_error(ERR_PASSWDMISMATCH, tmp, client, NULL, _all_clients, _all_channels);
 						client->setRegPass(false);
 					}
 				}
