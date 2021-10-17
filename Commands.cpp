@@ -566,12 +566,14 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 			tmp->present();
 
 			std::cout << YELLOW << "Channel " << tmp->getName() << " already exist" << RESET << std::endl;
+			/* Pas utlisé car ban pas suicvi
 			if (tmp->isUserBanned(client) == 1)//user banned
 			{
 				std::cout << RED << "You are banned from  channel" <<  tmp->getName() << RESET <<  std::endl;
 				ft_error(ERR_BANNEDFROMCHAN, params, client, tmp, client_list, *channel_list); // ERR_BANNEDFROMCHANNEL
 			}
-			else if(tmp->isUserMember(client) == 1)
+			*/
+			if(tmp->isUserMember(client) == 1)
 			{
 				std::cout << RED << client->getNickname() << " is already a client of channel " <<  tmp->getName() << RESET << std::endl;
 				//pas d'erreurs retournée
@@ -810,13 +812,18 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 
 	//On cherche un potentiel commentaire
 	it++;
-	std::string kick_comment = "";
-	while (it != ite)
+	std::string kick_comment;
+	if(it == ite)
+		std::string kick_comment = "";
+	else
 	{
-		kick_comment += ((*it) + " ");
-		it++;
+		while (it != ite)
+		{
+			kick_comment += ((*it) + " ");
+			it++;
+		}
+		kick_comment.erase(kick_comment.size() - 1);
 	}
-	kick_comment.erase(kick_comment.size() - 1);
 
 	//Juste pour imprimer
 	print_vector(channels_name);
@@ -863,6 +870,8 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 						else
 						{
 							std::cout << GREEN << client->getNickname() << " is forcing " << tmp_client->getNickname() << " to leave channel " <<  tmp_channel->getName() << RESET << std::endl;
+							if (kick_comment == "")
+								kick_comment = tmp_client->getNickname();
 							kickChannel(tmp_channel, client, tmp_client, kick_comment, channel_list);
 						}
 					}
