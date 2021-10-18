@@ -128,14 +128,18 @@ void	Channel::printOperators() { // iterateur sur membres
 void	Channel::printMembersNick() { // iterateur sur membres
 	std::vector<Client*>::iterator it = _members.begin();
 	std::vector<Client*>::iterator ite = _members.end();
+
 	std::string rpl;
-	std::cout << "printMembersNick function" << std::endl;
 	while (it != ite) {
-		rpl += "* User on @" + this->_name;
-		rpl += " : " + (*it)->getNickname();
-		rpl += "\r\n"; // + real name
+		rpl = ":" + (*it)->getNickname() + "!" + (*it)->getUsername() + "@" + (*it)->getHostname() + " " + "353" + " : ";
+		rpl = ":127.0.0.1 ";
+		rpl += "353";
+		rpl += " " +  (*it)->getNickname();
+		std::cout << "chan name :" << getName() << std::endl;
+		rpl += (" = " + (*it)->getServerName() + " :");
+		rpl += ((*it)->getNickname() + " ");
+		rpl +=  "\r\n";
 		send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
-		//	std::cout << "user : " << (*it)->getUsername() << std::endl;
 		rpl = "";
 		it++;
 	}

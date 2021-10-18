@@ -62,6 +62,7 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 		case 353: // RPL_NAMEREPLY
 		{
 			//<canal>:[[@|+]<pseudo>[[@|+]<pseudo>[...]]]
+			std::cout << "channel reply :" << channel->getName() << std::endl;
 			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname();
 			rpl += (" = " + channel->getName() + " :");
 			std::vector<Client*> tmp = channel->getMemberList();
@@ -79,7 +80,7 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 		case 366: // ENDOFNAMES
 		{
 			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname() + " ";
-			rpl += (channel->getName() + " :End of NAMES list\r\n");
+			rpl += client->getServerName() + " :End of NAMES list\r\n";
 			break;	
 		}
 

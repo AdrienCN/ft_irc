@@ -897,31 +897,58 @@ static void	printNamesAllChan(std::vector<std::string> params, CMD_PARAM) {
 	while (it != (*channel_list).end()) {
 		ft_reply(RPL_NAMEREPLY, params, client, *it, client_list, *channel_list);
 		ft_reply(RPL_ENDOFNAMES, params, client, *it, client_list, *channel_list);
-		/* (*it)->printMembersNick(); */
 		std::cout << "print name ALL" << std::endl;
 		it++;
 	}
 }
 
-static void printAllNames(CMD_PARAM) {
-	std::vector<Client*>::iterator it = client_list.begin();
-	(void)client;
-	(void)channel_list;
-	std::string rpl;
-	while (it != client_list.end()) {
-		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + "353" + " : ";
-		rpl = ":127.0.0.1 ";
-		rpl += "353";
-		rpl += " " +  client->getNickname();
-		rpl += (" = " + client->getServerName() + " :");
-		rpl += ((*it)->getNickname() + " ");
-		rpl +=  "\r\n";
-		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
-		rpl = "";
-		it++;
-	}
-}
+/* static void printAllNames(CMD_PARAM) { */
+/* 	std::vector<Client*>::iterator it = client_list.begin(); */
+/* 	(void)client; */
+/* 	(void)channel_list; */
+/* 	std::string rpl; */
+/* 	while (it != client_list.end()) { */
+/* 		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + "353" + " : "; */
+/* 		rpl = ":127.0.0.1 "; */
+/* 		rpl += "353"; */
+/* 		rpl += " " +  client->getNickname(); */
+/* 		rpl += (" = " + client->getServerName() + " :"); */
+/* 		rpl += ((*it)->getNickname() + " "); */
+/* 		rpl +=  "\r\n"; */
+/* 		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0); */
+/* 		rpl = ""; */
+/* 		it++; */
+/* 	} */
+/* 	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + "366" + " : "; */
+/* 	rpl = ":127.0.0.1 "; */
+/* 	rpl += "366"; */
+/* 	rpl += " " +  client->getNickname() + " "; */
+/* 	rpl += (client->getServerName() + " :End of NAMES list\r\n"); */
+/* } */
 
+/* static void printChanNames(Channel* channel) { */
+/* 	std::vector<Client*>::iterator it = .begin(); */
+/* 	(void)client; */
+/* 	(void)channel_list; */
+/* 	std::string rpl; */
+/* 	while (it != client_list.end()) { */
+/* 		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + "353" + " : "; */
+/* 		rpl = ":127.0.0.1 "; */
+/* 		rpl += "353"; */
+/* 		rpl += " " +  client->getNickname(); */
+/* 		rpl += (" = " + client->getServerName() + " :"); */
+/* 		rpl += ((*it)->getNickname() + " "); */
+/* 		rpl +=  "\r\n"; */
+/* 		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0); */
+/* 		rpl = ""; */
+/* 		it++; */
+/* 	} */
+/* 	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + "366" + " : "; */
+/* 	rpl = ":127.0.0.1 "; */
+/* 	rpl += "366"; */
+/* 	rpl += " " +  client->getNickname() + " "; */
+/* 	rpl += (client->getServerName() + " :End of NAMES list\r\n"); */
+/* } */
 
 void Commands::names(std::vector<std::string> params, CMD_PARAM) {
 	std::cout << YELLOW << "Hello from Names function!" << RESET << std::endl;
@@ -934,12 +961,12 @@ void Commands::names(std::vector<std::string> params, CMD_PARAM) {
 	int num = matchChannel(params, client, client_list, channel_list);
 	if (num >= 0) {
 		std::cout << "print name chan" << std::endl;
+		(*channel_list)[num]->printMembersNick();
 		ft_reply(RPL_NAMEREPLY, params, client, (*channel_list)[num], client_list, *channel_list);
 		ft_reply(RPL_ENDOFNAMES, params, client, (*channel_list)[num], client_list, *channel_list);
-		//	(*channel_list)[num]->printMembersNick();
 	}
 	else { 
 		printNamesAllChan(params, client, client_list, channel_list);
-		printAllNames(client, client_list, channel_list);
+		/* printAllNames(client, client_list, channel_list); */
 	}
 }
