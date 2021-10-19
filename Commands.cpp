@@ -22,6 +22,7 @@ Commands::Commands(std::string const & password, std::string server_name, std::s
 	_cmd_list["NOTICE"] = &Commands::notice;
 	_cmd_list["WHO"] = &Commands::who;
 	_cmd_list["NAMES"] = &Commands::names;
+	_cmd_list["LIST"] = &Commands::list;
 	_cmd_list["QUIT"] = &Commands::quit;
 	_cmd_list["MYHELP"] = &Commands::myhelp;
 	return;
@@ -166,20 +167,20 @@ void	Commands::oper(std::vector<std::string> params, CMD_PARAM)
 	(void)params;
 	(void)client_list;
 	(void)channel_list;
-    std::cout << YELLOW << "Hello from OPER function!" << RESET << std::endl;
+	std::cout << YELLOW << "Hello from OPER function!" << RESET << std::endl;
 	if (params.size() < 3)
 		return (ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]));
-		//return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
-	
+	//return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
+
 	//If the client is not connecting from a valid host for the given name,
 	if (client->isRegistered() == false)
 		return (ft_error(ERR_NOOPERHOST, client, NULL, ""));
-		//return (ft_error(ERR_NOOPERHOST, params, client, NULL, client_list, *channel_list));
+	//return (ft_error(ERR_NOOPERHOST, params, client, NULL, client_list, *channel_list));
 
 	//If the client does not send the correct password for the given name
 	if (params[2].compare(this->_server_password) != 0)
 		return (ft_error(ERR_PASSWDMISMATCH, client, NULL, ""));
-    std::cout << YELLOW << "OPER success" << RESET << std::endl;
+	std::cout << YELLOW << "OPER success" << RESET << std::endl;
 	client->setOper(true);
 	ft_reply(RPL_YOUREOPER, client, NULL, "");
 	ft_reply(RPL_UMODEIS, client, NULL, "");
@@ -192,25 +193,25 @@ void	Commands::oper(std::vector<std::string> params, CMD_PARAM)
 
 void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
 {
-    std::cout << YELLOW << "Hello from MODE function!" << RESET << std::endl;
+	std::cout << YELLOW << "Hello from MODE function!" << RESET << std::endl;
 
 	if (params.size() < 2)
 		return (ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]));
-		//return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
+	//return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
 	if (params[1] != client->getNickname())
 		return (ft_error(ERR_USERSDONTMATCH, client, NULL, ""));
-		//return (ft_error(ERR_USERSDONTMATCH, params, client, NULL, client_list, *channel_list));
+	//return (ft_error(ERR_USERSDONTMATCH, params, client, NULL, client_list, *channel_list));
 	//MODE <nickname> --> renvoie info sur user
 	if (params.size() == 2)
 		return(ft_reply(RPL_UMODEIS, client, NULL, ""));
-//		return (ft_reply(RPL_UMODEIS, params, client, NULL, client_list, *channel_list));
+	//		return (ft_reply(RPL_UMODEIS, params, client, NULL, client_list, *channel_list));
 	std::string mode = params[2];
 	if ((mode[0] != '-' && mode[0] != '+') || (mode.size() != 2))
 		return (ft_error(ERR_UMODEUNKNOWNFLAG, client, NULL, ""));
-		//return (ft_error(ERR_UMODEUNKNOWNFLAG, params, client, NULL, client_list, *channel_list));
+	//return (ft_error(ERR_UMODEUNKNOWNFLAG, params, client, NULL, client_list, *channel_list));
 	if (mode[1] != 'a' && mode[1] != 'O')
 		return (ft_error(ERR_UMODEUNKNOWNFLAG, client, NULL, ""));
-		//return (ft_error(ERR_UMODEUNKNOWNFLAG, params, client, NULL, client_list, *channel_list));
+	//return (ft_error(ERR_UMODEUNKNOWNFLAG, params, client, NULL, client_list, *channel_list));
 
 	//User attemps to bypass OPER command, IGNORE command
 	if (mode.compare("+O") == 0)
@@ -233,7 +234,7 @@ void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
 	else if (mode.compare("-a") == 0)
 	{
 		client->setAway(false);
-	//	ft_reply(RPL_CUSTOMMODESUCCESS, params, client, NULL, client_list, *channel_list);
+		//	ft_reply(RPL_CUSTOMMODESUCCESS, params, client, NULL, client_list, *channel_list);
 		ft_reply(RPL_CUSTOMMODESUCCESS, client, NULL, "");
 		std::vector<std::string> tmp;
 		tmp.push_back("AWAY");
@@ -247,7 +248,7 @@ void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
 
 void	Commands::away(std::vector<std::string> params, CMD_PARAM)
 {
-    std::cout << YELLOW << "Hello from AWAY function!" << RESET << std::endl;
+	std::cout << YELLOW << "Hello from AWAY function!" << RESET << std::endl;
 
 	(void)client;
 	(void)client_list;
@@ -258,7 +259,7 @@ void	Commands::away(std::vector<std::string> params, CMD_PARAM)
 	//BACK instead
 	if (params.size() == 1)
 	{
-   		 std::cout << GREEN << "MODE 1" << RESET << std::endl;
+		std::cout << GREEN << "MODE 1" << RESET << std::endl;
 
 		client->setAway(false);
 		client->getAwayMessage();
@@ -266,7 +267,7 @@ void	Commands::away(std::vector<std::string> params, CMD_PARAM)
 	}
 	else if (params.size() >= 2)
 	{
-   		 std::cout << GREEN << "MODE 2" << RESET << std::endl;
+		std::cout << GREEN << "MODE 2" << RESET << std::endl;
 
 		client->setAway(true);
 		//faux, message = concatene de params[1] -> params.end()
@@ -281,7 +282,7 @@ void	Commands::away(std::vector<std::string> params, CMD_PARAM)
 		client->setAwayMessage(away_msg);
 		return (ft_reply(RPL_NOWAWAY, client, NULL,""));
 	}
-//	*/
+	//	*/
 
 }
 // ******** PASS *************
@@ -296,19 +297,12 @@ void Commands::pass(std::vector<std::string> params, CMD_PARAM)
 	std::cout << YELLOW << "Hello from PASS function!" << RESET << std::endl;
 	if (client->isRegistered() == true)
 		return ft_error(ERR_ALREADYREGISTERED, client, NULL, "");
-		//return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
+	//return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
 	if (params.size() < 2)
-<<<<<<< HEAD
-		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
-	//quid si le password est faux
-	//quid si le password est vide
-
-=======
 		return (ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]));
-//		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
+	//		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
 	if (client->getRegUser() == true || client->getRegNick() == true)
 		return;
->>>>>>> ba6d0b36dfd8e36ec6c5b3c1020d23735192f233
 	std::cout << "Password OK" << std::endl;
 	client->setPassword(params[1]);
 	client->setRegPass(true);
@@ -409,14 +403,14 @@ void Commands::user(std::vector<std::string> params, CMD_PARAM)
 	std::cout << YELLOW << "Hello from USER function!" << RESET << std::endl;
 	if (client->isRegistered() == true)
 		return ft_error(ERR_ALREADYREGISTERED, client, NULL, "");
-		//return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
+	//return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
 	if (params.size() < 5)
 		return (ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]));
-		//return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);	
+	//return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);	
 	client->setRegUser(true);
 	client->setRealname(ft_findUserRealname(params));
 	client->setUsername(params[1]);
-	
+
 }
 
 // ******** Channel Functions *************
@@ -481,15 +475,7 @@ void joinChannel(Channel* new_chan, std::vector<std::string> params, CMD_PARAM)
 	(void)params;
 
 	//A eclaircir si besoin ou pas	
-<<<<<<< HEAD
-	if (new_chan->getStatusTopic() == false)
-		ft_reply(RPL_NOTOPIC, params, client, new_chan, client_list, *channel_list); // RPL_NOTOPIC
-	else
-		ft_reply(RPL_TOPIC, params, client, new_chan, client_list, *channel_list); // RPL_TOPIC
-	ft_reply(RPL_NAMEREPLY, params, client, new_chan, client_list, *channel_list); // RPL_NAMEREPLY
-	ft_reply(RPL_ENDOFNAMES, params, client, new_chan, client_list, *channel_list); // RPL_NAMEREPLY
 
-=======
 	if (new_chan->getStatusTopic() == true)
 		ft_reply(RPL_TOPIC, client, new_chan, "");
 	//Mis en commentaire car libera chat n'envoie que si le topic existe
@@ -497,8 +483,6 @@ void joinChannel(Channel* new_chan, std::vector<std::string> params, CMD_PARAM)
 	//	ft_reply(RPL_NOTOPIC, client, new_chan, ""); 
 	ft_reply(RPL_NAMEREPLY, client, new_chan, ""); 
 	ft_reply(RPL_ENDOFNAMES, client, new_chan, ""); 
-	
->>>>>>> ba6d0b36dfd8e36ec6c5b3c1020d23735192f233
 }
 
 void leaveChannel(Channel* channel, Client *client, std::string message, std::vector<Channel*>* channel_list)
@@ -517,7 +501,7 @@ void leaveChannel(Channel* channel, Client *client, std::string message, std::ve
 	}
 	channel->removeMember(client);
 	channel->removeOp(client); // si jamais le client est Operateur
-	
+
 	if (channel->getNbMembers() == 0) // si jamais je suis le dernier membre
 	{	
 		std::cout << YELLOW << client->getNickname() << " is the last member of this channel" << RESET << std::endl;
@@ -584,12 +568,12 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 
 			std::cout << YELLOW << "Channel " << tmp->getName() << " already exist" << RESET << std::endl;
 			/* Pas utlisé car ban pas suicvi
-			if (tmp->isUserBanned(client) == 1)//user banned
-			{
-				std::cout << RED << "You are banned from  channel" <<  tmp->getName() << RESET <<  std::endl;
-				ft_error(ERR_BANNEDFROMCHAN, params, client, tmp, client_list, *channel_list); // ERR_BANNEDFROMCHANNEL
-			}
-			*/
+			   if (tmp->isUserBanned(client) == 1)//user banned
+			   {
+			   std::cout << RED << "You are banned from  channel" <<  tmp->getName() << RESET <<  std::endl;
+			   ft_error(ERR_BANNEDFROMCHAN, params, client, tmp, client_list, *channel_list); // ERR_BANNEDFROMCHANNEL
+			   }
+			   */
 			if(tmp->isUserMember(client) == 1)
 			{
 				std::cout << RED << client->getNickname() << " is already a client of channel " <<  tmp->getName() << RESET << std::endl;
@@ -682,7 +666,6 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 	}
 	itn++;
 }
-}
 
 // ******** PART *************
 
@@ -724,18 +707,10 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 		message = client->getNickname();
 
 	//Juste pour imprimer
-<<<<<<< HEAD
-	/*
-	   print_vector(channels_name);
-	   std::cout << "Part message: " << part_message << std::endl;
-	   */
 
-=======
-	
 	print_vector(channels_name);
 	std::cout << "Part message: " << message << std::endl;
-	
->>>>>>> ba6d0b36dfd8e36ec6c5b3c1020d23735192f233
+
 	//On s'occupe des noms de chan un a un
 	std::vector<std::string>::iterator itn = channels_name.begin();
 	std::vector<std::string>::iterator itne = channels_name.end();
@@ -783,7 +758,7 @@ void kickChannel(Channel* channel, Client *client, Client* to_kick, std::string 
 	}
 	channel->removeMember(to_kick);
 	channel->removeOp(to_kick); // si jamais le client est Operateur
-	
+
 	if (channel->getNbMembers() == 0) // si jamais je suis le dernier membre et que je m'autoexpulse
 	{	
 		std::cout << YELLOW << to_kick->getNickname() << " is the last member of this channel" << RESET << std::endl;
@@ -815,7 +790,7 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 	{
 		std::cout << "Error : KICK lack of params" << std::endl;
 		ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]);
-//		ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list); 
+		//		ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list); 
 		return;
 	}
 
@@ -825,7 +800,7 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 	it++;
 	std::vector<std::string> channels_name;
 	commaSplit(*it, &channels_name);
-	
+
 	//On parse le 3e arg de params (user names)
 	it++;
 	std::vector<std::string> users_name;
@@ -850,7 +825,7 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 	print_vector(channels_name);
 	print_vector(users_name);
 	std::cout << "Kick comment: " << kick_comment << std::endl;
-	
+
 	//On s'occupe des noms de chan un a un
 	std::vector<std::string>::iterator itc = channels_name.begin();
 	std::vector<std::string>::iterator itce = channels_name.end();
@@ -883,8 +858,8 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 					{
 						if (tmp_channel->isUserMember(tmp_client) == 0) //
 						{
-								std::cout << RED << tmp_client->getNickname() << " is not a member  of channel " <<  tmp_channel->getName() << RESET << std::endl;
-								ft_error(ERR_USERNOTINCHANNEL, client, tmp_channel, *itu); 
+							std::cout << RED << tmp_client->getNickname() << " is not a member  of channel " <<  tmp_channel->getName() << RESET << std::endl;
+							ft_error(ERR_USERNOTINCHANNEL, client, tmp_channel, *itu); 
 						}
 						else
 						{
@@ -1025,8 +1000,7 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 
 			ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]);
 		else if (params.size() == 2)
-		    ft_error(ERR_NOTEXTTOSEND, client, NULL, "");
->>>>>>> ba6d0b36dfd8e36ec6c5b3c1020d23735192f233
+			ft_error(ERR_NOTEXTTOSEND, client, NULL, "");
 		return;
 	}
 
@@ -1074,7 +1048,7 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 			{
 				std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_client->getNickname() <<  " : " << message << RESET << std::endl;
 
-		   		send_privmsg_user(client, message, tmp_client);
+				send_privmsg_user(client, message, tmp_client);
 				if (tmp_client->getAway() == true)
 				{
 					std::cout << YELLOW << "Dest is away" << RESET << std::endl;
@@ -1093,8 +1067,8 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 				{
 					std::cout << RED << client->getNickname() << " is not a member of " << tmp_channel->getName() << RESET << std::endl;
 					ft_error(ERR_CANNOTSENDTOCHAN, client, tmp_channel, "");
-			        return;
-      			}
+					return;
+				}
 				else
 				{
 					std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_channel->getName() <<  " : " << message << RESET << std::endl;
@@ -1106,8 +1080,8 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 				std::cout << RED << "Not a client or a channel" << RESET << std::endl;
 				//std::vector<std::string> tmp_params;
 				//tmp_params.push_back(*itd);
-			    ft_error(ERR_NOSUCHNICK, client, NULL, *itd);
-			   // ft_error(ERR_NOSUCHNICK, tmp_params, client, NULL, client_list, *channel_list);
+				ft_error(ERR_NOSUCHNICK, client, NULL, *itd);
+				// ft_error(ERR_NOSUCHNICK, tmp_params, client, NULL, client_list, *channel_list);
 			}
 		}	
 		itd++;
@@ -1120,7 +1094,7 @@ void send_notice_user(Client *client, std::string message, Client* user)
 	std::string rpl;
 
 	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NOTICE " + user->getNickname() + message;
-  	send(user->getSocket(), (rpl.c_str()), rpl.size(), 0);;
+	send(user->getSocket(), (rpl.c_str()), rpl.size(), 0);;
 }
 // Meme chose que privmsg mais on n'envoie aucune erreur
 
@@ -1149,11 +1123,11 @@ void Commands::notice(std::vector<std::string> params, CMD_PARAM)
 	{
 		std::cout << "Error : NOTICE lack of params" << std::endl;
 		/*
-		if (params.size() == 1)
-		    ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list); 
-		else if (params.size() == 2)
-		    ft_error(ERR_NOTEXTTOSEND, params, client, NULL, client_list, *channel_list); 
-			*/
+		   if (params.size() == 1)
+		   ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list); 
+		   else if (params.size() == 2)
+		   ft_error(ERR_NOTEXTTOSEND, params, client, NULL, client_list, *channel_list); 
+		   */
 		return;
 	}
 
@@ -1192,7 +1166,7 @@ void Commands::notice(std::vector<std::string> params, CMD_PARAM)
 		if (tmp_client) // si j'ai trouvé un client 
 		{
 			std::cout << "I am a user" << std::endl;
-		    if (client == tmp_client)
+			if (client == tmp_client)
 			{
 				std::cout << RED << "Cannot send a message to yourself!" << RESET << std::endl;
 				//err?
@@ -1200,9 +1174,9 @@ void Commands::notice(std::vector<std::string> params, CMD_PARAM)
 			else
 			{
 				std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_client->getNickname() <<  " : " << message << RESET << std::endl;
-		   		send_notice_user(client, message, tmp_client);
+				send_notice_user(client, message, tmp_client);
 			}
-	   }
+		}
 		else // si je suis un cannal
 		{
 			Channel* tmp_channel = ft_channel_exist(*channel_list, *itd);
@@ -1212,8 +1186,8 @@ void Commands::notice(std::vector<std::string> params, CMD_PARAM)
 				if (tmp_channel->isUserMember(client) == 0) //si je ne fais pas parti de ce cannal
 				{
 					std::cout << RED << client->getNickname() << " is not a member of " << tmp_channel->getName() << RESET << std::endl;
-			        return;
-    	    }
+					return;
+				}
 				else
 				{
 					std::cout << GREEN << "Message from " << client->getNickname() << " to " << tmp_channel->getName() <<  " : " << message << RESET << std::endl;
@@ -1224,10 +1198,10 @@ void Commands::notice(std::vector<std::string> params, CMD_PARAM)
 			{
 				std::cout << RED << "Not a client or a channel" << RESET << std::endl;
 				/*
-				std::vector<std::string> tmp;
-				tmp.push_back(*itd);
-			    ft_error(ERR_NOSUCHNICK, params, client, NULL, client_list, *channel_list); 
-				*/
+				   std::vector<std::string> tmp;
+				   tmp.push_back(*itd);
+				   ft_error(ERR_NOSUCHNICK, params, client, NULL, client_list, *channel_list); 
+				   */
 			}
 		}	
 		itd++;
@@ -1363,9 +1337,11 @@ void Commands::who(std::vector<std::string> params, CMD_PARAM) {
 static void	printNamesAllChan(std::vector<std::string> params, CMD_PARAM) {
 	std::vector<Channel*>::iterator it = (*channel_list).begin();
 	(void)client;
+	(void)params;
+	(void)client_list;
 	while (it != (*channel_list).end()) {
-		ft_reply(RPL_NAMEREPLY, params, client, *it, client_list, *channel_list);
-		ft_reply(RPL_ENDOFNAMES, params, client, *it, client_list, *channel_list);
+		ft_reply(RPL_NAMEREPLY, client, *it, "");
+		ft_reply(RPL_ENDOFNAMES, client, *it, "");
 		std::cout << "print name ALL" << std::endl;
 		it++;
 	}
@@ -1431,14 +1407,54 @@ void Commands::names(std::vector<std::string> params, CMD_PARAM) {
 	if (num >= 0) {
 		std::cout << "print name chan" << std::endl;
 		(*channel_list)[num]->printMembersNick();
-		ft_reply(RPL_NAMEREPLY, params, client, (*channel_list)[num], client_list, *channel_list);
-		ft_reply(RPL_ENDOFNAMES, params, client, (*channel_list)[num], client_list, *channel_list);
+		ft_reply(RPL_NAMEREPLY, client, (*channel_list)[num], "");
+		ft_reply(RPL_ENDOFNAMES, client, (*channel_list)[num], "");
 	}
 	else { 
 		printNamesAllChan(params, client, client_list, channel_list);
 		/* printAllNames(client, client_list, channel_list); */
 	}
 }
+
+/* ************************************LIST****************************************** */
+
+std::vector<std::string>	split(const std::string &s, char delim) {
+	std::vector<std::string> result;
+	std::stringstream ss (s);
+	std::string item;
+
+	while (getline(ss, item, delim)) { 
+		result.push_back(item);
+	}
+
+	return result;
+}
+
+void Commands::list(std::vector<std::string> params, CMD_PARAM) {
+	std::cout << YELLOW << "Hello from list function!" << RESET << std::endl;
+	(void)client;
+	(void)client_list;
+	(void)channel_list;
+	std::vector<Channel*>::iterator it = channel_list->begin();
+	//split "," pour avoir tout les chans
+	std::vector<std::string> v = split(params[1], ',');
+	int canal = 0;
+
+	while (it != channel_list->end()) {
+		if (std::find(v.begin(), v.end(), (*it)->getName()) != v.end()) {
+			ft_reply(RPL_LIST, client, *it, "");
+			canal = 1;
+		}
+		it++;
+	}
+	it = channel_list->begin();
+	while (it != channel_list->end() && canal == 0) {
+		ft_reply(RPL_LIST, client, *it, "");
+		it++;
+	}
+	ft_reply(RPL_LISTEND, client, *it, "");
+}
+
 
 /* ************************************HELP****************************************** */
 void Commands::myhelp(std::vector<std::string> params, CMD_PARAM) 
@@ -1475,7 +1491,7 @@ void Commands::quit(std::vector<std::string> params, CMD_PARAM)
 		}
 		message.erase(message.end() - 1);
 	}	
-	
+
 	//leave all channels
 	std::cout << RED << client->getNickname() << " must leave all channels!" << RESET << std::endl;
 	client->leaveAllChannels();
@@ -1502,30 +1518,30 @@ void	Commands::kill(std::vector<std::string> params, CMD_PARAM)
 {
 	(void)client_list;
 	(void)channel_list;
-	
-    std::cout << YELLOW << "Hello from KILL function!" << RESET << std::endl;
+
+	std::cout << YELLOW << "Hello from KILL function!" << RESET << std::endl;
 	if (params.size() < 3)
 		return (ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]));
-    std::cout << YELLOW << "Hello from KILL function!" << RESET << std::endl;
+	std::cout << YELLOW << "Hello from KILL function!" << RESET << std::endl;
 	if (client->getOper() == false)
 		return (ft_error(ERR_NOPRIVILEGES, client, NULL, ""));
-    std::cout << YELLOW << "Hello from KILL function!" << RESET << std::endl;
+	std::cout << YELLOW << "Hello from KILL function!" << RESET << std::endl;
 
 	Client *client_to_kill = ft_nickname_exist_return(client_list, params[1]);
-    std::cout << YELLOW << "Hello from KILL function!" << RESET << std::endl;
+	std::cout << YELLOW << "Hello from KILL function!" << RESET << std::endl;
 	if (client_to_kill == NULL)
 		return (ft_error(ERR_NOSUCHNICK, client, NULL, params[1]));
-    std::cout << YELLOW << "Hello from KILL SUCCESS!" << RESET << std::endl;
+	std::cout << YELLOW << "Hello from KILL SUCCESS!" << RESET << std::endl;
 	std::string reason;
 	for (std::vector<std::string>::iterator it = params.begin() + 2; it != params.end(); it++)
 	{
 		reason += *it + " ";
 	}
 	std::string rpl;
-	
+
 
 	// AJOUT JOANN
-	
+
 	client_to_kill->leaveAllChannels();
 	std::vector<Channel*>::iterator itl = channel_list->begin();
 	std::vector<Channel*>::iterator itle = channel_list->end();
@@ -1535,7 +1551,7 @@ void	Commands::kill(std::vector<std::string> params, CMD_PARAM)
 			leaveChannel(*itl, client_to_kill, reason, channel_list);
 		itl++;
 	}
-	
+
 	// FIN AJOUT JOANN
 
 	rpl = "Operator(" + client->getNickname() + ") KILLED you for " + reason + "\r\n";

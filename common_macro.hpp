@@ -20,6 +20,8 @@
 #define RPL_AWAY				"301"//
 #define RPL_UNAWAY				"305"
 #define RPL_NOWAWAY				"306"
+#define RPL_LIST				"322" 
+#define RPL_LISTEND				"323" 
 #define RPL_NOTOPIC				"331"// 
 #define RPL_TOPIC				"332"
 #define RPL_NAMEREPLY			"353"

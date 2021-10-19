@@ -44,6 +44,7 @@ class Channel
 
 		void    printMembers(); // a effacer pour rendu
 		void    printMembersNick(); // a effacer pour rendu
+		void	printOperators();
 
     private:
         Channel();

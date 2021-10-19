@@ -12,26 +12,26 @@ Channel::~Channel()
 
 void Channel::present()
 {
-    std::cout << "Channel name = " << getName();
-    if (_has_key == true)
-     std::cout << " | my key is " << getKey();
-    if (_has_topic == true)
-        std::cout << " | my topic is " << getTopic();
-    std::cout << std::endl << "My members are : ";
-    std::vector<Client*>::iterator it = _members.begin();
-    std::vector<Client*>::iterator ite = _members.end();
+	std::cout << "Channel name = " << getName();
+	if (_has_key == true)
+		std::cout << " | my key is " << getKey();
+	if (_has_topic == true)
+		std::cout << " | my topic is " << getTopic();
+	std::cout << std::endl << "My members are : ";
+	std::vector<Client*>::iterator it = _members.begin();
+	std::vector<Client*>::iterator ite = _members.end();
 
-    while (it != ite)
-    {
-        std::cout << (*it)->getNickname() << " ";
-        it++;
-    }
-    std::cout << std::endl;
-    if (_channel_operator)
-        std::cout << "My operator is :" << _channel_operator->getNickname();
-    else
-        std::cout << "I don't have any operator left";
-    std::cout << std::endl;
+	while (it != ite)
+	{
+		std::cout << (*it)->getNickname() << " ";
+		it++;
+	}
+	std::cout << std::endl;
+	if (_channel_operator)
+		std::cout << "My operator is :" << _channel_operator->getNickname();
+	else
+		std::cout << "I don't have any operator left";
+	std::cout << std::endl;
 }
 
 // GETTERS
@@ -97,22 +97,24 @@ void	Channel::printMembers() { // iterateur sur membres
 }
 
 void	Channel::printOperators() { // iterateur sur membres
-	std::vector<Client*>::iterator it = _operators.begin();
-	std::vector<Client*>::iterator ite = _operators.end();
+	std::vector<Client*>::iterator it = _members.begin();
+	std::vector<Client*>::iterator ite = _members.end();
 	std::string rpl;
 	std::cout << "printOperators function" << std::endl;
 	while (it != ite) {
-		rpl = this->getName() + " ";
-		rpl += (*it)->getUsername() + " ";
-		rpl += (*it)->getServerIpaddress() + " ";
-		rpl += (*it)->getServerName() + " ";
-		rpl += (*it)->getNickname() + " ";
-		// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
-		rpl += "H@ :0 " + (*it)->getRealname() + "\r\n"; // + real name
-		send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
-		// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
-		// Adrien -> fait la fonction away qui va me donner les infos 
-		rpl = "";
+		if ((*it)->getOper()) {
+			rpl = this->getName() + " ";
+			rpl += (*it)->getUsername() + " ";
+			rpl += (*it)->getServerIpaddress() + " ";
+			rpl += (*it)->getServerName() + " ";
+			rpl += (*it)->getNickname() + " ";
+			// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
+			rpl += "H@ :0 " + (*it)->getRealname() + "\r\n"; // + real name
+			send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
+			// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
+			// Adrien -> fait la fonction away qui va me donner les infos 
+			rpl = "";
+		}
 		it++;
 	}
 }
@@ -168,9 +170,9 @@ void Channel::setTopic(std::string const& src)
 
 int Channel::isUserOp(Client* client)
 {
-    if (client == _channel_operator)
-        return (1);
-    return (0);
+	if (client == _channel_operator)
+		return (1);
+	return (0);
 }
 
 int Channel::isUserMember(Client* client)
@@ -221,6 +223,6 @@ void Channel::removeMember(Client *client)
 
 void Channel::removeOp(Client *client)
 {   
-    if (client == _channel_operator)
-        _channel_operator = NULL;
+	if (client == _channel_operator)
+		_channel_operator = NULL;
 }

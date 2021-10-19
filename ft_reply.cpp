@@ -85,6 +85,15 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 			rpl += "You have been marked as being away\r\n" ;
 			break;
 		}
+		case 322: //RPL_LIST
+		{
+			rpl += (client->getServerName() + " :" + channel->getTopic() + "\r\n");
+		}
+		case 323: //RPL_LISTEND
+		{
+			rpl += " :End of LIST\r\n";
+			break;
+		}
 		case 331: //RPL_NOTOPIC
 		{
 			rpl += (channel->getName() + " :No topic is set\r\n");
@@ -100,12 +109,7 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 		case 353: // RPL_NAMEREPLY
 		{
 			//<canal>:[[@|+]<pseudo>[[@|+]<pseudo>[...]]]
-<<<<<<< HEAD
-			std::cout << "channel reply :" << channel->getName() << std::endl;
-			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname();
-=======
 			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname(); // != id1 car pas double 00 ==> a checker
->>>>>>> ba6d0b36dfd8e36ec6c5b3c1020d23735192f233
 			rpl += (" = " + channel->getName() + " :");
 			std::vector<Client*> tmp = channel->getMemberList();
 			std::vector<Client*>::iterator it = tmp.begin();
@@ -123,13 +127,10 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 		}
 		case 366: // ENDOFNAMES
 		{
-<<<<<<< HEAD
 			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname() + " ";
 			rpl += client->getServerName() + " :End of NAMES list\r\n";
-=======
-			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname() + " ";  // != id1 car pas double 00 ==> a checker
-			rpl += (channel->getName() + " :End of NAMES list\r\n");
->>>>>>> ba6d0b36dfd8e36ec6c5b3c1020d23735192f233
+			/* rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname() + " ";  // != id1 car pas double 00 ==> a checker */
+			/* rpl += (channel->getName() + " :End of NAMES list\r\n"); */
 			break;	
 		}
 
