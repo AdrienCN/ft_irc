@@ -1,8 +1,7 @@
 #include "Channel.hpp"
 
-Channel::Channel(std::string name, Client* client) :_name(name), _nb_members(0), _has_topic(0)
+Channel::Channel(std::string name, Client* client) :_name(name), _nb_members(0), _has_topic(0), _channel_operator(client)
 {
-	_operators.push_back(client);
 	return;
 }
 
@@ -27,14 +26,11 @@ void Channel::present()
         std::cout << (*it)->getNickname() << " ";
         it++;
     }
-    std::cout << std::endl << "My operator is : ";
-    it = _operators.begin();
-    ite = _operators.end();
-    while (it != ite)
-    {
-        std::cout << (*it)->getNickname() << " ";
-        it++;
-    }
+    std::cout << std::endl;
+    if (_channel_operator)
+        std::cout << "My operator is :" << _channel_operator->getNickname();
+    else
+        std::cout << "I don't have any operator left";
     std::cout << std::endl;
 }
 
@@ -70,16 +66,12 @@ bool const &	    	Channel::getStatusTopic() const
 	return this->_has_topic;
 }
 
-std::vector<char> const &	Channel::getMode() const
-{
-	return this->_mode;
-}
-
 std::vector<Client*> const &	Channel::getMemberList() 
 {
 	return this->_members;
 }
 
+// A bouger dans printhelp?
 void	Channel::printMembers() { // iterateur sur membres
 	std::vector<Client*>::iterator it = _members.begin();
 	std::vector<Client*>::iterator ite = _members.end();
@@ -98,6 +90,7 @@ void	Channel::printMembers() { // iterateur sur membres
 	}
 }
 
+// A bouger dans printhelp?
 void	Channel::printMembersNick() { // iterateur sur membres
 	std::vector<Client*>::iterator it = _members.begin();
 	std::vector<Client*>::iterator ite = _members.end();
@@ -114,14 +107,9 @@ void	Channel::printMembersNick() { // iterateur sur membres
 	}
 }
 
-std::vector<Client*> const &	Channel::getOperatorList() 
+Client*     Channel::getOperator()
 {
-	return this->_members;
-}
-
-std::vector<Client*> const &	Channel::getBannedList() 
-{
-	return this->_members;
+	return this->_channel_operator;
 }
 
 //SETTERS
@@ -146,32 +134,10 @@ void Channel::setTopic(std::string const& src)
 
 //OTHERS
 
-int Channel::isUserBanned(Client* client)
-{
-
-    std::vector<Client*>::iterator it = _banned.begin();
-    std::vector<Client*>::iterator ite = _banned.end();
-    
-    while (it != ite)
-    {
-        if ((*it)->getNickname() == client->getNickname())
-            return (1);
-        it++;
-    }
-    return (0);
-}
-
 int Channel::isUserOp(Client* client)
 {
-    std::vector<Client*>::iterator it = _operators.begin();
-    std::vector<Client*>::iterator ite = _operators.end();
-    
-    while (it != ite)
-    {
-        if ((*it)->getNickname() == client->getNickname())
-            return (1);
-        it++;
-    }
+    if (client == _channel_operator)
+        return (1);
     return (0);
 }
 
@@ -204,16 +170,6 @@ void Channel::addMember(Client *client)
 
 }
 
-void Channel::addOp(Client *client)
-{
-	_operators.push_back(client);
-}
-
-void Channel::addBanned(Client *client)
-{
-	_banned.push_back(client);
-}
-
 void Channel::removeMember(Client *client)
 {
     std::vector<Client*>::iterator it = _members.begin();
@@ -233,34 +189,6 @@ void Channel::removeMember(Client *client)
 
 void Channel::removeOp(Client *client)
 {   
-
-    std::vector<Client*>::iterator it = _operators.begin();
-    std::vector<Client*>::iterator ite = _operators.end();
-    
-    while (it != ite)
-    {
-        if ((*it)->getNickname() == client->getNickname())
-        {
-            _operators.erase(it);
-            return;
-        }
-        it++;
-    }
+    if (client == _channel_operator)
+        _channel_operator = NULL;
 }
-
-void Channel::removeBanned(Client *client)
-{
-    std::vector<Client*>::iterator it = _banned.begin();
-    std::vector<Client*>::iterator ite = _banned.end();
-    
-    while (it != ite)
-    {
-        if ((*it)->getNickname() == client->getNickname())
-        {
-            _banned.erase(it);
-            return;
-        }
-        it++;
-    }
-}
-

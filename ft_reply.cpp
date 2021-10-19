@@ -1,22 +1,28 @@
 #include "ft.hpp"
 #include "common_macro.hpp"
 
-
-void ft_reply(std::string nb_str, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list)
+std::string ft_id_type1(Client* client, std::string nb_str)
 {
-    (void)params;
-    (void)client;
-    (void)client_list;
-    (void)channel_list;
+	std::string id = ":127.0.0.1 00" + nb_str + " " + client->getNickname() + " :";
+	return (id);
+}
 
+std::string ft_id_type2(Client* client, std::string nb_str)
+{
+	std::string id = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + nb_str + " : ";
+	return (id);
+}
+
+void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string arg)
+{
 	std::string rpl;
 	int nb = atoi(nb_str.c_str());
 	rpl.clear();
 	if (nb <= 5)
-		rpl = ":127.0.0.1 00" + nb_str + " " + client->getNickname() + " :";
+		rpl = ft_id_type1(client, nb_str);
 	else
 	{
-		rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + nb_str + " : ";
+		rpl = ft_id_type2(client, nb_str);
 	}
 	switch(nb)
     {
@@ -64,8 +70,7 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 		//RPL_AWAY
 		case 301:
 		{
-			// TMP != PARAMS
-			rpl += (params[0] +" :" + params[1] + "\r\n");
+			rpl += (arg + "\r\n");
 			break;
 		}
 		//RPL_UNAWAY
@@ -89,14 +94,13 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 		case 332: //RPL_TOPIC 
 		{			
 			rpl +=(channel->getName() + " :" + channel->getTopic() + "\r\n");
-
 			break;
 		}
 		
 		case 353: // RPL_NAMEREPLY
 		{
 			//<canal>:[[@|+]<pseudo>[[@|+]<pseudo>[...]]]
-			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname();
+			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname(); // != id1 car pas double 00 ==> a checker
 			rpl += (" = " + channel->getName() + " :");
 			std::vector<Client*> tmp = channel->getMemberList();
 			std::vector<Client*>::iterator it = tmp.begin();
@@ -114,7 +118,7 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 		}
 		case 366: // ENDOFNAMES
 		{
-			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname() + " ";
+			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname() + " ";  // != id1 car pas double 00 ==> a checker
 			rpl += (channel->getName() + " :End of NAMES list\r\n");
 			break;	
 		}
@@ -132,7 +136,7 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 		}
 		case 4243:
 		{
-			rpl += client->getNickname() + ": sets mode " + params[2] + " on " + client->getNickname() + "\r\n";
+			rpl += client->getNickname() + ": sets mode " + arg + " on " + client->getNickname() + "\r\n";
 			break;
 		}
 		case 4244: // customhelp
@@ -147,7 +151,7 @@ void ft_reply(std::string nb_str, std::vector<std::string> params, Client* clien
 		}
 		case 4245: //error for quit
 		{
-			
+			break;
 		}
 		default:
 		{

@@ -1,11 +1,15 @@
 #ifndef COMMON_MACRO_H
 #define COMMON_MACRO_H
 
+# define COMPLETE 1
+# define INCOMPLETE 0
+# define DISCONNECT -1
+
 #define EMO_ROBOT "\U0001F916"
-# define END_CHAR "\r\n"
-# define MAX_CHAR 512
-# define CHAN_MAXCAPACITY 2 // a revoir
-# define USER_MAXCHAN 2 // a revoir
+#define END_CHAR "\r\n"
+#define MAX_CHAR 4096
+#define CHAN_MAXCAPACITY 2 // a revoir
+#define USER_MAXCHAN 2 // a revoir
 
 #define RPL_WELCOME				"1" //
 #define RPL_YOURHOST			"2" //
@@ -45,7 +49,7 @@
 #define ERR_BANNEDFROMCHAN		"474"
 #define ERR_BADCHANNELKEY		"475"
 #define ERR_BADCHANMASK 		"476"
-#define ERR_NOPRIVILEGES	    "482"
+#define ERR_NOPRIVILEGES	    "481"
 #define ERR_CHANOPRIVNEEDED     "482"
 #define ERR_RESTRICTED			"484"
 #define ERR_NOOPERHOST			"491"

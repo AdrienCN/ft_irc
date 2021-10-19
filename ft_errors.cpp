@@ -1,30 +1,23 @@
 #include "ft.hpp"
 #include "common_macro.hpp"
 
-void ft_error(std::string nb_str, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list)
+void ft_error(std::string nb_str, Client* client, Channel* channel, std::string arg)
 {
-    (void)client;  
-    (void)params;
-    (void)client_list;
-    (void)channel_list;
 	int nb = atoi(nb_str.c_str());
-
     std::string error;
-   
 	//Revoir syntax systematique des erreurs	
-	error = ":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + nb_str + " : ";
+	error = ft_id_type2(client, nb_str); //":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + nb_str + " : ";
+
     switch (nb)
     {
         case 401: //ERR_NOSUCHNICK
         {
-			// !!!! PARAMS ==  TMP
-            error += (params[0] + " :No such nick\r\n");
+            error += (arg + " :No such nick\r\n");
             break;
         }
         case 403: // ERR_NOSUCHCHANNEL
         {
-			// !!!! PARAMS ==  TMP
-            error += (params[0] + " :No such channel\r\n");
+            error += (arg + " :No such channel\r\n");
             break;
         }
         case 404: //ERR_CANNOTSENDTOCHAN
@@ -43,6 +36,7 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
             error += (":No recipient given (" + command + ")\r\n");
             break;
         }
+		*/
         case 412: // ERR_NOTEXTTOSEND
         {
             error += ":No text to send\r\n";
@@ -50,17 +44,7 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
         }
 		case 421: //ERR_UNKNOWNCOMMAND
 		{
-			std::string cmd("[");
-			std::vector<std::string>::iterator itb = params.begin();
-			while (itb != params.end())
-			{
-				cmd += *itb;
-				itb++;
-				if (itb != params.end())
-					cmd += " ";
-			}
-			cmd += "]";
-			error += (cmd + " :Unknown command\r\n");
+			error += (arg + " :Unknown command\r\n");
 			break;
 		}
 		case 431: //ERR_NONICKNAMEGIVEN (deja gerer par hexchat?)
@@ -68,22 +52,19 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 			error += ":No nickname given\r\n";
 			break;
 		}
-
 		case 432: //ERR_ERRONEOUSNICKNAME
 		{
-			error += (params[1]/*<nickname>*/ + " :Erroneous nicknamei\r\n");
+			error += (arg/*<nickname>*/ + " :Erroneous nicknamei\r\n");
 			break;
 		}
-
 		case 433: //ERR_NICKNAMEINUSE
 		{
-			error += (params[1] + " :Nickname is already in use\r\n");
+			error += (arg + " :Nickname is already in use\r\n");
 			break;
 		}
 		case 441: // ERR_USERNOTINCHANNEL
         {
-			//TMP != PARAM
-            error += (channel->getName() + " :" + params[0] + " is not that channel\r\n");
+            error += (channel->getName() + " :" + arg + " is not that channel\r\n");
             break;
         }
         case 442: // ERR_NOTONCHANNEL
@@ -93,8 +74,7 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
         }
         case 461: // ERR_NEEDMOREPARAMS
         {
-            std::string command = *(params.begin());
-            error += (command + " :Not enough parameters\r\n");
+            error += (arg + " :Not enough parameters\r\n");
             break;
         }
 		case 462: //ERR_ALREADYREGISTERED
@@ -102,7 +82,6 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 			error += " :Unauthorized command (already registered)\r\n";
 			break;
 		}
-
 		case 464: //ERR_PASSWDMISMATCH
 		{
 			error += " :Password incorrect\r\n";
@@ -123,17 +102,14 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
             error += (channel->getName() + " :Cannot join channel (+b)\r\n");
             break;
         }
-
         case 475: // ERR_BADCHANNELKEY
         {
             error += (channel->getName() + " :Cannot join channel (+k)\r\n");
             break;
         }
-
 		case 476: // ERR_BADCHANMASK
         {
-			// !!!! PARAMS ==  TMP
-            error += (params[0] + " :Bad Channel Mask (+k)\r\n"); 
+            error += (arg + " :Bad Channel Mask (+k)\r\n"); 
             break;
         }
 		case 481: //ERR_NOPRIVILEGES
@@ -151,7 +127,6 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 			error += " :Your connection is restricted\r\n";
 			break;
 		}
-
 		case 491: //ERR_NOOPERHOST
 		{
 			error += " :No O-lines for your host\r\n";
@@ -171,9 +146,7 @@ void ft_error(std::string nb_str, std::vector<std::string> params, Client* clien
 		{
 			error += "No Error set yet \r\n";
 		}
-
     }
     send(client->getSocket(), error.c_str(), error.size(), 0);
-    
     return;
 }

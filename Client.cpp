@@ -217,15 +217,9 @@ void	Client::setAway(bool const& src)
 
 //OTHERS
 
-
 void Client::clearCommand()
 {
 	_command.clear();
-}
-
-void Client::clearStr(std::string str)
-{
-    str.clear();
 }
 
 void Client::clearMessage()
