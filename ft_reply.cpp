@@ -33,7 +33,7 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 		}
 		case 2:
 		{
-			rpl += "Your host is " + client->getServerName() + ", running version 42.42\r\n";
+			rpl += "Your host is [" + client->getServerIpAddress() + "], running on version [42.42]\r\n";
 			break;
 		}
 		case 3:
@@ -43,7 +43,7 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 		}
 		case 4:
 		{
-			rpl += client->getServerName() + " 42.42 <available user modes> <available channel modes>\r\n";
+			rpl += client->getServerName() + " version [42.42]. Available user MODE : +Oa . Avalaible channel MODE : none. \r\n";
 			break;
 		}
 		case 5:
