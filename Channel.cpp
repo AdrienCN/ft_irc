@@ -71,73 +71,25 @@ std::vector<Client*> const &	Channel::getMemberList()
 	return this->_members;
 }
 
-// A bouger dans printhelp?
-void	Channel::printMembers() { // iterateur sur membres
+void	Channel::printMembersNick(Client *client) { // iterateur sur membres
 	std::vector<Client*>::iterator it = _members.begin();
 	std::vector<Client*>::iterator ite = _members.end();
+
 	std::string rpl;
-	std::cout << "printMembers function" << std::endl;
+	rpl = ":127.0.0.1 ";
+	rpl += "353";
+	rpl += (" " +  client->getNickname());
+	std::cout << "chan name :" << getName() << std::endl;
+	rpl += (" = " + getName() + " :");
+
 	while (it != ite) {
-		rpl = this->getName() + " ";
-		rpl += (*it)->getUsername() + " ";
-		rpl += (*it)->getServerIpaddress() + " ";
-		rpl += (*it)->getServerName() + " ";
-		rpl += (*it)->getNickname() + " ";
-		// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
-		rpl += "H";
-		if (isUserOp(*it))
+		if (isUserOp(*it) == 1)
 			rpl += "@";
-		rpl += " :0 " + (*it)->getRealname() + "\r\n"; // + real name
-		send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
-		// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
-		// Adrien -> fait la fonction away qui va me donner les infos 
-		rpl = "";
-		it++;
-	}
-}
-
-void	Channel::printOperators() { // iterateur sur membres
-	std::vector<Client*>::iterator it = _members.begin();
-	std::vector<Client*>::iterator ite = _members.end();
-	std::string rpl;
-	std::cout << "printOperators function" << std::endl;
-	while (it != ite) {
-		if ((*it)->getOper()) {
-			rpl = this->getName() + " ";
-			rpl += (*it)->getUsername() + " ";
-			rpl += (*it)->getServerIpaddress() + " ";
-			rpl += (*it)->getServerName() + " ";
-			rpl += (*it)->getNickname() + " ";
-			// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
-			rpl += "H@ :0 " + (*it)->getRealname() + "\r\n"; // + real name
-			send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
-			// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@") 
-			// Adrien -> fait la fonction away qui va me donner les infos 
-			rpl = "";
-		}
-		it++;
-	}
-}
-
-// A bouger dans printhelp?
-void	Channel::printMembersNick() { // iterateur sur membres
-	std::vector<Client*>::iterator it = _members.begin();
-	std::vector<Client*>::iterator ite = _members.end();
-
-	std::string rpl;
-	while (it != ite) {
-		rpl = ":" + (*it)->getNickname() + "!" + (*it)->getUsername() + "@" + (*it)->getHostname() + " " + "353" + " : ";
-		rpl = ":127.0.0.1 ";
-		rpl += "353";
-		rpl += " " +  (*it)->getNickname();
-		std::cout << "chan name :" << getName() << std::endl;
-		rpl += (" = " + (*it)->getServerName() + " :");
 		rpl += ((*it)->getNickname() + " ");
-		rpl +=  "\r\n";
-		send((*it)->getSocket(), (rpl.c_str()), rpl.size(), 0);
-		rpl = "";
 		it++;
 	}
+	rpl +=  "\r\n";
+	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
 }
 
 Client*     Channel::getOperator()
