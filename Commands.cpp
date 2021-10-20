@@ -904,7 +904,6 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 }
 
 
-
 // ******** TOPIC *************
 
 void Commands::topic(std::vector<std::string> params, CMD_PARAM)
@@ -951,9 +950,16 @@ void Commands::topic(std::vector<std::string> params, CMD_PARAM)
 		}
 		else // creer ou change le sujet du cannal
 		{
-			std::string topic = *it;
+			std::string topic;
+			while (it != ite)			
+			{
+				topic += (*it + " ");
+				it++;
+			}
+			topic.erase(topic.end() -1);
 			if (topic[0] == ':')
 				topic.erase(0,1);
+			
 			std::cout << YELLOW <<  "I want to create or change the TOPIC of channel " << tmp->getName() <<  " to " << topic << RESET << std::endl;
 			if (tmp->getStatusTopic() == false) // creation
 			{
