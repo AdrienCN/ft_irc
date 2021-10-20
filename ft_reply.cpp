@@ -3,7 +3,7 @@
 
 std::string ft_id_type1(Client* client, std::string nb_str)
 {
-	std::string id = ":127.0.0.1 00" + nb_str + " " + client->getNickname() + " :";
+	std::string id = ":127.0.0.1 " + nb_str + " " + client->getNickname() + " :";
 	return (id);
 }
 
@@ -18,7 +18,7 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 	std::string rpl;
 	int nb = atoi(nb_str.c_str());
 	rpl.clear();
-	if (nb <= 5)
+	if (nb <= 5 || nb == 353)
 		rpl = ft_id_type1(client, nb_str);
 	else
 	{

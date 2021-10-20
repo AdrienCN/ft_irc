@@ -237,7 +237,7 @@ void Client::init(int const & socket)
 
 void Client::recvMessage()
 {
-	char buf[MAX_CHAR];
+	char buf[MAX_CHAR + 1];
 	int ret; // sisze_t?
 
 	memset(buf, 0, MAX_CHAR);

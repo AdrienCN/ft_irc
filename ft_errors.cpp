@@ -32,11 +32,9 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
 		}
         case 411: // ERR_NORECIPIENT
         {
-            std::string command = params[0];
-            error += (":No recipient given (" + command + ")\r\n");
+            error += (":No recipient given (" + arg + ")\r\n");
             break;
         }
-		*/
         case 412: // ERR_NOTEXTTOSEND
         {
             error += ":No text to send\r\n";
