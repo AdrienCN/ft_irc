@@ -1,6 +1,0 @@
--Reponse propre si welcome fail
--Nick ne change plus jamais apres un welcome fail
--Gerer welcome sans password
--Rajouter au client : _nb_channelsjoined et _max_channels
--Implementer TOUTE les erreurs de NICK
-

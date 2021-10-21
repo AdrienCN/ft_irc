@@ -1,5 +1,5 @@
 #include "Server.hpp"
-Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _server_name("****>>>[IRC_90S]<<<****"), _server_ipaddress("127.0.0.1/6667"), _server_creation_date(""), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
+Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _server_name("irc.irc90s.com"), _server_ipaddress("127.0.0.1"), _server_creation_date(""), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
 {
 	time_t	raw_time;
 	time(&raw_time);
@@ -84,10 +84,47 @@ void Server::init()
 	// 1. Prepare for launch!
 	//Rempli notre structure serv_info qui contient 
 	//tout les parametres pour call socket(), bind(), listen()
-	ret = getaddrinfo(NULL, this->_port.c_str(), &_hints, &_serv_info);
+	ret = getaddrinfo("localhost", this->_port.c_str(), &_hints, &_serv_info);
 	if (ret != 0)
 		throw Server::ExceptGetaddr();
-	
+
+	void	*addr;
+	char	ip_final[INET6_ADDRSTRLEN];
+	std::string str;
+
+    if (_serv_info->ai_family == AF_INET) 
+	{ 
+		struct sockaddr_in *tmp = (struct sockaddr_in*)_serv_info->ai_addr;
+		addr = &(tmp->sin_addr);
+		std::cout << "IPV4" << std::endl;
+		/*if (inet_ntop(_hints.ai_family, addr, ip_final, sizeof(ip_final)) == NULL)
+            struct sockaddr_in *ipv4 = (struct sockaddr_in *)_hints.ai_addr;
+            addr = &(ipv4->sin_addr);
+			std::cout << "IPV4" << std::endl;
+			*/
+    } 
+	else 
+	{ // IPv6p
+		struct sockaddr_in6 *tmp = (struct sockaddr_in6*)_serv_info->ai_addr;
+		addr = &(tmp->sin6_addr);
+		std::cout << "IPV6" << std::endl;
+	//	struct in6_addr tmp =  _hints.ai_addr->sin6_addr;
+		/*
+		if (inet_ntop(_hints.ai_family, addr, ip_final, sizeof(ip_final)) == NULL)
+            struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)_hints.ai_addr;
+            addr = &(ipv6->sin6_addr);
+			std::cout << "IPV6" << std::endl;
+   //         ipver = "IPv6";
+   //         */
+    }
+	if (inet_ntop(_serv_info->ai_family, addr, ip_final, sizeof(ip_final)) == NULL)
+		throw Server::ExceptErrno();
+	else
+	{
+		_server_ipaddress = ip_final;
+		_command_book.setServerIpaddress(ip_final);
+	}
+	std::cout << _server_ipaddress << std::endl;
 	// 2. Get the FD
 	//Creer ce qui sera notre socket d'ecoute
 	//domain = type d'address = ai_family | type = socketype = ai_socktype |  protocole = ai_protocole
