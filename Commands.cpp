@@ -63,10 +63,35 @@ void  Commands::setServerCreationDate(std::string const & src)
 	this->_server_creation_date = src;
 }
 
+static void	ft_registration_failed(Client *client)
+{
+	std::string tmp("Registration incomplete : Execute these command(s) first:\n");
+	if (client->getRegNick() == false)
+		tmp += "/NICK <nickname>\n";
+	if (client->getRegUser() == false)
+		tmp += "/USER <username> <mode> <unused> :<realname>\n";
+	tmp += "\r\n";
+	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
+}
+
 void Commands::find_command(std::string input, Client* client, std::vector<Client*> client_list, std::vector<Channel*>* channel_list) 
 {
 	this->analyzeCommand(input);
 	std::string key(_parsed_cmd.front());
+	if (client->isRegistered() == false)
+	{
+		if (key.compare("CAP") != 0 && key.compare("PASS") != 0 && key.compare("USER") != 0 && key.compare("NICK") != 0)
+		{
+			
+			this->_parsed_cmd.clear();
+			return (ft_registration_failed(client));
+		}
+		if ((key.compare("USER") == 0 && client->getRegUser() == true) || (key.compare("NICK") == 0 && client->getRegNick() == true))
+		{	
+			this->_parsed_cmd.clear();
+			return ft_registration_failed(client);
+		}
+	}
 	if (_cmd_list[key])
 		(this->*_cmd_list[key])(_parsed_cmd, client, client_list, channel_list);
 	else
@@ -83,6 +108,7 @@ void Commands::find_command(std::string input, Client* client, std::vector<Clien
 		arg += "]";
 		ft_error(ERR_UNKNOWNCOMMAND, client, NULL, arg);
 	}
+	
 	this->_parsed_cmd.clear();
 }
 
@@ -332,7 +358,10 @@ void Commands::user(std::vector<std::string> params, CMD_PARAM)
 		return ft_error(ERR_ALREADYREGISTERED, client, NULL, "");
 	if (params.size() < 5)
 		return (ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]));
+	if ((std::strstr(params[4].c_str(), ":")) == NULL)
+		return (ft_error(ERR_USERREALNAMEFORMAT, client, NULL, params[0]));
 	client->setRegUser(true);
+	//SEGV ici si il manque ":" avant realname
 	client->setRealname(ft_findUserRealname(params));
 	client->setUsername(params[1]);
 }
