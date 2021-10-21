@@ -251,6 +251,7 @@ void	Server::find_to_kill()
 		if ((*it)->getMessageStatus() == DISCONNECT)
 		{
 			close((*it)->getSocket());
+			delete(*it);
 			_all_clients.erase(it);
 			_nbClients--;
 			//std::cout<< YELLOW  << "KILL SUCCESS" << RESET << std::endl;
@@ -315,6 +316,7 @@ void	Server::removeClient(int const & fd)
 		if (*it == tmp)
 		{
 			close((*it)->getSocket());
+			delete (*it);
 			_all_clients.erase(it);
 			break;
 		}

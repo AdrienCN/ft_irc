@@ -1,8 +1,5 @@
 #include "Commands.hpp"
 
-
-Client* 	ft_nickname_exist_return(std::vector<Client*> client_list, std::string nickname);
-
 Commands::Commands(std::string const & password, std::string server_name, std::string server_ipaddress, std::string server_creation_date): _server_password(password) , _server_name(server_name) , _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date), _oper_name("admin"), _oper_pass("password")
 {
 
@@ -68,22 +65,8 @@ void  Commands::setServerCreationDate(std::string const & src)
 
 void Commands::find_command(std::string input, Client* client, std::vector<Client*> client_list, std::vector<Channel*>* channel_list) 
 {
-	// A verifier si on doit gérer les prefixes ":" en premier message (mais je pense pas)
-	(void)client;
-	(void)client_list;
-	(void)channel_list;
-
-	if (input.size() > 510) // 510 car \r\n deja parsé == 512
-	{
-		std::string rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " : command too long (512)\r\n";
-		send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
-		return; 
-	}
-
 	this->analyzeCommand(input);
 	std::string key(_parsed_cmd.front());
-	std::cout << "key :" << key << std::endl;
-	//std::map<std::string , void(Commands::*)(std::vector<std::string>)>::iterator it = _cmd_list.begin();
 	if (_cmd_list[key])
 		(this->*_cmd_list[key])(_parsed_cmd, client, client_list, channel_list);
 	else
@@ -119,23 +102,10 @@ void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
 	std::istringstream str(command);
 	std::string tmp;
 	bool first = 1;
-	//1. Split du sub_str message par les whitespaces dans un vector
 	while (std::getline(str, tmp,' ')) // on met dans tmp tout jusqu'a l"espace  + tant que l'on trouve des espaces
 	{
-		if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
-		{
-			tmp.erase(tmp.length() - 1);
-			//tmp.erase(tmp.length() - 1); //en fonction de /r /n
-		}
 		if (tmp != "\0") // si je suis pas une chaine vide
 		{
-			/* On en a plus besoin car fait a l'etape d'avant
-			   if (std::strstr(tmp.c_str(), END_CHAR)) // pour enlver le retoru charriot
-			   {
-			   tmp.erase(tmp.length() - 1);
-			//tmp.erase(tmp.length() - 1); //en fonction de /r /n
-			}
-			*/
 			if (first == 1)
 			{
 				ft_uppercase(tmp);
@@ -153,7 +123,7 @@ void Commands::analyzeCommand(std::string command) // Parsing des whitespaces
 
 //************ COMMANDES A EXECUTER ********************
 
-// *********CAP******
+/* ************************************CAP****************************************** */
 void	Commands::cap(std::vector<std::string> params, CMD_PARAM)
 {
 	(void)params;
@@ -162,6 +132,7 @@ void	Commands::cap(std::vector<std::string> params, CMD_PARAM)
 	ft_reply(RPL_CUSTOMCAP, client, NULL, "");
 }
 
+/* ************************************OPER****************************************** */
 
 void	Commands::oper(std::vector<std::string> params, CMD_PARAM)
 {
@@ -171,26 +142,20 @@ void	Commands::oper(std::vector<std::string> params, CMD_PARAM)
 	std::cout << YELLOW << "Hello from OPER function!" << RESET << std::endl;
 	if (params.size() < 3)
 		return (ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]));
-	//return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
 
 	//If the client is not connecting from a valid host for the given name,
 	if (client->isRegistered() == false)
 		return (ft_error(ERR_NOOPERHOST, client, NULL, ""));
-	//return (ft_error(ERR_NOOPERHOST, params, client, NULL, client_list, *channel_list));
 
 	//If the client does not send the correct password for the given name
 	if (params[1].compare(this->_oper_name) || params[2].compare(this->_oper_pass))
 		return (ft_error(ERR_PASSWDMISMATCH, client, NULL, ""));
-	std::cout << YELLOW << "OPER success" << RESET << std::endl;
 	client->setOper(true);
 	ft_reply(RPL_YOUREOPER, client, NULL, "");
 	ft_reply(RPL_UMODEIS, client, NULL, "");
 }
 
-
-
-// *********MODE**********(Ne peut s'utiliser que sur soit meme)
-
+/* ************************************MODE****************************************** */
 
 void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
 {
@@ -198,21 +163,16 @@ void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
 
 	if (params.size() < 2)
 		return (ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]));
-	//return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
 	if (params[1] != client->getNickname())
 		return (ft_error(ERR_USERSDONTMATCH, client, NULL, ""));
-	//return (ft_error(ERR_USERSDONTMATCH, params, client, NULL, client_list, *channel_list));
 	//MODE <nickname> --> renvoie info sur user
 	if (params.size() == 2)
 		return(ft_reply(RPL_UMODEIS, client, NULL, ""));
-	//		return (ft_reply(RPL_UMODEIS, params, client, NULL, client_list, *channel_list));
 	std::string mode = params[2];
 	if ((mode[0] != '-' && mode[0] != '+') || (mode.size() != 2))
 		return (ft_error(ERR_UMODEUNKNOWNFLAG, client, NULL, ""));
-	//return (ft_error(ERR_UMODEUNKNOWNFLAG, params, client, NULL, client_list, *channel_list));
 	if (mode[1] != 'a' && mode[1] != 'O')
 		return (ft_error(ERR_UMODEUNKNOWNFLAG, client, NULL, ""));
-	//return (ft_error(ERR_UMODEUNKNOWNFLAG, params, client, NULL, client_list, *channel_list));
 
 	//User attemps to bypass OPER command, IGNORE command
 	if (mode.compare("+O") == 0)
@@ -235,97 +195,64 @@ void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
 	else if (mode.compare("-a") == 0)
 	{
 		client->setAway(false);
-		//	ft_reply(RPL_CUSTOMMODESUCCESS, params, client, NULL, client_list, *channel_list);
 		ft_reply(RPL_CUSTOMMODESUCCESS, client, NULL, "");
 		std::vector<std::string> tmp;
 		tmp.push_back("AWAY");
 		this->away(tmp, client, client_list, channel_list);
 	}
-	//quid de l'input MODE <nickname> +o qqchose qqchose || MODE <nickname> +oui
 }
 
-
-// ******** AWAY *************
+/* ************************************AWAY****************************************** */
 
 void	Commands::away(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from AWAY function!" << RESET << std::endl;
 
-	(void)client;
 	(void)client_list;
 	(void)channel_list;
-	(void)params;
 
-
-	//BACK instead
 	if (params.size() == 1)
 	{
-		std::cout << GREEN << "MODE 1" << RESET << std::endl;
-
 		client->setAway(false);
 		client->getAwayMessage();
 		return (ft_reply(RPL_UNAWAY, client, NULL,""));
 	}
 	else if (params.size() >= 2)
 	{
-		std::cout << GREEN << "MODE 2" << RESET << std::endl;
-
 		client->setAway(true);
-		//faux, message = concatene de params[1] -> params.end()
 		std::string away_msg;
 		for (std::vector<std::string>::iterator it = params.begin() + 1; it != params.end(); it++)
 		{
 			away_msg += *it + " ";
 		}
 		away_msg.erase(away_msg.end() - 1);
-		//delete ":"
 		away_msg.erase(away_msg.begin());
 		client->setAwayMessage(away_msg);
 		return (ft_reply(RPL_NOWAWAY, client, NULL,""));
 	}
-	//	*/
-
 }
-// ******** PASS *************
+
+/* ************************************PASS****************************************** */
 
 void Commands::pass(std::vector<std::string> params, CMD_PARAM)
 {
-	(void)client;
 	(void)client_list;
 	(void)channel_list;
-	(void)params;
 
 	std::cout << YELLOW << "Hello from PASS function!" << RESET << std::endl;
 	if (client->isRegistered() == true)
 		return ft_error(ERR_ALREADYREGISTERED, client, NULL, "");
-	//return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
 	if (params.size() < 2)
 		return (ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]));
-	//		return (ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list));
 	if (client->getRegUser() == true || client->getRegNick() == true)
 		return;
-	std::cout << "Password OK" << std::endl;
 	client->setPassword(params[1]);
 	client->setRegPass(true);
 }
 
-// ******** NICK *************
+/* ************************************NICK****************************************** */
 
-// Faire fonction generique qui retourne un *Client puis NULL au bout de la liste
-int		ft_nickname_exist(std::vector<Client*> client_list, std::string nickname)
-{
-	std::vector<Client*>::iterator it = client_list.begin();
-
-	while (it != client_list.end())
-	{
-		if ((*it)->getNickname() == nickname)
-			return (1);
-		it++;
-	}
-	return (0);
-}
-
-Client* 	ft_nickname_exist_return(std::vector<Client*> client_list, std::string nickname)
+static Client* 	ft_nickname_exist(std::vector<Client*> client_list, std::string nickname)
 {
 	std::vector<Client*>::iterator it = client_list.begin();
 
@@ -338,58 +265,44 @@ Client* 	ft_nickname_exist_return(std::vector<Client*> client_list, std::string 
 	return (NULL);
 }
 
-bool	ft_nick_syntax_error(std::string nick)
+static bool	ft_nick_syntax_error(std::string nick)
 {
 	std::string special("[]\\_^{|}");
-	std::cout<<  YELLOW << "nickname = nick " << std::endl;
-	
+	std::cout << "nick :" << nick << std::endl;
 	if (!isalpha(nick[0]) && special.find(nick[0], 0) == std::string::npos )
 		return (true);
-	std::cout << "first ok" << std::endl;
 	for (std::string::iterator it = nick.begin() + 1; it != nick.end(); it++)
 	{
 		if (!isalpha(*it) && special.find(*it, 0) == std::string::npos && *it != '-'  && !isdigit(*it))
 			return (true);
 	}
-	std::cout << "nick syntax return false : nick ok" << RESET << std::endl;
 	return false;
 }
 
-
 void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 {
-	(void)client;
-	(void)client_list;
 	(void)channel_list;
-	(void)params;
 
 	std::cout << YELLOW << "Hello from NICK function!"<< RESET  << std::endl;
-	//Pas de pseudo donne
 	if (params.size() < 2)
-	{
 		return ft_error(ERR_NONICKNAMEGIVEN, client, NULL, "");
-		//return ft_error(ERR_NONICKNAMEGIVEN, params, client, NULL, client_list, *channel_list);
-	}
 
 	if (ft_nick_syntax_error(params[1]) == true)
 		return (ft_error(ERR_ERRONEUSNICKNAME, client, NULL, params[1]));
 
-  if (ft_nickname_exist(client_list, params[1]))
-	{
+	if (ft_nickname_exist(client_list, params[1]) != NULL)
 		return ft_error(ERR_NICKNAMEINUSE, client, NULL, params[1]);
-		//return ft_error(ERR_NICKNAMEINUSE, params, client, NULL, client_list, *channel_list);
-	}
 	std::string rpl;
 	rpl = ":" + client->getNickname() + "!" + client->getUsername() + "@" + "0" + " NICK " + params[1] + "\r\n";
 	send(client->getSocket(), (rpl.c_str()), rpl.size(), 0);
-	std::cout << rpl << std::endl;
 	client->setNickname(params[1]);
 	client->setRegNick(true);
+	std::cout << YELLOW << "NICK sucess function!"<< RESET  << std::endl;
 }
 
-// ******** USER *************
+/* ************************************USER****************************************** */
 
-std::string ft_findUserRealname(std::vector<std::string> params)
+static std::string ft_findUserRealname(std::vector<std::string> params)
 {
 	std::vector<std::string>::iterator itb = params.begin();
 	std::vector<std::string>::iterator ite = params.end();
@@ -398,7 +311,6 @@ std::string ft_findUserRealname(std::vector<std::string> params)
 
 	while(itb != ite)
 	{
-
 		if (std::strstr((*itb).c_str(), ":"))
 			semicolon_found = true;
 
@@ -406,30 +318,23 @@ std::string ft_findUserRealname(std::vector<std::string> params)
 			realname += *itb;
 		itb++;
 	}
-	//effacer le : de :realname
 	realname.erase(realname.begin());
-	std::cout << "realname = ["<< realname << std::endl;
 	return (realname);
 }
 
 void Commands::user(std::vector<std::string> params, CMD_PARAM)
 {
-	(void)client;
 	(void)client_list;
 	(void)channel_list;
-	(void)params;
 
 	std::cout << YELLOW << "Hello from USER function!" << RESET << std::endl;
 	if (client->isRegistered() == true)
 		return ft_error(ERR_ALREADYREGISTERED, client, NULL, "");
-	//return ft_error(ERR_ALREADYREGISTERED, params, client, NULL, client_list, *channel_list);
 	if (params.size() < 5)
 		return (ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]));
-	//return ft_error(ERR_NEEDMOREPARAMS, params, client, NULL, client_list, *channel_list);	
 	client->setRegUser(true);
 	client->setRealname(ft_findUserRealname(params));
 	client->setUsername(params[1]);
-
 }
 
 // ******** Channel Functions *************
@@ -874,7 +779,7 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 				std::cout << YELLOW << client->getNickname() << " is an operator of channel " <<  tmp_channel->getName() << RESET << std::endl;
 				if (itu != itue)
 				{
-					Client* tmp_client = ft_nickname_exist_return(client_list, *itu);
+					Client* tmp_client = ft_nickname_exist(client_list, *itu);
 					if (tmp_client)
 					{
 						if (tmp_channel->isUserMember(tmp_client) == 0) //
@@ -963,7 +868,7 @@ void Commands::topic(std::vector<std::string> params, CMD_PARAM)
 			topic.erase(topic.end() -1);
 			if (topic[0] == ':')
 				topic.erase(0,1);
-			
+
 			std::cout << YELLOW <<  "I want to create or change the TOPIC of channel " << tmp->getName() <<  " to " << topic << RESET << std::endl;
 			if (tmp->getStatusTopic() == false) // creation
 			{
@@ -1062,7 +967,7 @@ void Commands::privmsg(std::vector<std::string> params, CMD_PARAM)
 	std::vector<std::string>::iterator itde = destinataires.end();
 	while (itd != itde)
 	{
-		Client* tmp_client = ft_nickname_exist_return(client_list, *itd);
+		Client* tmp_client = ft_nickname_exist(client_list, *itd);
 		if (tmp_client) // si j'ai trouvé un client 
 		{
 			std::cout << "I am a user" << std::endl;
@@ -1189,7 +1094,7 @@ void Commands::notice(std::vector<std::string> params, CMD_PARAM)
 	std::vector<std::string>::iterator itde = destinataires.end();
 	while (itd != itde)
 	{
-		Client* tmp_client = ft_nickname_exist_return(client_list, *itd);
+		Client* tmp_client = ft_nickname_exist(client_list, *itd);
 		if (tmp_client) // si j'ai trouvé un client 
 		{
 			std::cout << "I am a user" << std::endl;
@@ -1494,7 +1399,7 @@ void	Commands::kill(std::vector<std::string> params, CMD_PARAM)
 		return (ft_error(ERR_NOPRIVILEGES, client, NULL, ""));
 	std::cout << YELLOW << "Hello from KILL function!" << RESET << std::endl;
 
-	Client *client_to_kill = ft_nickname_exist_return(client_list, params[1]);
+	Client *client_to_kill = ft_nickname_exist(client_list, params[1]);
 	std::cout << YELLOW << "Hello from KILL function!" << RESET << std::endl;
 	if (client_to_kill == NULL)
 		return (ft_error(ERR_NOSUCHNICK, client, NULL, params[1]));

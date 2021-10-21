@@ -26,10 +26,6 @@ class Commands
 		Commands(std::string const & password, std::string server_name, std::string server_ipaddress, std::string server_creation_date); 
         virtual ~Commands(); 
 
-        //General
-        void 	initialize_list();
-        void 	print_command(std::string prefix, std::string command, std::vector<std::string> params); 
-
 		// Parsing et tri de la str command
         void 	find_command(std::string params, CMD_PARAM); 
 		void	analyzeCommand(std::string command);

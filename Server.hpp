@@ -3,7 +3,6 @@
 
 #include "common_macro.hpp"
 #include "headers.hpp"
-#include "signal_handler.hpp"
 #include "Channel.hpp"
 #include "Client.hpp"
 #include "Commands.hpp"

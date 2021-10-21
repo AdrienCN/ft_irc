@@ -10,7 +10,7 @@ Channel::~Channel()
 	return;
 }
 
-void Channel::present()
+void Channel::present() // a effacer version finale
 {
 	std::cout << "Channel name = " << getName();
 	if (_has_key == true)

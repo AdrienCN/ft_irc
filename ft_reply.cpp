@@ -151,7 +151,7 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 
 		case 381: // YOUREOPER
 			{
-				rpl += " :You are now an IRC operator\r\n";
+				rpl += "You are now an IRC operator\r\n";
 				break;	
 			}
 		case 4242:

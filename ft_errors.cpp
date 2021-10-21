@@ -32,12 +32,12 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
 		}
         case 411: // ERR_NORECIPIENT
         {
-            error += (":No recipient given (" + arg + ")\r\n");
+            error += ("No recipient given (" + arg + ")\r\n");
             break;
         }
         case 412: // ERR_NOTEXTTOSEND
         {
-            error += ":No text to send\r\n";
+            error += "No text to send\r\n";
             break;
         }
 		case 421: //ERR_UNKNOWNCOMMAND
@@ -47,12 +47,12 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
 		}
 		case 431: //ERR_NONICKNAMEGIVEN (deja gerer par hexchat?)
 		{
-			error += ":No nickname given\r\n";
+			error += "No nickname given\r\n";
 			break;
 		}
 		case 432: //ERR_ERRONEOUSNICKNAME
 		{
-			error += (arg/*<nickname>*/ + " :Erroneous nicknamei\r\n");
+			error += (arg + " :Erroneous nickname\r\n");
 			break;
 		}
 		case 433: //ERR_NICKNAMEINUSE
@@ -77,12 +77,12 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
         }
 		case 462: //ERR_ALREADYREGISTERED
 		{
-			error += " :Unauthorized command (already registered)\r\n";
+			error += "Unauthorized command (already registered)\r\n";
 			break;
 		}
 		case 464: //ERR_PASSWDMISMATCH
 		{
-			error += " :Password incorrect\r\n";
+			error += "Password incorrect\r\n";
 			break;
 		}
 		case 471: //ERR_CHANNELISFULL
@@ -112,7 +112,7 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
         }
 		case 481: //ERR_NOPRIVILEGES
 		{
-			error += " :Permission Denied- You're not an IRC operator\r\n";
+			error += "Permission Denied- You're not an IRC operator\r\n";
 			break;
 		}
 		case 482: //ERR_CHANOPRIVNEEDED
@@ -122,22 +122,22 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
 		}
 		case 484: //ERR_RESTRICTED
 		{
-			error += " :Your connection is restricted\r\n";
+			error += "Your connection is restricted\r\n";
 			break;
 		}
 		case 491: //ERR_NOOPERHOST
 		{
-			error += " :No O-lines for your host\r\n";
+			error += "No O-lines for your host\r\n";
 			break;
 		}
 		case 501: //ERR_UMODEUNKNOWNFLAG
 		{
-			error += " :Unknown MODE flag\r\n";
+			error += "Unknown MODE flag\r\n";
 			break;
 		}
 		case 502: //ERR_USERDONTMATCH
 		{
-			error += " :Cant change mode for other users\r\n";
+			error += "Cant change mode for other users\r\n";
 			break;
 		}
         default:
