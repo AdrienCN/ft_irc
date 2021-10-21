@@ -42,8 +42,7 @@ class Channel
         void    removeMember(Client* client);
         void    removeOp(Client* client);
 
-		void    printMembers(); // a effacer pour rendu
-		void    printMembersNick(); // a effacer pour rendu
+		void    printMembersNick(Client *client);
 
     private:
         Channel();
