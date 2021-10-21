@@ -12,6 +12,7 @@ class Client;
 #include <vector>
 #include <map>
 #include <ctime>
+#include <iostream>
 
 //Pour non blocking fcntl
 #include "unistd.h"
