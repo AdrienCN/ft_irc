@@ -30,20 +30,11 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
 			error += (channel->getName() + " :You have joined too many channels\r\n"); 
 			break;
 		}
-		case 407: //ERR_TOOMANYTARGETS
-		{
-			//A voir
-			error += "<target> :<error code> recipients. <abort message>\r\n";
-			break;
-		}
-		/* Not used
         case 411: // ERR_NORECIPIENT
         {
-            std::string command = params[0];
-            error += (":No recipient given (" + command + ")\r\n");
+            error += (":No recipient given (" + arg + ")\r\n");
             break;
         }
-		*/
         case 412: // ERR_NOTEXTTOSEND
         {
             error += ":No text to send\r\n";
@@ -67,11 +58,6 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
 		case 433: //ERR_NICKNAMEINUSE
 		{
 			error += (arg + " :Nickname is already in use\r\n");
-			break;
-		}
-		case 436: //ERR_NICKCOLLISION
-		{
-			error += (arg + " :Nickname collision KILL from" + client->getUsername() + "@" + client->getHostname() + "\r\n");
 			break;
 		}
 		case 441: // ERR_USERNOTINCHANNEL

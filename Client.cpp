@@ -103,7 +103,7 @@ std::string const & Client::getServerName() const
 	return this->_server_name;
 }
 
-std::string const & Client::getServerIpaddress() const
+std::string const & Client::getServerIpAddress() const
 {
 	return this->_server_ipaddress;
 }
@@ -237,7 +237,7 @@ void Client::init(int const & socket)
 
 void Client::recvMessage()
 {
-	char buf[MAX_CHAR];
+	char buf[MAX_CHAR + 1];
 	int ret; // sisze_t?
 
 	memset(buf, 0, MAX_CHAR);

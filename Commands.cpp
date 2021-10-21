@@ -3,7 +3,7 @@
 
 Client* 	ft_nickname_exist_return(std::vector<Client*> client_list, std::string nickname);
 
-Commands::Commands(std::string const & password, std::string server_name, std::string server_ipaddress, std::string server_creation_date): _server_password(password) , _server_name(server_name) , _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date) 
+Commands::Commands(std::string const & password, std::string server_name, std::string server_ipaddress, std::string server_creation_date): _server_password(password) , _server_name(server_name) , _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date), _oper_name("admin"), _oper_pass("password")
 {
 
 	_cmd_list["MODE"] = &Commands::mode;
@@ -178,7 +178,7 @@ void	Commands::oper(std::vector<std::string> params, CMD_PARAM)
 	//return (ft_error(ERR_NOOPERHOST, params, client, NULL, client_list, *channel_list));
 
 	//If the client does not send the correct password for the given name
-	if (params[2].compare(this->_server_password) != 0)
+	if (params[1].compare(this->_oper_name) || params[2].compare(this->_oper_pass))
 		return (ft_error(ERR_PASSWDMISMATCH, client, NULL, ""));
 	std::cout << YELLOW << "OPER success" << RESET << std::endl;
 	client->setOper(true);
@@ -337,6 +337,23 @@ Client* 	ft_nickname_exist_return(std::vector<Client*> client_list, std::string 
 	return (NULL);
 }
 
+bool	ft_nick_syntax_error(std::string nick)
+{
+	std::string special("[]\\_^{|}");
+	std::cout<<  YELLOW << "nickname = nick " << std::endl;
+	
+	if (!isalpha(nick[0]) && special.find(nick[0], 0) == std::string::npos )
+		return (true);
+	std::cout << "first ok" << std::endl;
+	for (std::string::iterator it = nick.begin() + 1; it != nick.end(); it++)
+	{
+		if (!isalpha(*it) && special.find(*it, 0) == std::string::npos && *it != '-'  && !isdigit(*it))
+			return (true);
+	}
+	std::cout << "nick syntax return false : nick ok" << RESET << std::endl;
+	return false;
+}
+
 
 void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 {
@@ -352,10 +369,11 @@ void Commands::nick(std::vector<std::string> params, CMD_PARAM)
 		return ft_error(ERR_NONICKNAMEGIVEN, client, NULL, "");
 		//return ft_error(ERR_NONICKNAMEGIVEN, params, client, NULL, client_list, *channel_list);
 	}
-	//Pseudo contient des chars non autorise 
-	//	ft_error(432)a coder ??
-	//Pseudo exist deja
-	if (ft_nickname_exist(client_list, params[1]))
+
+	if (ft_nick_syntax_error(params[1]) == true)
+		return (ft_error(ERR_ERRONEUSNICKNAME, client, NULL, params[1]));
+
+  if (ft_nickname_exist(client_list, params[1]))
 	{
 		return ft_error(ERR_NICKNAMEINUSE, client, NULL, params[1]);
 		//return ft_error(ERR_NICKNAMEINUSE, params, client, NULL, client_list, *channel_list);
@@ -889,7 +907,6 @@ void Commands::kick(std::vector<std::string> params, CMD_PARAM)
 }
 
 
-
 // ******** TOPIC *************
 
 void Commands::topic(std::vector<std::string> params, CMD_PARAM)
@@ -936,9 +953,16 @@ void Commands::topic(std::vector<std::string> params, CMD_PARAM)
 		}
 		else // creer ou change le sujet du cannal
 		{
-			std::string topic = *it;
+			std::string topic;
+			while (it != ite)			
+			{
+				topic += (*it + " ");
+				it++;
+			}
+			topic.erase(topic.end() -1);
 			if (topic[0] == ':')
 				topic.erase(0,1);
+			
 			std::cout << YELLOW <<  "I want to create or change the TOPIC of channel " << tmp->getName() <<  " to " << topic << RESET << std::endl;
 			if (tmp->getStatusTopic() == false) // creation
 			{

@@ -11,11 +11,11 @@
 #define CHAN_MAXCAPACITY 2 // a revoir
 #define USER_MAXCHAN 2 // a revoir
 
-#define RPL_WELCOME				"1" //
-#define RPL_YOURHOST			"2" //
-#define RPL_CREATED				"3" //
-#define RPL_MYINFO				"4" //
-#define RPL_BOUNCE				"5"//
+#define RPL_WELCOME				"001" //
+#define RPL_YOURHOST			"002" //
+#define RPL_CREATED				"003" //
+#define RPL_MYINFO				"004" //
+#define RPL_BOUNCE				"005"//
 #define RPL_UMODEIS				"221"
 #define RPL_AWAY				"301"//
 #define RPL_UNAWAY				"305"
@@ -37,14 +37,12 @@
 #define ERR_NOSUCHCHANNEL		"403"
 #define ERR_CANNOTSENDTOCHAN	"404"
 #define ERR_TOOMANYCHANNELS		"405" 
-#define ERR_TOOMANYTARGETS		"407" 
 #define ERR_NORECIPIENT			"411"
 #define ERR_NOTEXTTOSEND		"412"
 #define ERR_UNKNOWNCOMMAND		"421"
 #define ERR_NONICKNAMEGIVEN		"431"
 #define ERR_ERRONEUSNICKNAME	"432"
 #define ERR_NICKNAMEINUSE		"433"
-#define ERR_NICKCOLLISION		"436"
 #define ERR_USERNOTINCHANNEL    "441"
 #define ERR_NOTONCHANNEL		"442"
 #define ERR_NEEDMOREPARAMS		"461"

@@ -73,6 +73,8 @@ class Commands
 		std::string 				_server_name;
 		std::string					_server_ipaddress;
 		std::string					_server_creation_date;
+		std::string					_oper_name;
+		std::string					_oper_pass;
 };
 
 #endif

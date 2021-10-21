@@ -3,7 +3,7 @@
 
 std::string ft_id_type1(Client* client, std::string nb_str)
 {
-	std::string id = ":127.0.0.1 00" + nb_str + " " + client->getNickname() + " :";
+	std::string id = ":127.0.0.1 " + nb_str + " " + client->getNickname() + " :";
 	return (id);
 }
 
@@ -18,7 +18,7 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 	std::string rpl;
 	int nb = atoi(nb_str.c_str());
 	rpl.clear();
-	if (nb <= 5)
+	if (nb <= 5 || nb == 353)
 		rpl = ft_id_type1(client, nb_str);
 	else
 	{
@@ -32,20 +32,20 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 				break;
 			}
 		case 2:
-			{
-				rpl += "Your host is " + client->getServerName() + ", running version 42.42\r\n";
-				break;
-			}
+		{
+			rpl += "Your host is [" + client->getServerIpAddress() + "], running on version [42.42]\r\n";
+			break;
+		}
 		case 3:
 			{
 				rpl += "This server was created " + client->getServerCreationDate() + "\r\n";
 				break;
 			}
 		case 4:
-			{
-				rpl += client->getServerName() + " 42.42 <available user modes> <available channel modes>\r\n";
-				break;
-			}
+		{
+			rpl += client->getServerName() + " version [42.42]. Available user MODE : +Oa . Avalaible channel MODE : none. \r\n";
+			break;
+		}
 		case 5:
 			{
 				rpl +="Sorry IRC_90's capacity is full. Please retry connection later\r\n";

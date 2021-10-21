@@ -1,5 +1,5 @@
 #include "Server.hpp"
-Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _server_name("****>>>[IRC_90S]<<<****"), _server_ipaddress("127.0.0.1"), _server_creation_date(""), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
+Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _server_name("****>>>[IRC_90S]<<<****"), _server_ipaddress("127.0.0.1/6667"), _server_creation_date(""), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
 {
 	time_t	raw_time;
 	time(&raw_time);
@@ -84,23 +84,24 @@ void Server::init()
 	// 1. Prepare for launch!
 	//Rempli notre structure serv_info qui contient 
 	//tout les parametres pour call socket(), bind(), listen()
-	ret = getaddrinfo(NULL, PORT_SERVER, &_hints, &_serv_info);
+	ret = getaddrinfo(NULL, this->_port.c_str(), &_hints, &_serv_info);
 	if (ret != 0)
 		throw Server::ExceptGetaddr();
 	
 	// 2. Get the FD
 	//Creer ce qui sera notre socket d'ecoute
 	//domain = type d'address = ai_family | type = socketype = ai_socktype |  protocole = ai_protocole
-	_server_socket = socket(_serv_info->ai_family, _serv_info->ai_socktype /*| SOCK_NONBLOCK*/, _serv_info->ai_protocol);
+	_server_socket = socket(_serv_info->ai_family, _serv_info->ai_socktype , _serv_info->ai_protocol);
 	if (_server_socket == -1)
 		throw Server::ExceptErrno();
-		
-		 //Dit que la socket peut etre retutiliser si elle fail ou mal ferme ?
-			ret = 1;
-			setsockopt(_server_socket, SOL_SOCKET, SO_REUSEADDR, &ret, sizeof(ret));
+	ret = 1;
+	if ((setsockopt(_server_socket, SOL_SOCKET, SO_REUSEADDR, &ret, sizeof(ret))) == -1)
+	{
+		throw Server::ExceptErrno();
+	}
 
 	//Pour passer notre socket en non blocking, portable sur mac
-	if (fcntl(_server_socket, F_SETFL, O_NONBLOCK) == -1) // c'est la seule maniere dont on a le droit de l'utiliser
+	if (fcntl(_server_socket, F_SETFL, O_NONBLOCK) == -1)
 		throw Server::ExceptErrno();
 
 	//3. What port Am I on?
@@ -115,11 +116,9 @@ void Server::init()
 	std::cout << "Server init success" << std::endl;
 	std::cout << "Listening for clients ..." << std::endl;
 
-	// Set up la struct poll
 	_poll.fd = _server_socket;
 	_poll.events = POLLIN;                                           
 	_fds.push_back(_poll);
-	std::cout << "fd = " << _poll.fd << std::endl;
 
 }
 
@@ -137,6 +136,7 @@ void	Server::pollInfo(std::vector<struct pollfd> const & src)
 void	Server::run() 
 {	
 	std::vector<struct pollfd>		tmp;
+	//Useless ?
 	tmp.push_back(this->_poll);
 	while (1)
 	{

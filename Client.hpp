@@ -19,29 +19,30 @@ class Client
 
         // Presentation
         void present();
-        
-		// GETTERS
-        std::string const &					getPassword() const;
-        std::string const &					getNickname() const;
-        std::string const &					getUsername() const;
-		std::string const &					getHostname() const;
-		std::string const &					getRealname() const;
-        std::string const &					getMessage() const;
-        int         const &					getMessageStatus() const;
-        int         const &    	 			getSocket() const;
-        int									getNbChannels() const;
-        struct pollfd const &	 			getPoll() const;
-		bool		const &					isRegistered() const;
-		bool		const &					getRegPass() const;
-		bool		const &					getRegNick() const;
-		bool		const &					getRegUser() const;
-		bool		const &					getAway() const;
-		bool		const &					getOper() const;
-		std::vector<std::string> const &	getCommand() const;
-		std::string const &					getServerName() const;
-		std::string const & 				getServerIpaddress() const;
-		std::string const & 				getServerCreationDate() const;
-		std::string const &					getAwayMessage() const;
+
+        	        // GETTERS
+        std::string const &		getPassword() const;
+        std::string const &		getNickname() const;
+        std::string const &		getUsername() const;
+		std::string const &		getHostname() const;
+		std::string const &		getRealname() const;
+        std::string const &		getMessage() const;
+        int         const &		getMessageStatus() const;
+        int         const &     getSocket() const;
+        int			getNbChannels() const;
+        struct pollfd   const & getPoll() const;
+		bool		const &		isRegistered() const;
+		bool		const &		getRegPass() const;
+		bool		const &		getRegNick() const;
+		bool		const &		getRegUser() const;
+		bool		const &		getAway() const;
+		bool		const &		getOper() const;
+		std::vector<std::string> const & getCommand() const;
+		std::string const & getServerName() const;
+		std::string const & getServerIpAddress() const;
+		std::string const & getServerCreationDate() const;
+		std::string const & getAwayMessage() const;
+
 		
         //SETTERS
  		void	setRegPass(bool const& src);
