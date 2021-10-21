@@ -1,4 +1,6 @@
 #include "Server.hpp"
+#include <iostream>
+#include <fstream>
 
 Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _server_name("irc.irc90s.com"), _server_ipaddress("127.0.0.1"), _server_creation_date(""), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
 {
@@ -11,6 +13,20 @@ Server::Server(std::string port, std::string password) : _domain("NULL"), _port(
 	_hints.ai_family = AF_UNSPEC; //Accept IPv4 & IPv6
 	_hints.ai_socktype = SOCK_STREAM; //Sock type
 	_hints.ai_flags = AI_PASSIVE; //Puts my Ip as default + NULL in getaddrinfo
+	std::ifstream image("pic.txt");
+	if (image.is_open())
+	{
+		while(image.good())
+		{
+			std::string tmp;
+			std::getline(image, tmp);
+			tmp += "\n";
+			_pokemon += tmp;
+		}
+	}
+	else
+		_pokemon = "";
+	std::cout << _pokemon << std::endl;
 }
 
 Server::~Server()
@@ -371,6 +387,7 @@ void	Server::welcomeClient(Client *client)
 		ft_reply("2", client, NULL, "");
 		ft_reply("3", client, NULL, "");
 		ft_reply("4", client, NULL, "");
+		ft_reply(RPL_CUSTOMMOTD, client, NULL, _pokemon);
 		if (client->getRegPass() == true)
 		{
 			if (client->getPassword() != this->_password)

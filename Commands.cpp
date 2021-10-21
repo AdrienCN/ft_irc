@@ -67,10 +67,10 @@ static void	ft_registration_failed(Client *client)
 {
 	std::string tmp("Registration incomplete : Execute these command(s) first:\n");
 	if (client->getRegNick() == false)
-		tmp += "/NICK <nickname>\n";
+		tmp += "/NICK <nickname>\r\n";
 	if (client->getRegUser() == false)
-		tmp += "/USER <username> <mode> <unused> :<realname>\n";
-	tmp += "\r\n";
+		tmp += "/USER <username> <mode> <unused> :<realname>\r\n";
+	//tmp += "\r\n";
 	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
 }
 
@@ -361,7 +361,6 @@ void Commands::user(std::vector<std::string> params, CMD_PARAM)
 	if ((std::strstr(params[4].c_str(), ":")) == NULL)
 		return (ft_error(ERR_USERREALNAMEFORMAT, client, NULL, params[0]));
 	client->setRegUser(true);
-	//SEGV ici si il manque ":" avant realname
 	client->setRealname(ft_findUserRealname(params));
 	client->setUsername(params[1]);
 }

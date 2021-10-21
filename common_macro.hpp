@@ -32,6 +32,7 @@
 #define RPL_CUSTOMCAP			"4242"
 #define RPL_CUSTOMMODESUCCESS	"4243"
 #define RPL_CUSTOMHELP      	"4244"
+#define RPL_CUSTOMMOTD	     	"4246"
 
 #define ERR_NOSUCHNICK			"401"
 #define ERR_NOSUCHCHANNEL		"403"

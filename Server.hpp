@@ -94,6 +94,7 @@ class Server
         Commands                    _command_book;
         std::vector<Client*>        _all_clients;
         std::vector<Channel*>       _all_channels;
+		std::string					_pokemon;
 };
 
 #endif

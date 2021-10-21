@@ -179,6 +179,11 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 			{
 				break;
 			}
+		case 4246:
+			{
+				rpl += arg + "\r\n";
+				break;
+			}
 		default:
 			{
 				rpl = "No RPL set yet \r\n";

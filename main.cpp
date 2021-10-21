@@ -1,5 +1,6 @@
 #include "common_macro.hpp"
 #include "headers.hpp"
+#include <iostream>
 #include "Server.hpp"
 
 class ExceptSignal : public std::exception
