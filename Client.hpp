@@ -8,8 +8,6 @@
 
 class Channel;
 
-//namespace ft
-
 class Client
 {
 
@@ -17,10 +15,10 @@ class Client
         Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date); 
         virtual ~Client(); 
 
-        // Presentation
-        void present();
+        //a effacer version finale
+		void present();
 
-        	        // GETTERS
+        // GETTERS
         std::string const &		getPassword() const;
         std::string const &		getNickname() const;
         std::string const &		getUsername() const;
@@ -43,8 +41,7 @@ class Client
 		std::string const & getServerCreationDate() const;
 		std::string const & getAwayMessage() const;
 
-		
-        //SETTERS
+		//SETTERS
  		void	setRegPass(bool const& src);
 		void	setRegNick(bool const& src);
 		void	setRegUser(bool const& src);
@@ -88,9 +85,6 @@ class Client
 		std::string 				_server_ipaddress;
 		std::string	 				_server_creation_date;
 		std::string 				_away_message;
-        //std::string _host;
-        //std::string _servername;
-        //std::string _realname;
         std::vector<Channel*>		_channels; // liste des channels dans lesquels il est     
         int							_socket;
 		std::vector<std::string>	_command;

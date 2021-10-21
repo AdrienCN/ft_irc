@@ -1,7 +1,12 @@
 #include "Client.hpp"
 
-Client::Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date): _message_status(DISCONNECT),  _hostname("defaultconstructorHOSTNAMEvalue"), _username("Default_Username"), _nickname("Default_Nickname"), _realname("Default_realname"), _server_name(server_name), _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date),  _away_message(""), _registration_status(false), _reg_pass(false), _reg_nick(false), _reg_user(false), _away(false), _oper(false)
-
+Client::Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date):
+_message_status(DISCONNECT),  _hostname("defaultconstructorHOSTNAMEvalue"),
+_username("Default_Username"), _nickname("Default_Nickname"), 
+_realname("Default_realname"), _password(""), _message(""), _server_name(server_name), 
+_server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date),  
+_away_message(""), _registration_status(false), _reg_pass(false), _reg_nick(false),
+_reg_user(false), _away(false), _oper(false)
 {
     return;
 }
@@ -11,6 +16,7 @@ Client::~Client()
     return;
 }
 
+// A effacer version finale
 void Client::present()
 {
     std::cout << "CLIENT: user = " << getUsername() << " | nickname = " << getNickname() << std::endl; 
@@ -76,7 +82,6 @@ std::string const &		Client::getRealname() const
 {
     return this->_realname;
 }
-
 
 std::string const &		Client::getMessage() const
 {
@@ -160,7 +165,6 @@ void  Client::setServerCreationDate(std::string const & src)
 	this->_server_creation_date = src;
 }
 
-
 void Client::setRegPass(bool const & src)
 {
 	this->_reg_pass = src;
@@ -170,10 +174,12 @@ void Client::setRegNick(bool const & src)
 {
 	this->_reg_nick = src;
 }
+
 void Client::setRegUser(bool const & src)
 {
 	this->_reg_user = src;
 }
+
 void Client::setPassword(std::string const& src)
 {
     this->_password = src;
@@ -238,7 +244,7 @@ void Client::init(int const & socket)
 void Client::recvMessage()
 {
 	char buf[MAX_CHAR + 1];
-	int ret; // sisze_t?
+	int ret;
 
 	memset(buf, 0, MAX_CHAR);
 	if(this->_message_status == COMPLETE)
@@ -247,43 +253,27 @@ void Client::recvMessage()
 		this->_message_status = INCOMPLETE;
 	}
 	ret = recv(this->getSocket(), buf, MAX_CHAR, 0);
-	//Err systeme quitter abruptement
 	if (ret == -1)
 	{
 		this->_message_status = INCOMPLETE;
-		std::cout << "ERROR : FATAL : RECV -1" << std::endl;
+		std::cout << "ERROR : RECV -1 --> IGNORED" << std::endl;
 		return;
-		//throw Server::ExceptErrno();
 	}
-	//Demande de DECO sur linux
-	if (ret == 0)
+	if (ret == 0) //Demande de DECO sur linux
 	{
 		this->_message_status = DISCONNECT;
 		this->clearMessage();
 		return;
 	}
-	//A changer pour voir si cmd_lenght > 512 --> dans Commands. analyze directement (requete complete)
-	/*
-	if (ret > 512)
-	{
-		std::cout << "Error : buff > 512" << std::endl;
-		this->_message_status = INCOMPLETE;
-		return;
-	}
-	*/
-	//Qq chose a lire :
 	this->_message  +=  buf;
-	//Si on trouve CRCL et qu'on est deja enregistre. Alors CRCL = fin de message.
-	
-	//Rajouter condiont CRCL DOIT etre LE last char (&& LAST_CHAR == END_CHAR)
-	if (std::strstr(buf, END_CHAR) != NULL) // END CHAR
+	//if (std::strstr(buf, END_CHAR) != NULL) // END CHAR
+	if (_message.size() > 2 && *(_message.end() - 2) ==  '\r' && *(_message.end() - 1) == '\n')
 		this->_message_status = COMPLETE;
-	//Si pas de CRCL - msg incomplet. Si CRCL mais pas registreded alors le premier msg qui contient plusieurs CRCL est peut etre scinde
 	else
 		this->_message_status = INCOMPLETE;
 }
 
-void Client::analyzeMessage() // Parsing du END_CHAR
+void Client::analyzeMessage() //Parsing du END_CHAR
 {
 	int i = 0;
 	int init = 0;
@@ -292,7 +282,6 @@ void Client::analyzeMessage() // Parsing du END_CHAR
 		if (_message[i] ==  '\r' && _message[i + 1] == '\n')
 		{
 			this->_command.push_back(_message.substr(init, i - init));
-			//manage_substr(_message.substr(init, i - init));
 			init = i + 2;
 			i += 2;
 		}
@@ -309,7 +298,7 @@ void Client::add_channel(Channel* channel)
 	while(it != ite)
 	{
 		if (*it == channel)
-			return; // already exists
+			return;
 		it++;
 	}
 	_channels.push_back(channel);

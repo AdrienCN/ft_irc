@@ -30,6 +30,7 @@ Commands::Commands(std::string const & password, std::string server_name, std::s
 
 Commands::~Commands()
 {
+	_cmd_list.clear();
 	return;
 }
 
@@ -1268,7 +1269,7 @@ static void	printWho(std::vector<std::string> params, Channel *channel, Client *
 	else 
 		rpl = params[1];
 	rpl += " " + client_ref->getUsername() + " ";
-	rpl += client_ref->getServerIpaddress() + " ";
+	rpl += client_ref->getServerIpAddress() + " ";
 	rpl += client_ref->getServerName() + " " + client_ref->getNickname();
 	// lettre change en fonction du mode away (" H")/(" G") - user operator ("*")/ member operator ("@")
 	if (client_ref->getAway())

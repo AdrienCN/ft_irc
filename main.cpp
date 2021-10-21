@@ -1,6 +1,21 @@
 #include "common_macro.hpp"
 #include "headers.hpp"
+#include "signal_handler.hpp"
 #include "Server.hpp"
+
+class ExceptSignal : public std::exception
+{
+   virtual const char* what() const throw()
+   {
+		return ("Server interruption : leaving");
+   }
+};
+
+void signal_handler(int signum) 
+{
+	(void)signum;
+	throw ExceptSignal();
+}
 
 int main(int argc, char **argv)
 {

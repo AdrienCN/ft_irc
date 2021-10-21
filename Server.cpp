@@ -1,16 +1,13 @@
 #include "Server.hpp"
+
 Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _server_name("irc.irc90s.com"), _server_ipaddress("127.0.0.1"), _server_creation_date(""), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
 {
 	time_t	raw_time;
 	time(&raw_time);
 	_server_creation_date = ctime(&raw_time);
-	_command_book.setServerCreationDate(_server_creation_date);
-	//enlever le /n automatique de la fin
 	_server_creation_date.erase((_server_creation_date.end() - 1));
-	//_command_book._server_name = _server_name;
-	std::cout << _server_name << std::endl;
+	_command_book.setServerCreationDate(_server_creation_date);
 	memset(&_hints, 0, sizeof(_hints));
-	//Prepare hints sur la stack pour getaddrinfo()
 	_hints.ai_family = AF_UNSPEC; //Accept IPv4 & IPv6
 	_hints.ai_socktype = SOCK_STREAM; //Sock type
 	_hints.ai_flags = AI_PASSIVE; //Puts my Ip as default + NULL in getaddrinfo
@@ -18,12 +15,30 @@ Server::Server(std::string port, std::string password) : _domain("NULL"), _port(
 
 Server::~Server()
 {
-	std::cout << "Server destruction" << std::endl;
-	//garder ?  ou creer une fonction Server.end() qui close tout proprement
+	std::cout << "<< Server destruction >>" << std::endl;
+	
+	std::vector<Client*>::iterator it = _all_clients.begin();
+	std::vector<Client*>::iterator ite = _all_clients.end();
+	while (it != ite)
+	{
+		delete *it;
+		it++;
+	}
+	_all_clients.clear();
+	
+	std::vector<Channel*>::iterator itb = _all_channels.begin();
+	std::vector<Channel*>::iterator itbe = _all_channels.end();
+	while (itb != itbe)
+	{
+		delete *itb;
+		itb++;
+	}
+	_all_channels.clear();
+	
 	close(_server_socket);
 	freeaddrinfo(_serv_info);
     return;
-} 
+}
 
 int const & Server::getSocket() const
 {
@@ -75,8 +90,6 @@ void  Server::setServerCreationDate(std::string const & src)
 	this->_server_creation_date = src;
 }
 
-
-//On catchera une erreur de construction dans le main au start
 void Server::init()
 {
 	int ret;
@@ -94,28 +107,15 @@ void Server::init()
 
     if (_serv_info->ai_family == AF_INET) 
 	{ 
+		// IPV4
 		struct sockaddr_in *tmp = (struct sockaddr_in*)_serv_info->ai_addr;
 		addr = &(tmp->sin_addr);
-		std::cout << "IPV4" << std::endl;
-		/*if (inet_ntop(_hints.ai_family, addr, ip_final, sizeof(ip_final)) == NULL)
-            struct sockaddr_in *ipv4 = (struct sockaddr_in *)_hints.ai_addr;
-            addr = &(ipv4->sin_addr);
-			std::cout << "IPV4" << std::endl;
-			*/
     } 
 	else 
-	{ // IPv6p
+	{
+		// IPV6
 		struct sockaddr_in6 *tmp = (struct sockaddr_in6*)_serv_info->ai_addr;
 		addr = &(tmp->sin6_addr);
-		std::cout << "IPV6" << std::endl;
-	//	struct in6_addr tmp =  _hints.ai_addr->sin6_addr;
-		/*
-		if (inet_ntop(_hints.ai_family, addr, ip_final, sizeof(ip_final)) == NULL)
-            struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)_hints.ai_addr;
-            addr = &(ipv6->sin6_addr);
-			std::cout << "IPV6" << std::endl;
-   //         ipver = "IPv6";
-   //         */
     }
 	if (inet_ntop(_serv_info->ai_family, addr, ip_final, sizeof(ip_final)) == NULL)
 		throw Server::ExceptErrno();
@@ -124,7 +124,7 @@ void Server::init()
 		_server_ipaddress = ip_final;
 		_command_book.setServerIpaddress(ip_final);
 	}
-	std::cout << _server_ipaddress << std::endl;
+	
 	// 2. Get the FD
 	//Creer ce qui sera notre socket d'ecoute
 	//domain = type d'address = ai_family | type = socketype = ai_socktype |  protocole = ai_protocole
@@ -150,15 +150,14 @@ void Server::init()
 	// sockfd et backlog = numbers of connection allowed in the back queue
 	if ((listen(_server_socket, MAX_CLIENT)) == -1)
 		throw Server::ExceptErrno();
-	std::cout << "Server init success" << std::endl;
+	std::cout << "Server init success!!" << std::endl;
 	std::cout << "Listening for clients ..." << std::endl;
 
 	_poll.fd = _server_socket;
 	_poll.events = POLLIN;                                           
-	_fds.push_back(_poll);
-
 }
 
+/*
 void	Server::pollInfo(std::vector<struct pollfd> const & src)
 {
 	std::vector<struct pollfd>::const_iterator it = src.begin();
@@ -169,87 +168,67 @@ void	Server::pollInfo(std::vector<struct pollfd> const & src)
 	}
 	return ;
 }
+*/
 
 void	Server::run() 
 {	
 	std::vector<struct pollfd>		tmp;
 	//Useless ?
-	tmp.push_back(this->_poll);
+	// tmp.push_back(this->_poll);
 	while (1)
 	{
-		std::cout << YELLOW << "FROM MAIN SERVER" << RESET << std::endl;
-		print_client_list(_all_clients);
-		print_channel_list(_all_channels);
-		
+		signal(SIGINT, signal_handler);
+		signal(SIGQUIT, signal_handler);
 
+		//std::cout << YELLOW << "FROM MAIN SERVER" << RESET << std::endl;
+		//print_client_list(_all_clients);
+		//print_channel_list(_all_channels);
+	
 		tmp.push_back(this->_poll);
 		for (std::vector<Client*>::iterator it = _all_clients.begin(); it != _all_clients.end(); it++)
 		{
 			tmp.push_back((*it)->getPoll());
 		}
 		
-
 		std::vector<pollfd>::iterator it = tmp.begin();
 //		std::cout << "Starting new poll ..." << std::endl;
 		int poll_count = poll(&(*it), _nbClients + 1, -1);
 		if (poll_count == -1)
 			throw Server::ExceptErrno();
-		this->pollInfo(tmp);
+	//	this->pollInfo(tmp);
 
 		std::vector<pollfd>::iterator itb = tmp.begin();
 		std::vector<pollfd>::iterator ite = tmp.end();
 		
-	/*	
-		std::vector<pollfd>::iterator it = _fds.begin();
-//		std::cout << "Starting new poll ..." << std::endl;
-		int poll_count = poll(&(*it), _nbClients + 1, -1);
-		if (poll_count == -1)
-			throw Server::ExceptErrno();
-		this->pollInfo();
-
-		std::vector<pollfd>::iterator itb = _fds.begin();
-		std::vector<pollfd>::iterator ite = _fds.end();
-		*/
-		while (itb != ite)
+			while (itb != ite)
 		{
-			 if (((*itb).revents & POLLHUP) == POLLHUP)
+			 if ((*itb).revents & POLLHUP)
 			{
-				std::cout << "Trying to disconnect .... fd = " << (*itb).fd << std::endl;
 				if ((*itb).fd != _server_socket)
-				{					
 					this->removeClient((*itb).fd);
-					//break;
-				}
 			}
-			//Event est un POLLIN
 			else if ((*itb).revents & POLLIN)
 			{
-				//Je suis le serveur
-				if ((*itb).fd == _server_socket)
+				if ((*itb).fd == _server_socket) ///Je suis le serveur
 				{	
 					if (_nbClients == MAX_CLIENT)
 						this->refuseClient();
 					else
-						this->addClient(); //tmp.push_back(this->addClient()); //cette ligne de mort cause notre bug 
+						this->addClient();
 				}
-				//Je suis un client
-				else
+				else //Je suis un clien
 				{
-					// Propal de plan "propre"
 					Client *client = this->find_client_from_fd((*itb).fd);
 					client->recvMessage();
-					//Deco
 					if (client->getMessageStatus() == DISCONNECT)
 						this->removeClient(client->getSocket());
-					//Buff pas fini. Pas de CRCL
-					else if (client->getMessageStatus() == COMPLETE)
+					else if (client->getMessageStatus() == COMPLETE) //CLRC received
 					{
 						client->analyzeMessage();
 						if (client->isRegistered() == false)
 							welcomeClient(client);
 						else
 							_command_book.find_command(client->getCommand().front(), client, _all_clients, &_all_channels);
-						// JOANN pour QUIT: avoir
 						client->clearMessage();
 						client->clearCommand();
 						this->find_to_kill();
@@ -259,7 +238,6 @@ void	Server::run()
 			itb++;
 		}
 		tmp.clear();
-		std::cout << YELLOW << "LOOP END" << RESET << std::endl;
 	}
 }
 
@@ -267,7 +245,7 @@ void	Server::find_to_kill()
 {
 	std::vector<Client*>::iterator it = _all_clients.begin();
 	std::vector<Client*>::iterator ite = _all_clients.end();
-	std::cout << YELLOW << "Hello from FIND_KILL" << RESET << std::endl;
+	//std::cout << YELLOW << "Hello from FIND_KILL" << RESET << std::endl;
 	while (it != ite)
 	{
 		if ((*it)->getMessageStatus() == DISCONNECT)
@@ -275,13 +253,11 @@ void	Server::find_to_kill()
 			close((*it)->getSocket());
 			_all_clients.erase(it);
 			_nbClients--;
-			std::cout<< YELLOW  << "KILL SUCCESS" << RESET << std::endl;
+			//std::cout<< YELLOW  << "KILL SUCCESS" << RESET << std::endl;
 			return;
 		}
 		it++;
 	}
-	// Remove from Poll Fds
-//	this->poll_remove_client(fd);
 }
 	
 void	Server::refuseClient()
@@ -293,73 +269,41 @@ void	Server::refuseClient()
 	addrlen = sizeof(client_addr);
 	socket = accept(_server_socket, (struct sockaddr *)&client_addr, &addrlen);
 	if (socket == -1)
-	{
-		std::cout << "Pbm socket function" << std::endl;
 		throw Server::ExceptErrno();
-	}
-
 	if (fcntl(socket, F_SETFL,  O_NONBLOCK) == -1)
 		throw Server::ExceptErrno();
 	
-	Client*			new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
+	Client*	new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
 	new_client->init(socket);
-	//std::vector<std::string> useless;
-	std::cout << "ERROR : refuseClient : Client already maximum" << std::endl;
+	std::cout << RED << "ERROR : refuseClient : Client already maximum" << RESET << std::endl;
 	ft_reply(RPL_BOUNCE,  new_client, NULL, "");
-	//ft_reply(RPL_BOUNCE,  useless, new_client, NULL,  _all_clients, _all_channels);
 	close(socket);
 	delete new_client;
 }
 
-//void	Server::addClient()
-struct pollfd const &	Server::addClient()
+void	Server::addClient()
 {
-	//struct sockaddr ?? 
 	struct sockaddr_storage client_addr;
-	socklen_t		addrlen;
-	int				socket;
+	socklen_t				addrlen;
+	int						socket;
 
 	addrlen = sizeof(client_addr);
 	socket = accept(_server_socket, (struct sockaddr *)&client_addr, &addrlen);
 	if (socket == -1)
-	{
-		std::cout << "Pbm socket function" << std::endl;
 		throw Server::ExceptErrno();
-	}
-
 	if (fcntl(socket, F_SETFL,  O_NONBLOCK) == -1)
 		throw Server::ExceptErrno();
 
-	Client*			new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
+	Client*	new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
 	new_client->init(socket);
-	_fds.push_back(new_client->getPoll());
-	//this->poll_add_client(*new_client);
 	_all_clients.push_back(new_client);
 	_nbClients++;
-	std::cout << "New client added" <<std::endl;
-	send(new_client->getSocket(), "Hello to you NEW CLIENT JOANN\n", 30, 0);
-	return (new_client->getPoll());
-}
-
-void Server::poll_add_client(Client const& new_client)
-{
-	std::vector<struct pollfd>::iterator it = _fds.begin();
-	std::vector<struct pollfd>::iterator ite = _fds.end();
-	while (it != ite)
-	{
-		if (new_client.getSocket() == it->fd)
-		{
-			std::cout << "Error : Server : adding poll_fds client" << std::endl;
-			return;
-		}
-		it++;
-	}
-	_fds.push_back(new_client.getPoll());
+	std::cout << YELLOW << "New client not registered yet" << RESET << std::endl;
 	return;
 }
+
 void	Server::removeClient(int const & fd)
 {
-	// Remove from Client List
 	std::vector<Client*>::iterator it = _all_clients.begin();
 	std::vector<Client*>::iterator ite = _all_clients.end();
 
@@ -377,32 +321,7 @@ void	Server::removeClient(int const & fd)
 		it++;
 	}
 	_nbClients--;
-	// Remove from Poll Fds
-//	this->poll_remove_client(fd);
-	print_client_list(_all_clients);
 	return;	
-}
-
-void	Server::poll_remove_client(int const & fd)
-{
-	std::vector<struct pollfd>::iterator it = _fds.begin();
-	std::vector<struct pollfd>::iterator ite = _fds.end();
-
-	while(it != ite)
-	{
-		//if (old_client.getSocket() == it->fd)
-		if (fd == it->fd)
-		{
-			std::cout << "Erasing fd : " << it->fd << std::endl;
-			close(it->fd);
-			_fds.erase(it);
-			_nbClients--;
-			std::cout << "Client has disconnected succesfully" << std::endl;
-			return;
-		}
-		it++;
-	}
-	return;
 }
 
 Client* Server::find_client_from_fd(int fd)
@@ -419,7 +338,7 @@ Client* Server::find_client_from_fd(int fd)
 	return NULL;
 }
 
-void	ft_registration_failed(Client *client)
+static void	ft_registration_failed(Client *client)
 {
 	std::string tmp("Command(s) needed to complete registration:\n");
 	if (client->getRegNick() == false)
@@ -427,7 +346,6 @@ void	ft_registration_failed(Client *client)
 	if (client->getRegUser() == false)
 		tmp += "/USER <username> <mode> <unused> :<realname>\r";
 	tmp += "\r\n";
-	std::cout << tmp << RESET <<std::endl;
 	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
 }
 
@@ -442,7 +360,6 @@ void	Server::welcomeClient(Client *client)
 	}
 	//Evite le msg d'erreur si CAP ou PASS
 	//Checker si les commandes NICK et USER sont presente dans les cmd
-
 	while (tmp.empty() == false)
 	{
 		//Si l'une des deux ou les deux sont presente checker l'etat de l'enregistrement
@@ -450,14 +367,8 @@ void	Server::welcomeClient(Client *client)
 		{
 			if (client->getRegNick() == true && client->getRegUser() == true)
 			{
-				std::cout << GREEN << "****************REGISTRATION SUCCESS************************" << RESET << std::endl;
+				std::cout << GREEN << "********REGISTRATION SUCCESS for " << client->getNickname() << "**********" << RESET << std::endl;
 				client->setRegistration(true);
-				/*
-				ft_reply("1", tmp, client, NULL, _all_clients, _all_channels);
-				ft_reply("2", tmp, client, NULL, _all_clients, _all_channels);
-				ft_reply("3", tmp, client, NULL, _all_clients, _all_channels);
-				ft_reply("4", tmp, client, NULL, _all_clients, _all_channels);
-				*/
 				ft_reply("1", client, NULL, "");
 				ft_reply("2", client, NULL, "");
 				ft_reply("3", client, NULL, "");
@@ -467,7 +378,6 @@ void	Server::welcomeClient(Client *client)
 					if (client->getPassword() != this->_password)
 					{
 						ft_error(ERR_PASSWDMISMATCH, client, NULL, "");
-						//ft_error(ERR_PASSWDMISMATCH, tmp, client, NULL, _all_clients, _all_channels);
 						client->setRegPass(false);
 					}
 				}
