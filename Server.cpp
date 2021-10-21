@@ -231,6 +231,7 @@ void	Server::run()
 							_command_book.find_command(client->getCommand().front(), client, _all_clients, &_all_channels);
 						client->clearMessage();
 						client->clearCommand();
+						client->clearCommand();
 						this->find_to_kill();
 					}
 				}
@@ -339,17 +340,18 @@ Client* Server::find_client_from_fd(int fd)
 	}
 	return NULL;
 }
-
+/*
 static void	ft_registration_failed(Client *client)
 {
-	std::string tmp("Command(s) needed to complete registration:\n");
+	std::string tmp("Registration is not complete : Please enter the following command(s):\n");
 	if (client->getRegNick() == false)
-		tmp += "/NICK <nickname>\r";
+		tmp += "/NICK <nickname>\n";
 	if (client->getRegUser() == false)
-		tmp += "/USER <username> <mode> <unused> :<realname>\r";
+		tmp += "/USER <username> <mode> <unused> :<realname>\n";
 	tmp += "\r\n";
 	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
 }
+*/
 
 void	Server::welcomeClient(Client *client)
 {
@@ -357,12 +359,31 @@ void	Server::welcomeClient(Client *client)
 	std::vector<std::string> tmp = full_command;
 	while (full_command.empty() == false)
 	{
+		
 		_command_book.find_command(full_command.front(), client, _all_clients, &_all_channels);
 		full_command.erase(full_command.begin());
 	}
+	if (client->getRegNick() == true && client->getRegUser() == true)
+	{
+		std::cout << GREEN << "********REGISTRATION SUCCESS for " << client->getNickname() << "**********" << RESET << std::endl;
+		client->setRegistration(true);
+		ft_reply("1", client, NULL, "");
+		ft_reply("2", client, NULL, "");
+		ft_reply("3", client, NULL, "");
+		ft_reply("4", client, NULL, "");
+		if (client->getRegPass() == true)
+		{
+			if (client->getPassword() != this->_password)
+			{
+				ft_error(ERR_PASSWDMISMATCH, client, NULL, "");
+				client->setRegPass(false);
+			}
+		}
+	}
 	//Evite le msg d'erreur si CAP ou PASS
-	//Checker si les commandes NICK et USER sont presente dans les cmd
-	while (tmp.empty() == false)
+	//
+	////Checker si les commandes NICK et USER sont presente dans les cmd
+	/*while (tmp.empty() == false)
 	{
 		//Si l'une des deux ou les deux sont presente checker l'etat de l'enregistrement
 		if (std::strstr(tmp.front().c_str(), "USER") || std::strstr(tmp.front().c_str(), "NICK"))
@@ -385,9 +406,9 @@ void	Server::welcomeClient(Client *client)
 				}
 			}
 			else
-				ft_registration_failed(client);
 			return;
 		}
 		tmp.erase(tmp.begin());
 	}
+	*/
 }

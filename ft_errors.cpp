@@ -140,6 +140,10 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
 			error += "Cant change mode for other users\r\n";
 			break;
 		}
+		case 4242:
+		{
+			error += "User <:realname> format error. Must include \":\"\r\n";
+		}
         default:
 		{
 			error += "No Error set yet \r\n";
