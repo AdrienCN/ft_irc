@@ -7,15 +7,15 @@ int main(int argc, char **argv)
 	std::string port;
 	std::string password;
 	//condition a retravailler
-	if (argc == 3)
+	if (argc != 3)
 	{
-		port = argv[1];
-		password = argv[2];
+		std::cout << "Error : Arg : ./Irc_90's <port> <password>" << std::endl;
+		return (1);
 	}
 	else
 	{
-		port = "6667";
-		password = "password";
+		port = argv[1];
+		password = argv[2];
 	}
 	Server irc(port, password);
 	try

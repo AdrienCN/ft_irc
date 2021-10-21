@@ -31,7 +31,6 @@ class Server
 	   virtual const char* what() const throw()
 	   {
 		   return (strerror(errno));
-		   //std::cout << "Error : Socket or Bind() or Listen() failed" << std::endl;
 	   }
 	};
     
