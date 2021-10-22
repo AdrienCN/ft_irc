@@ -18,7 +18,7 @@ DIR		  = $(sort $(dir $(OBJS)))
 
 CXX = clang++
 
-CXXFLAGS = -Wall -Werror -Wextra -g3 -std=c++98 -fsanitize=address 
+CXXFLAGS = -Wall -Werror -Wextra -g3 -std=c++98 #-fsanitize=address 
 
 RM        = rm -rf
 

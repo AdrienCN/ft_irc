@@ -29,6 +29,11 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
 		{
 			error += (channel->getName() + " :You have joined too many channels\r\n"); 
 			break;
+		}	
+		case 407: //ERR_TOOMANYTARGETS
+		{
+			error += (arg + " :Too many targets\r\n"); 
+			break;
 		}
         case 411: // ERR_NORECIPIENT
         {

@@ -32,6 +32,7 @@ class Channel
         void    setName(std::string const & src);
         void    setKey(std::string const & src);
         void    setTopic(std::string const & src);
+        void    unsetTopic();
 
         //Others
         int     isUserBanned(Client* client);

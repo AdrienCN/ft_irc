@@ -8,7 +8,7 @@
 #define EMO_ROBOT "\U0001F916"
 #define END_CHAR "\r\n"
 #define MAX_CHAR 4096
-#define CHAN_MAXCAPACITY 2 // a revoir
+#define CHAN_MAXCAPACITY 3 // a revoir
 #define USER_MAXCHAN 2 // a revoir
 
 #define RPL_WELCOME				"001" //
@@ -38,6 +38,7 @@
 #define ERR_NOSUCHCHANNEL		"403"
 #define ERR_CANNOTSENDTOCHAN	"404"
 #define ERR_TOOMANYCHANNELS		"405" 
+#define ERR_TOOMANYTARGETS		"407" 
 #define ERR_NORECIPIENT			"411"
 #define ERR_NOTEXTTOSEND		"412"
 #define ERR_UNKNOWNCOMMAND		"421"

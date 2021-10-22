@@ -114,9 +114,13 @@ void Channel::setTopic(std::string const& src)
 {
 	this->_topic = src;
 	this->_has_topic = true;
-
 }
 
+void Channel::unsetTopic()
+{
+	this->_topic = "";
+	this->_has_topic = false;
+}
 //OTHERS
 
 
