@@ -14,13 +14,17 @@ Server::Server(std::string port, std::string password) : _domain("NULL"), _port(
 	_hints.ai_socktype = SOCK_STREAM; //Sock type
 	_hints.ai_flags = AI_PASSIVE; //Puts my Ip as default + NULL in getaddrinfo
 	std::ifstream image("pic.txt");
+	//_pokemon += ":" + _server_name + " " + "372 " + "nickname :-\r\n";
+	_pokemon = "\n";	
 	if (image.is_open())
 	{
 		while(image.good())
 		{
+			_pokemon += ":" + _server_name + " " + "372 " + "nickname ";
+			_pokemon += ":- ";
 			std::string tmp;
 			std::getline(image, tmp);
-			tmp += "\n";
+			tmp += "\r\n";
 			_pokemon += tmp;
 		}
 	}
@@ -294,7 +298,7 @@ void	Server::refuseClient()
 	if (fcntl(socket, F_SETFL,  O_NONBLOCK) == -1)
 		throw Server::ExceptErrno();
 
-	Client*	new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
+	Client*	new_client = new Client(_server_name, _server_ipaddress, _server_creation_date, _port);
 	new_client->init(socket);
 	std::cout << RED << "ERROR : refuseClient : Client already maximum" << RESET << std::endl;
 	ft_reply(RPL_BOUNCE,  new_client, NULL, "");
@@ -315,7 +319,7 @@ void	Server::addClient()
 	if (fcntl(socket, F_SETFL,  O_NONBLOCK) == -1)
 		throw Server::ExceptErrno();
 
-	Client*	new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
+	Client*	new_client = new Client(_server_name, _server_ipaddress, _server_creation_date, _port);
 	new_client->init(socket);
 	_all_clients.push_back(new_client);
 	_nbClients++;
@@ -390,7 +394,9 @@ void	Server::welcomeClient(Client *client)
 		ft_reply("2", client, NULL, "");
 		ft_reply("3", client, NULL, "");
 		ft_reply("4", client, NULL, "");
+		ft_reply(RPL_MOTDSTART, client, NULL, "");
 		ft_reply(RPL_CUSTOMMOTD, client, NULL, _pokemon);
+		ft_reply(RPL_ENDOFMOTD, client, NULL, "");
 		if (client->getRegPass() == true)
 		{
 			if (client->getPassword() != this->_password)

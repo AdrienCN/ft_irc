@@ -1,12 +1,12 @@
 #include "Client.hpp"
 
-Client::Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date):
+Client::Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date, std::string port):
 _message_status(DISCONNECT),  _hostname(server_name),
 _username("Default_Username"), _nickname("Default_Nickname"), 
 _realname("Default_realname"), _password(""), _message(""), _server_name(server_name), 
 _server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date),  
 _away_message(""), _registration_status(false), _reg_pass(false), _reg_nick(false),
-_reg_user(false), _away(false), _oper(false)
+_reg_user(false), _away(false), _oper(false), _port(port)
 {
     return;
 }
@@ -51,6 +51,11 @@ bool const &					 Client::getRegNick() const
 bool const &					 Client::getRegUser() const
 {
 	return this->_reg_user;
+}
+
+std::string const &				Client::getPort() const
+{
+	return this->_port;
 }
 
 std::string const &				Client::getHostname() const

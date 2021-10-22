@@ -12,7 +12,7 @@ class Client
 {
 
     public:
-        Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date); 
+        Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date, std::string port); 
         virtual ~Client(); 
 
         //a effacer version finale
@@ -20,6 +20,7 @@ class Client
 
         // GETTERS
         std::string const &		getPassword() const;
+        std::string const &		getPort() const;
         std::string const &		getNickname() const;
         std::string const &		getUsername() const;
 		std::string const &		getHostname() const;
@@ -97,6 +98,7 @@ class Client
 		bool						_reg_user;
 		bool						_away;
 		bool						_oper;
+		std::string					_port;
 };
 
 #endif
