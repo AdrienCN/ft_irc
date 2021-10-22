@@ -32,7 +32,7 @@ Server::Server(std::string port, std::string password) : _domain("NULL"), _port(
 Server::~Server()
 {
 	std::cout << "<< Server destruction >>" << std::endl;
-	
+
 	std::vector<Client*>::iterator it = _all_clients.begin();
 	std::vector<Client*>::iterator ite = _all_clients.end();
 	while (it != ite)
@@ -41,7 +41,7 @@ Server::~Server()
 		it++;
 	}
 	_all_clients.clear();
-	
+
 	std::vector<Channel*>::iterator itb = _all_channels.begin();
 	std::vector<Channel*>::iterator itbe = _all_channels.end();
 	while (itb != itbe)
@@ -50,15 +50,15 @@ Server::~Server()
 		itb++;
 	}
 	_all_channels.clear();
-	
+
 	close(_server_socket);
 	freeaddrinfo(_serv_info);
-    return;
+	return;
 }
 
 int const & Server::getSocket() const
 {
-    return _server_socket;
+	return _server_socket;
 }
 
 struct addrinfo* Server::getServInfo() const
@@ -109,7 +109,7 @@ void  Server::setServerCreationDate(std::string const & src)
 void Server::init()
 {
 	int ret;
-	
+
 	// 1. Prepare for launch!
 	//Rempli notre structure serv_info qui contient 
 	//tout les parametres pour call socket(), bind(), listen()
@@ -121,18 +121,18 @@ void Server::init()
 	char	ip_final[INET6_ADDRSTRLEN];
 	std::string str;
 
-    if (_serv_info->ai_family == AF_INET) 
+	if (_serv_info->ai_family == AF_INET) 
 	{ 
 		// IPV4
 		struct sockaddr_in *tmp = (struct sockaddr_in*)_serv_info->ai_addr;
 		addr = &(tmp->sin_addr);
-    } 
+	} 
 	else 
 	{
 		// IPV6
 		struct sockaddr_in6 *tmp = (struct sockaddr_in6*)_serv_info->ai_addr;
 		addr = &(tmp->sin6_addr);
-    }
+	}
 	if (inet_ntop(_serv_info->ai_family, addr, ip_final, sizeof(ip_final)) == NULL)
 		throw Server::ExceptErrno();
 	else
@@ -140,7 +140,7 @@ void Server::init()
 		_server_ipaddress = ip_final;
 		_command_book.setServerIpaddress(ip_final);
 	}
-	
+
 	// 2. Get the FD
 	//Creer ce qui sera notre socket d'ecoute
 	//domain = type d'address = ai_family | type = socketype = ai_socktype |  protocole = ai_protocole
@@ -174,17 +174,17 @@ void Server::init()
 }
 
 /*
-void	Server::pollInfo(std::vector<struct pollfd> const & src)
-{
-	std::vector<struct pollfd>::const_iterator it = src.begin();
-	while (it != src.end())
-	{
-		std::cout << "FD : " << it->fd  << " | EVENTS: " << it->events << " | REVENTS: "<< it->revents << std::endl;
-		it++;
-	}
-	return ;
-}
-*/
+   void	Server::pollInfo(std::vector<struct pollfd> const & src)
+   {
+   std::vector<struct pollfd>::const_iterator it = src.begin();
+   while (it != src.end())
+   {
+   std::cout << "FD : " << it->fd  << " | EVENTS: " << it->events << " | REVENTS: "<< it->revents << std::endl;
+   it++;
+   }
+   return ;
+   }
+   */
 
 void	Server::run() 
 {	
@@ -199,26 +199,26 @@ void	Server::run()
 		//std::cout << YELLOW << "FROM MAIN SERVER" << RESET << std::endl;
 		//print_client_list(_all_clients);
 		//print_channel_list(_all_channels);
-	
+
 		tmp.push_back(this->_poll);
 		for (std::vector<Client*>::iterator it = _all_clients.begin(); it != _all_clients.end(); it++)
 		{
 			tmp.push_back((*it)->getPoll());
 		}
-		
+
 		std::vector<pollfd>::iterator it = tmp.begin();
-//		std::cout << "Starting new poll ..." << std::endl;
+		//		std::cout << "Starting new poll ..." << std::endl;
 		int poll_count = poll(&(*it), _nbClients + 1, -1);
 		if (poll_count == -1)
 			throw Server::ExceptErrno();
-	//	this->pollInfo(tmp);
+		//	this->pollInfo(tmp);
 
 		std::vector<pollfd>::iterator itb = tmp.begin();
 		std::vector<pollfd>::iterator ite = tmp.end();
-		
-			while (itb != ite)
+
+		while (itb != ite)
 		{
-			 if ((*itb).revents & POLLHUP)
+			if ((*itb).revents & POLLHUP)
 			{
 				if ((*itb).fd != _server_socket)
 					this->removeClient((*itb).fd);
@@ -235,20 +235,23 @@ void	Server::run()
 				else //Je suis un clien
 				{
 					Client *client = this->find_client_from_fd((*itb).fd);
-					client->recvMessage();
-					if (client->getMessageStatus() == DISCONNECT)
-						this->removeClient(client->getSocket());
-					else if (client->getMessageStatus() == COMPLETE) //CLRC received
+					if (client != NULL) 
 					{
-						client->analyzeMessage();
-						if (client->isRegistered() == false)
-							welcomeClient(client);
-						else
-							_command_book.find_command(client->getCommand().front(), client, _all_clients, &_all_channels);
-						client->clearMessage();
-						client->clearCommand();
-						client->clearCommand();
-						this->find_to_kill();
+						client->recvMessage();
+						if (client->getMessageStatus() == DISCONNECT)
+							this->removeClient(client->getSocket());
+						else if (client->getMessageStatus() == COMPLETE) //CLRC received
+						{
+							client->analyzeMessage();
+							if (client->isRegistered() == false)
+								welcomeClient(client);
+							else
+								_command_book.find_command(client->getCommand().front(), client, _all_clients, &_all_channels);
+							client->clearMessage();
+							client->clearCommand();
+							client->clearCommand();
+							this->find_to_kill();
+						}
 					}
 				}
 			}
@@ -277,7 +280,7 @@ void	Server::find_to_kill()
 		it++;
 	}
 }
-	
+
 void	Server::refuseClient()
 {
 	struct sockaddr_storage client_addr;
@@ -290,7 +293,7 @@ void	Server::refuseClient()
 		throw Server::ExceptErrno();
 	if (fcntl(socket, F_SETFL,  O_NONBLOCK) == -1)
 		throw Server::ExceptErrno();
-	
+
 	Client*	new_client = new Client(_server_name, _server_ipaddress, _server_creation_date);
 	new_client->init(socket);
 	std::cout << RED << "ERROR : refuseClient : Client already maximum" << RESET << std::endl;
@@ -357,17 +360,17 @@ Client* Server::find_client_from_fd(int fd)
 	return NULL;
 }
 /*
-static void	ft_registration_failed(Client *client)
-{
-	std::string tmp("Registration is not complete : Please enter the following command(s):\n");
-	if (client->getRegNick() == false)
-		tmp += "/NICK <nickname>\n";
-	if (client->getRegUser() == false)
-		tmp += "/USER <username> <mode> <unused> :<realname>\n";
-	tmp += "\r\n";
-	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
-}
-*/
+   static void	ft_registration_failed(Client *client)
+   {
+   std::string tmp("Registration is not complete : Please enter the following command(s):\n");
+   if (client->getRegNick() == false)
+   tmp += "/NICK <nickname>\n";
+   if (client->getRegUser() == false)
+   tmp += "/USER <username> <mode> <unused> :<realname>\n";
+   tmp += "\r\n";
+   send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
+   }
+   */
 
 void	Server::welcomeClient(Client *client)
 {
@@ -375,7 +378,7 @@ void	Server::welcomeClient(Client *client)
 	std::vector<std::string> tmp = full_command;
 	while (full_command.empty() == false)
 	{
-		
+
 		_command_book.find_command(full_command.front(), client, _all_clients, &_all_channels);
 		full_command.erase(full_command.begin());
 	}
@@ -401,31 +404,31 @@ void	Server::welcomeClient(Client *client)
 	//
 	////Checker si les commandes NICK et USER sont presente dans les cmd
 	/*while (tmp.empty() == false)
+	  {
+	//Si l'une des deux ou les deux sont presente checker l'etat de l'enregistrement
+	if (std::strstr(tmp.front().c_str(), "USER") || std::strstr(tmp.front().c_str(), "NICK"))
 	{
-		//Si l'une des deux ou les deux sont presente checker l'etat de l'enregistrement
-		if (std::strstr(tmp.front().c_str(), "USER") || std::strstr(tmp.front().c_str(), "NICK"))
-		{
-			if (client->getRegNick() == true && client->getRegUser() == true)
-			{
-				std::cout << GREEN << "********REGISTRATION SUCCESS for " << client->getNickname() << "**********" << RESET << std::endl;
-				client->setRegistration(true);
-				ft_reply("1", client, NULL, "");
-				ft_reply("2", client, NULL, "");
-				ft_reply("3", client, NULL, "");
-				ft_reply("4", client, NULL, "");
-				if (client->getRegPass() == true)
-				{
-					if (client->getPassword() != this->_password)
-					{
-						ft_error(ERR_PASSWDMISMATCH, client, NULL, "");
-						client->setRegPass(false);
-					}
-				}
-			}
-			else
-			return;
-		}
-		tmp.erase(tmp.begin());
+	if (client->getRegNick() == true && client->getRegUser() == true)
+	{
+	std::cout << GREEN << "********REGISTRATION SUCCESS for " << client->getNickname() << "**********" << RESET << std::endl;
+	client->setRegistration(true);
+	ft_reply("1", client, NULL, "");
+	ft_reply("2", client, NULL, "");
+	ft_reply("3", client, NULL, "");
+	ft_reply("4", client, NULL, "");
+	if (client->getRegPass() == true)
+	{
+	if (client->getPassword() != this->_password)
+	{
+	ft_error(ERR_PASSWDMISMATCH, client, NULL, "");
+	client->setRegPass(false);
+	}
+	}
+	}
+	else
+	return;
+	}
+	tmp.erase(tmp.begin());
 	}
 	*/
 }

@@ -1,6 +1,6 @@
 #include "Channel.hpp"
 
-Channel::Channel(std::string name, Client* client) :_name(name), _nb_members(0), _has_topic(0), _channel_operator(client)
+Channel::Channel(std::string name, Client* client) :_name(name), _has_key(0), _nb_members(0), _has_topic(0), _channel_operator(client)
 {
 	return;
 }

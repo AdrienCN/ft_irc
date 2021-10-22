@@ -182,12 +182,30 @@ void	Commands::oper(std::vector<std::string> params, CMD_PARAM)
 
 /* ************************************MODE****************************************** */
 
+static Channel*	matchChannel(std::vector<std::string> params, CMD_PARAM) {
+	std::vector<Channel*>::iterator it = channel_list->begin();
+	int i = 0;
+	(void)client_list;
+	(void)client;
+
+	while (it != channel_list->end()) {
+		if (!params[1].compare((*it)->getName())) {
+			return (*it);
+		}
+		i++;
+		it++;
+	}
+	return (NULL);
+}
+
 void	Commands::mode(std::vector<std::string> params, CMD_PARAM)
 {
 	std::cout << YELLOW << "Hello from MODE function!" << RESET << std::endl;
 
 	if (params.size() < 2)
 		return (ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]));
+	if (params.size() == 2 && matchChannel(params, client, client_list, channel_list) != NULL)
+		return ;
 	if (params[1] != client->getNickname())
 		return (ft_error(ERR_USERSDONTMATCH, client, NULL, ""));
 	//MODE <nickname> --> renvoie info sur user
@@ -1169,28 +1187,6 @@ void Commands::notice(std::vector<std::string> params, CMD_PARAM)
 
 /* ************************************WHO****************************************** */
 
-//reste a definir : 
-//l utilisation de "o"
-//l exporation des variable du serveur pour enlever les parametres en dur de printWho
-//comprendre les operator a send
-//utilisation de real name
-
-static Channel*	matchChannel(std::vector<std::string> params, CMD_PARAM) {
-	std::vector<Channel*>::iterator it = channel_list->begin();
-	int i = 0;
-	(void)client_list;
-	(void)client;
-
-	while (it != channel_list->end()) {
-		if (!params[1].compare((*it)->getName())) {
-			return (*it);
-		}
-		i++;
-		it++;
-	}
-	return (NULL);
-}
-
 static void	printWho(std::vector<std::string> params, Channel *channel, Client *client, Client* client_ref, int user) {
 	std::string rpl;
 	std::cout << "print WHO" << std::endl;
@@ -1234,7 +1230,8 @@ static	int	matchOthers(std::vector<std::string> params, CMD_PARAM) {
 		}
 		it++;
 	}
-	ft_reply(RPL_ENDOFWHO, client, NULL, "");
+	if (i != 0)
+		ft_reply(RPL_ENDOFWHO, client, NULL, "");
 	return i;
 }
 
@@ -1249,7 +1246,7 @@ static void	printChan(std::vector<std::string> params, Client* client, Channel* 
 		}
 		it++;
 	}
-	ft_reply(RPL_ENDOFWHO, client, NULL, "");
+	ft_reply(RPL_ENDOFWHO, client, NULL, channel->getName());
 }
 
 static void	printWhoAllClient(std::vector<std::string> params, Client* client, std::vector<Client *> client_list) {
@@ -1268,7 +1265,7 @@ void Commands::who(std::vector<std::string> params, CMD_PARAM) {
 		printWhoAllClient(params, client, client_list);
 		return ;
 	}
-	// on cheche si un cannal correspond au second parametre de who 
+	// on cheche si un canal correspond au second parametre de who 
 	Channel *tmp = matchChannel(params, client, client_list, channel_list);
 	if (!tmp) {
 		//on regarde si le parametre de who correspond a n importe quoi d autre
@@ -1278,7 +1275,7 @@ void Commands::who(std::vector<std::string> params, CMD_PARAM) {
 		}
 		return ;
 	}
-	//on print tout les membres du cannal trouvé
+	//on print tout les membres du canal trouvé
 	if (params.size() == 3 && !params[2].compare("O")) {
 		printChan(params, client, tmp, 1);
 	}
@@ -1322,7 +1319,6 @@ void Commands::names(std::vector<std::string> params, CMD_PARAM) {
 	(void)client_list;
 	(void)channel_list;
 	//la commande NAMES seule est renvoyer par hexchat comme NAMES + IRC_90's
-	//split "," pour avoir tout les chans
 	std::vector<std::string> v = split(params[1], ',');
 	std::vector<std::string>::iterator vit = v.begin();
 
@@ -1343,10 +1339,8 @@ void Commands::names(std::vector<std::string> params, CMD_PARAM) {
 
 void Commands::list(std::vector<std::string> params, CMD_PARAM) {
 	std::cout << YELLOW << "Hello from list function!" << RESET << std::endl;
-	(void)client;
 	(void)params;
 	(void)client_list;
-	(void)channel_list;
 	std::vector<Channel*>::iterator it = channel_list->begin();
 
 	while (it != channel_list->end()) {
@@ -1355,7 +1349,6 @@ void Commands::list(std::vector<std::string> params, CMD_PARAM) {
 	}
 	ft_reply(RPL_LISTEND, client, NULL, "");
 }
-
 
 /* ************************************HELP****************************************** */
 void Commands::myhelp(std::vector<std::string> params, CMD_PARAM) 
