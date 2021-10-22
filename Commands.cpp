@@ -70,7 +70,6 @@ static void	ft_registration_failed(Client *client)
 		tmp += "/NICK <nickname>\r\n";
 	if (client->getRegUser() == false)
 		tmp += "/USER <username> <mode> <unused> :<realname>\r\n";
-	//tmp += "\r\n";
 	send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
 }
 
@@ -1194,8 +1193,6 @@ static Channel*	matchChannel(std::vector<std::string> params, CMD_PARAM) {
 
 static void	printWho(std::vector<std::string> params, Channel *channel, Client *client, Client* client_ref, int user) {
 	std::string rpl;
-	//if params[1] == nom -> * 
-	//if params[1] == channel -> #nom de channel
 	std::cout << "print WHO" << std::endl;
 	if (user)
 		rpl = "*";
@@ -1209,43 +1206,47 @@ static void	printWho(std::vector<std::string> params, Channel *channel, Client *
 		rpl += " G ";
 	else
 		rpl += " H";
-	if (channel->isUserOp(client_ref))
+	if (channel && channel->isUserOp(client_ref))
 		rpl += "@";
-	// Adrien -> fait la fonction away qui va me donner les infos
 	rpl += " :0 " + client_ref->getRealname() + "\r\n"; // + real name
+	std::cout << "rpl who :" << rpl << std::endl;
 	ft_reply(RPL_WHOREPLY, client, NULL, rpl);
-	/* send(client->getSocket(), (rpl.c_str()), rpl.size(), 0); */
 }
 
 static	int	matchOthers(std::vector<std::string> params, CMD_PARAM) {
 	std::vector<Client*>::iterator it = client_list.begin();
 	(void)channel_list;
 	(void)client;
+	int i = 0;
 
 	while (it != client_list.end()) {
 		if (!params[1].compare((*it)->getUsername())) {
 			printWho(params, NULL, client,  *it, 1);
+			i++;
 		}
 		else if (!params[1].compare((*it)->getRealname())) {
 			printWho(params, NULL, client, *it, 1);
+			i++;
 		}
 		else if (!params[1].compare((*it)->getNickname())) {
 			printWho(params, NULL, client, *it, 1);
+			i++;;
 		}
 		it++;
 	}
 	ft_reply(RPL_ENDOFWHO, client, NULL, "");
-	return false;
+	return i;
 }
 
 static void	printChan(std::vector<std::string> params, Client* client, Channel* channel, int isOp) {
 	std::vector<Client*>::const_iterator it = channel->getMemberList().begin();
 	while (it != channel->getMemberList().end()) {
-		if (isOp) {
-			printWho(params, channel, client, *it, 1);
+		if (isOp && channel->isUserOp(*it)) {
+			printWho(params, channel, client, *it, 0);
 		}
-		else 
-			printWho(params, channel, client, *it, 1);
+		else if (!isOp) {
+			printWho(params, channel, client, *it, 0);
+		}
 		it++;
 	}
 	ft_reply(RPL_ENDOFWHO, client, NULL, "");

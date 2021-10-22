@@ -10,7 +10,7 @@ Server::Server(std::string port, std::string password) : _domain("NULL"), _port(
 	_server_creation_date.erase((_server_creation_date.end() - 1));
 	_command_book.setServerCreationDate(_server_creation_date);
 	memset(&_hints, 0, sizeof(_hints));
-	_hints.ai_family = AF_UNSPEC; //Accept IPv4 & IPv6
+	_hints.ai_family = AF_UNSPEC; //Accept IPv4 & IPv5
 	_hints.ai_socktype = SOCK_STREAM; //Sock type
 	_hints.ai_flags = AI_PASSIVE; //Puts my Ip as default + NULL in getaddrinfo
 	std::ifstream image("pic.txt");

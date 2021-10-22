@@ -117,7 +117,7 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 			}
 		case 352: //RPL_WHO
 			{
-				rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname(); // != id1 car pas double 00 ==> a checker
+				rpl = ":127.0.0.1 " + nb_str + " " + client->getNickname() + " "; // != id1 car pas double 00 ==> a checker
 				rpl += arg;
 				break;
 			}
