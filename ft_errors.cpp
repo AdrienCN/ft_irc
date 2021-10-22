@@ -148,6 +148,7 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
 		case 4242:
 		{
 			error += "User format error. <:realname> must include \":\"\r\n";
+			break;
 		}
         default:
 		{

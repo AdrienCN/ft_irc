@@ -3,7 +3,7 @@
 
 std::string ft_id_type1(Client* client, std::string nb_str)
 {
-	std::string id = ":127.0.0.1 " + nb_str + " " + client->getNickname() + " :";
+	std::string id = ":" + client->getServerName() + " " + nb_str + " " + client->getNickname() + " :";
 	return (id);
 }
 
@@ -47,12 +47,12 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 			break;
 		}
 		case 5:
-			{
+		{
 				rpl +="Sorry IRC_90's capacity is full. Please retry connection later\r\n";
 				//RPL OFFICIELLE
-				//rpl += "Try server <server name>, port <port number>\r\n";
+				//rpl += "Try server " + client->getServerName() +", port " + client->getPort() + "\r\n";
 				break;
-			}
+		}
 			//RPL_UMODEIS
 		case 221:
 			{
@@ -148,7 +148,16 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 				rpl += " :End of NAMES list\r\n";
 				break;	
 			}
-
+		case 375:
+			{
+				rpl += ":- " + client->getServerName() + " Message of the day - \r\n";
+				break;
+			}
+		case 376:
+			{
+				rpl += ":End of MOTD command\r\n";
+				break;
+			}
 		case 381: // YOUREOPER
 			{
 				rpl += "You are now an IRC operator\r\n";
@@ -156,8 +165,8 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 			}
 		case 4242:
 			{
-				rpl ="[CAP] : IRC_90'S does not handle capabilities\r\n";
-				std::cout << GREEN << rpl << RESET <<std::endl;
+				rpl += ":" + client->getServerName() + " " + nb_str + " " + client->getNickname() + " :";
+				rpl = "[CAP] : IRC_90'S does not handle capabilities\r\n";
 				break;
 			}
 		case 4243:
