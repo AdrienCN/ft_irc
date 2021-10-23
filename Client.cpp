@@ -299,7 +299,8 @@ void Client::add_channel(Channel* channel)
 {
 	std::vector<Channel*>::iterator it = _channels.begin();
 	std::vector<Channel*>::iterator ite = _channels.end();
-	
+	if (channel == NULL)
+		return;
 	while(it != ite)
 	{
 		if (*it == channel)
@@ -316,6 +317,8 @@ void Client::remove_channel(Channel* channel)
 	std::vector<Channel*>::iterator it = _channels.begin();
 	std::vector<Channel*>::iterator ite = _channels.end();
 	
+	if (channel == NULL)
+		return;
 	while(it != ite)
 	{
 		if (*it == channel)

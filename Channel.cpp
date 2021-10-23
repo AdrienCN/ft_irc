@@ -75,6 +75,8 @@ void	Channel::printMembersNick(Client *client) { // iterateur sur membres
 	std::vector<Client*>::iterator it = _members.begin();
 	std::vector<Client*>::iterator ite = _members.end();
 
+	if (client == NULL)
+		return;
 	std::string rpl;
 	rpl = ":127.0.0.1 ";
 	rpl += "353";
@@ -137,6 +139,8 @@ int Channel::isUserMember(Client* client)
 	std::vector<Client*>::iterator it = _members.begin();
 	std::vector<Client*>::iterator ite = _members.end();
 
+	if (client == NULL)
+		return (0);
 	while (it != ite)
 	{
 		if ((*it)->getNickname() == client->getNickname())
@@ -155,16 +159,19 @@ int Channel::isKeyRight(std::string key)
 
 void Channel::addMember(Client *client)
 {
+	if (client == NULL)
+		return;
 	_members.push_back(client);
 	_nb_members++;
-
 }
 
 void Channel::removeMember(Client *client)
 {
 	std::vector<Client*>::iterator it = _members.begin();
 	std::vector<Client*>::iterator ite = _members.end();
-
+	
+	if (client == NULL)
+		return;
 	while (it != ite)
 	{
 		if ((*it)->getNickname() == client->getNickname())

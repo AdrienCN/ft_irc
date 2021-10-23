@@ -574,7 +574,7 @@ void Commands::join(std::vector<std::string> params, CMD_PARAM)
 				if (isValidChanName(*itn) == 0) //not a channel name
 				{
 					std::cout << RED << *itn << " is not a valid Channel name" << RESET << std::endl;
-					ft_error(ERR_BADCHANMASK, client, tmp, *itn); 			
+					ft_error(ERR_BADCHANMASK, client, NULL, *itn); 			
 				}
 				else
 				{
@@ -611,7 +611,6 @@ void Commands::part(std::vector<std::string> params, CMD_PARAM)
 
 	if (params.size() == 1)
 	{
-		std::cout << "Error : PART lack of params" << std::endl;
 		ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]);
 		return;
 	}
@@ -805,7 +804,6 @@ void Commands::topic(std::vector<std::string> params, CMD_PARAM)
 
 	if (params.size() == 1)
 	{
-		std::cout << "Error : TOPIC lack of params" << std::endl;
 		ft_error(ERR_NEEDMOREPARAMS, client, NULL, params[0]);
 		return;
 	}
@@ -819,7 +817,7 @@ void Commands::topic(std::vector<std::string> params, CMD_PARAM)
 		std::cout << GREEN << "The Channel \"" << tmp->getName() << "\" exists" << RESET << std::endl;
 		if (tmp->isUserMember(client) == 0) //si je ne suis pas membre du chat
 		{
-			ft_error(ERR_NOTONCHANNEL, client, NULL, ""); 
+			ft_error(ERR_NOTONCHANNEL, client, tmp, ""); 
 			return;
 		}
 		it++;

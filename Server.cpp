@@ -15,13 +15,13 @@ Server::Server(std::string port, std::string password) : _domain("NULL"), _port(
 	_hints.ai_flags = AI_PASSIVE; //Puts my Ip as default + NULL in getaddrinfo
 	std::ifstream image("pic.txt");
 	//_pokemon += ":" + _server_name + " " + "372 " + "nickname :-\r\n";
-	_pokemon = "\n";	
+	//_pokemon = "\n";	
 	if (image.is_open())
 	{
 		while(image.good())
 		{
-			_pokemon += ":" + _server_name + " " + "372 " + "nickname ";
-			_pokemon += ":- ";
+			//_pokemon += ":" + _server_name + " " + "372 " + "nickname ";
+			//_pokemon += ":- ";
 			std::string tmp;
 			std::getline(image, tmp);
 			tmp += "\r\n";
@@ -394,9 +394,9 @@ void	Server::welcomeClient(Client *client)
 		ft_reply("2", client, NULL, "");
 		ft_reply("3", client, NULL, "");
 		ft_reply("4", client, NULL, "");
-		ft_reply(RPL_MOTDSTART, client, NULL, "");
+	//	ft_reply(RPL_MOTDSTART, client, NULL, "");
 		ft_reply(RPL_CUSTOMMOTD, client, NULL, _pokemon);
-		ft_reply(RPL_ENDOFMOTD, client, NULL, "");
+	//	ft_reply(RPL_ENDOFMOTD, client, NULL, "");
 		if (client->getRegPass() == true)
 		{
 			if (client->getPassword() != this->_password)
