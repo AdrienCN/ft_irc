@@ -136,6 +136,8 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 			rpl = ":127.0.0.1 " + nb_str + " " +  client->getNickname() + " ";  // != id1 car pas double 00 ==> a checker
 			if (channel)
 				rpl += channel->getName();
+			else 
+				rpl += arg;
 			rpl += " :End of NAMES list\r\n";
 			break;	
 		}

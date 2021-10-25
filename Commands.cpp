@@ -1121,7 +1121,6 @@ static void	printChan(std::vector<std::string> params, Client* client, Channel* 
 		}
 		it++;
 	}
-	ft_reply(RPL_ENDOFWHO, client, NULL, channel->getName());
 }
 
 static void	printWhoAllClient(std::vector<std::string> params, Client* client, std::vector<Client *> client_list) {
@@ -1151,11 +1150,13 @@ void Commands::who(std::vector<std::string> params, CMD_PARAM) {
 		return ;
 	}
 	//on print tout les membres du canal trouvé
-	if (params.size() == 3 && !params[2].compare("O")) {
+	if (params.size() == 3 && !params[2].compare("O") && 
+			tmp->isUserMember(client) == 1) {
 		printChan(params, client, tmp, 1);
 	}
-	else 
+	else if (tmp->isUserMember(client) == 1)
 		printChan(params, client, tmp, 0);
+	ft_reply(RPL_ENDOFWHO, client, NULL, tmp->getName());
 	//si o imprimer les _operator sinon _members
 }
 
@@ -1190,21 +1191,22 @@ static int	matchNamesChannel(std::string params, CMD_PARAM) {
 
 void Commands::names(std::vector<std::string> params, CMD_PARAM) {
 	//std::cout << YELLOW << "Hello from Names function!" << RESET << std::endl;
-	(void)client;
 	(void)client_list;
-	(void)channel_list;
 	//la commande NAMES seule est renvoyer par hexchat comme NAMES + IRC_90's
 	std::vector<std::string> v = split(params[1], ',');
 	std::vector<std::string>::iterator vit = v.begin();
 
 	while (vit != v.end()) {
 		int num = matchNamesChannel(*vit, client, client_list, channel_list);
-		if (num >= 0) {
+		if (num >= 0 && (*channel_list)[num]->isUserMember(client) == 1) {
 			(*channel_list)[num]->printMembersNick(client);
 			ft_reply(RPL_ENDOFNAMES, client, (*channel_list)[num], "");
 		}
-		else { 
-			ft_reply(RPL_ENDOFNAMES, client, NULL , "");
+		else if (num >= 0) {
+			ft_reply(RPL_ENDOFNAMES, client, (*channel_list)[num] , "");
+		}
+		else {
+			ft_reply(RPL_ENDOFNAMES, client, NULL , *vit);
 		}
 		vit++;
 	}

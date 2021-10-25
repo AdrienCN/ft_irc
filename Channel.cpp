@@ -153,7 +153,6 @@ void	Channel::printMembersNick(Client *client) // iterateur sur membres
 	rpl = ":127.0.0.1 ";
 	rpl += "353";
 	rpl += (" " +  client->getNickname());
-	std::cout << "chan name :" << getName() << std::endl;
 	rpl += (" = " + getName() + " :");
 
 	while (it != ite) {
