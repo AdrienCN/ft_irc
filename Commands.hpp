@@ -1,10 +1,3 @@
-// Class  pour analyser les  Commands
-//[{:}{prefix}{SP}]{Commands}[{SP}{PARAMS}]{CRLF}
-//[optionnel] {SP = espace normal} {CRLF = duo charriot fin de ligne}
-//===> au total 512 caracteres max
-//===> {Commands} = Commandse ou reponse en 3 chiffre du serveur
-// std::string _prefix; // optionnel dans notre cas sans la com server server
-
 #ifndef Commands_hpp
 #define Commands_hpp
 

@@ -1,4 +1,4 @@
-NAME = IRC_90s
+NAME = ircserv
 
 SRCS = 	main.cpp \
 		Server.cpp \
@@ -9,7 +9,6 @@ SRCS = 	main.cpp \
 		ft_reply.cpp \
 		ft_print_help.cpp
 
-# OBJ = $(SRCS:.cpp=.o)
 OBJ_DIR   = objs/
 
 OBJS      = $(addprefix $(OBJ_DIR), ${SRCS:.cpp=.o})
@@ -28,9 +27,6 @@ INCLUDE = headers.hpp \
 		  Commands.hpp
 
 MAKE	+= --no-print-directory
-
-# %.o:%.cpp $(INCLUDE)
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 all: 
 	@${MAKE} -j ${NAME}

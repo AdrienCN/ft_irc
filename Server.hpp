@@ -1,20 +1,16 @@
 #ifndef Server_hpp
 #define Server_hpp
 
-#include "common_macro.hpp"
 #include "headers.hpp"
+#include "common_macro.hpp"
 #include "Channel.hpp"
 #include "Client.hpp"
 #include "Commands.hpp"
 #include "ft.hpp"
 
-
-//namespace ft
-//
 #define MAX_CLIENT 10
 #define PORT_SERVER "6667"
 
-//class Commands;
 void signal_handler(int signum);
 
 class Server
@@ -40,6 +36,7 @@ class Server
     public:
         Server(std::string port, std::string password); 
         virtual ~Server(); 
+        
         // GETTERS
         int const &				getSocket() const;
         std::string const &		getPort() const;
@@ -54,17 +51,11 @@ class Server
 		void  setServerIpaddress(std::string const & src);
 		void  setServerCreationDate(std::string const & src);
 
-
-		//Adrien_degub
-		//void	pollInfo(std::vector<struct pollfd> const & src);
-
         // CONNECTIONS MANAGEMENT
         void    init();
         void    run();
 		void	find_to_kill();
 		void	refuseClient();
-
-       // void    addClient();
 		void    addClient();
         void    removeClient(int const & fd);
         Client* find_client_from_fd(int fd);
@@ -79,7 +70,6 @@ class Server
         Server(Server const& src);
         Server & operator=(Server const& src); 
         
-
         struct pollfd               _poll;
         std::string                 _domain; // char* add IP ou nom de domain ou NULL si propre IP (!! flag AI8PASSIVE hint en plus)
         std::string                 _port; // char* port or http? Dans notre 6667

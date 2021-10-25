@@ -2,11 +2,11 @@
 
 Client::Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date, std::string port):
 _message_status(DISCONNECT),  _hostname(server_name),
-_username("Default_Username"), _nickname("Default_Nickname"), 
-_realname("Default_realname"), _password(""), _message(""), _server_name(server_name), 
-_server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date),  
-_away_message(""), _registration_status(false), _reg_pass(false), _reg_nick(false),
-_reg_user(false), _away(false), _oper(false), _port(port)
+_username("Default_Username"), _nickname("Default_Nickname"), _realname("Default_realname"),
+_password(""), _message(""), _server_name(server_name), 
+_server_ipaddress(server_ipaddress), _server_creation_date(server_creation_date), _away_message(""),
+_registration_status(false), _reg_pass(false), _reg_nick(false),_reg_user(false), _away(false), _oper(false),
+_port(port)
 {
     return;
 }
@@ -16,128 +16,114 @@ Client::~Client()
     return;
 }
 
-// A effacer version finale
-void Client::present()
-{
-    std::cout << "CLIENT: user = " << getUsername() << " | nickname = " << getNickname() << std::endl; 
-	std::cout << "My channels are : ";
-	std::vector<Channel*>::iterator it = _channels.begin();
-	std::vector<Channel*>::iterator ite = _channels.end();
-	while (it != ite)
-	{
-		(*it)->present();
-		it++;	
-	}
-	std::cout << std::endl;
-	
-}
 
 // GETTERS
-bool const &		Client::getOper() const
+
+bool const &						Client::getOper() const
 {
 	return this->_oper;
 }
 
-bool const &					 Client::getRegPass() const
+bool const &						 Client::getRegPass() const
 {
 	return this->_reg_pass;
 }
 
-bool const &					 Client::getRegNick() const
+bool const &						 Client::getRegNick() const
 {
 	return this->_reg_nick;
 }
 
-bool const &					 Client::getRegUser() const
+bool const &						 Client::getRegUser() const
 {
 	return this->_reg_user;
 }
 
-std::string const &				Client::getPort() const
+std::string const &					Client::getPort() const
 {
 	return this->_port;
 }
 
-std::string const &				Client::getHostname() const
+std::string const &					Client::getHostname() const
 {
 	return this->_hostname;
 }
 
-std::vector<std::string> const & Client::getCommand() const
+std::vector<std::string> const &	Client::getCommand() const
 {
 	return this->_command;
 }
 
-std::string const &		Client::getPassword() const
+std::string const &					Client::getPassword() const
 {
     return this->_password;
 }
 
-std::string const &		Client::getNickname() const
+std::string const &					Client::getNickname() const
 {
     return this->_nickname;
 }
 
-std::string const &		Client::getUsername() const
+std::string const &					Client::getUsername() const
 {
     return this->_username;
 }
 
-std::string const &		Client::getRealname() const
+std::string const &					Client::getRealname() const
 {
     return this->_realname;
 }
 
-std::string const &		Client::getMessage() const
+std::string const &					Client::getMessage() const
 {
     return this->_message;
 }
 
-int	 const &		Client::getMessageStatus() const
+int	 const &						Client::getMessageStatus() const
 {
     return this->_message_status;
 }
 
-int         const &     Client::getSocket() const
+int         const &   				Client::getSocket() const
 {
     return this->_socket;
 }
 
-struct pollfd   const & Client::getPoll() const
+struct pollfd   const &				Client::getPoll() const
 {
     return this->_poll;
 }
 
-std::string const & Client::getServerName() const
+std::string const &					Client::getServerName() const
 {
 	return this->_server_name;
 }
 
-std::string const & Client::getServerIpAddress() const
+std::string const &					Client::getServerIpAddress() const
 {
 	return this->_server_ipaddress;
 }
 
-std::string const & Client::getServerCreationDate() const
+std::string const &					Client::getServerCreationDate() const
 {
 	return this->_server_creation_date;
 }
-bool			const & Client::isRegistered() const
+bool const &						Client::isRegistered() const
 {
 	return this->_registration_status;
 }
 
-int  Client::getNbChannels() const
+int  								Client::getNbChannels() const
 {
 	return this->_channels.size();
 }
 
-bool const & Client::getAway() const
+bool const & 						Client::getAway() const
 {
 	return this->_away;
 }
 
-std::string const & Client::getAwayMessage() const
+std::string const & 				Client::getAwayMessage() const
 {
 	return this->_away_message;
 }
@@ -150,67 +136,67 @@ void	Client::setOper(bool const & src)
 	this->_oper = src;
 }
 
-void  Client::setAwayMessage(std::string const & src)
+void	Client::setAwayMessage(std::string const & src)
 {
 	this->_away_message = src;
 }
 
-void  Client::setServerName(std::string const & src)
+void	Client::setServerName(std::string const & src)
 {
 	this->_server_name = src;
 }
 
-void  Client::setServerIpaddress(std::string const & src)
+void	Client::setServerIpaddress(std::string const & src)
 {
 	this->_server_ipaddress = src;
 }
 
-void  Client::setServerCreationDate(std::string const & src)
+void 	Client::setServerCreationDate(std::string const & src)
 {
 	this->_server_creation_date = src;
 }
 
-void Client::setRegPass(bool const & src)
+void	Client::setRegPass(bool const & src)
 {
 	this->_reg_pass = src;
 }
 
-void Client::setRegNick(bool const & src)
+void	Client::setRegNick(bool const & src)
 {
 	this->_reg_nick = src;
 }
 
-void Client::setRegUser(bool const & src)
+void	Client::setRegUser(bool const & src)
 {
 	this->_reg_user = src;
 }
 
-void Client::setPassword(std::string const& src)
+void	Client::setPassword(std::string const& src)
 {
     this->_password = src;
 }
 
-void Client::setNickname(std::string const& src)
+void	Client::setNickname(std::string const& src)
 {
     this->_nickname = src;
 }
 
-void Client::setUsername(std::string const& src)
+void	Client::setUsername(std::string const& src)
 {
     this->_username = src;
 }
 
-void Client::setRealname(std::string const& src)
+void	Client::setRealname(std::string const& src)
 {
     this->_realname = src;
 }
 
-void Client::setMessage(std::string const& src)
+void	Client::setMessage(std::string const& src)
 {
     this->_message = src;
 }
 
-void Client::setMessageStatus(int const& src)
+void	Client::setMessageStatus(int const& src)
 {
     this->_message_status = src;
 }
@@ -271,7 +257,6 @@ void Client::recvMessage()
 		return;
 	}
 	this->_message  +=  buf;
-	//if (std::strstr(buf, END_CHAR) != NULL) // END CHAR
 	if (_message.size() > 2 && *(_message.end() - 2) ==  '\r' && *(_message.end() - 1) == '\n')
 		this->_message_status = COMPLETE;
 	else
@@ -334,4 +319,20 @@ void Client::remove_channel(Channel* channel)
 void Client::leaveAllChannels()
 {
 	_channels.clear();
+}
+
+// Util pour debuguer 
+void Client::present()
+{
+    std::cout << "CLIENT: user = " << getUsername() << " | nickname = " << getNickname() << std::endl; 
+	std::cout << "My channels are : ";
+	std::vector<Channel*>::iterator it = _channels.begin();
+	std::vector<Channel*>::iterator ite = _channels.end();
+	while (it != ite)
+	{
+		(*it)->present();
+		it++;	
+	}
+	std::cout << std::endl;
+	
 }

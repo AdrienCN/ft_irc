@@ -5,8 +5,7 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
 {
 	int nb = atoi(nb_str.c_str());
     std::string error;
-	//Revoir syntax systematique des erreurs	
-	error = ft_id_type2(client, nb_str); //":" + client->getNickname() + "!" + client->getUsername() + "@" + client->getHostname() + " " + nb_str + " : ";
+	error = ft_id_type2(client, nb_str); 
 
     switch (nb)
     {
@@ -112,7 +111,7 @@ void ft_error(std::string nb_str, Client* client, Channel* channel, std::string 
         }
 		case 476: // ERR_BADCHANMASK
         {
-            error += (arg + " :Bad Channel Mask (+k)\r\n"); 
+            error += (arg + " :Bad Channel Mask\r\n"); 
             break;
         }
 		case 481: //ERR_NOPRIVILEGES

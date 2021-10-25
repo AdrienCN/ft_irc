@@ -1,69 +1,38 @@
 #ifndef HEADERS_HPP
 #define HEADERS_HPP
-class Channel;
-class Client;
 
-// accept, bind, listen, socket, getaddrinfo
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-
-#include <string>
+// C++ specials
 #include <vector>
 #include <map>
 #include <ctime>
 #include <iostream>
+#include <cstring>
+#include <sstream> 
+#include <exception>
+
+// accept, bind, listen, socket, getaddrinfo, inet
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 
 //Pour non blocking fcntl
-#include "unistd.h"
-#include "fcntl.h"
+#include <unistd.h>
+#include <fcntl.h>
 
 //poll
-#include "poll.h"
+#include <poll.h>
 
-//printf
-#include <stdio.h>
-#include <unistd.h> //write
-
-//atoi
-#include <stdlib.h>
-
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <unistd.h>
+// Gestion signaux
 #include <signal.h>
 
+// Atoi 
+#include <stdlib.h>
+
+//Gestion erreurs
 #include <errno.h>
 
 
-#include <exception>
-#include <cstring>
-#include <iostream>
-#include <istream>
-#include <sstream>
-#include <algorithm>
 
 
-
-
-#define GREEN "\033[0;32m"
-#define YELLOW "\033[0;33m"
-#define RED "\033[0;31m"
-#define RESET "\033[0m"
-
-void ft_error(int nb, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list);
-void ft_reply(int nb, std::vector<std::string> params, Client* client, Channel* channel, std::vector<Client *> client_list, std::vector<Channel*> channel_list);
-
-/*#define 
-#define 
-#define 
-#define 
-#define 
-#define 
-#define 
-#define 
-#define 
-#define 
-#define 
-*/
 #endif

@@ -14,8 +14,6 @@ class Channel
     public:
         Channel(std::string name, Client* client); 
         virtual ~Channel(); 
-
-        void present();
         
         // GETTERS
         std::string const &             getName() const;
@@ -42,8 +40,8 @@ class Channel
         void    addMember(Client* client);
         void    removeMember(Client* client);
         void    removeOp(Client* client);
-
 		void    printMembersNick(Client *client);
+        void    present(); //Util pour debug
 
     private:
         Channel();

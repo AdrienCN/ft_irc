@@ -1,13 +1,12 @@
-#include "common_macro.hpp"
 #include "headers.hpp"
-#include <iostream>
+#include "common_macro.hpp"
 #include "Server.hpp"
 
 class ExceptSignal : public std::exception
 {
    virtual const char* what() const throw()
    {
-		return ("Server interruption : leaving");
+		return ("\nServer interruption --> leaving");
    }
 };
 
@@ -21,7 +20,7 @@ int main(int argc, char **argv)
 {
 	std::string port;
 	std::string password;
-	//condition a retravailler
+
 	if (argc != 3)
 	{
 		std::cout << "Error : Arg : ./Irc_90's <port> <password>" << std::endl;

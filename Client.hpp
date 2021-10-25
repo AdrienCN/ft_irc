@@ -2,9 +2,9 @@
 #define Client_hpp
 
 #include "headers.hpp"
+#include "common_macro.hpp"
 #include "Channel.hpp"
 #include "Commands.hpp"
-#include "common_macro.hpp"
 
 class Channel;
 
@@ -14,9 +14,6 @@ class Client
     public:
         Client(std::string server_name, std::string server_ipaddress, std::string server_creation_date, std::string port); 
         virtual ~Client(); 
-
-        //a effacer version finale
-		void present();
 
         // GETTERS
         std::string const &		getPassword() const;
@@ -69,13 +66,15 @@ class Client
         void	add_channel(Channel* channel);
         void	remove_channel(Channel* channel);
         void	leaveAllChannels();
+		void	present(); //Util pour debuguer
+
 
     private:
         Client(Client const& src);
         Client & operator=(Client const& src); 
 
         struct pollfd				_poll;
-        int	        				_message_status; //COMPLETE - DISCONNECT - INCOMPLETE 
+        int	        				_message_status;
 		std::string 				_hostname;
         std::string 				_username;
         std::string		 			_nickname;
@@ -86,7 +85,7 @@ class Client
 		std::string 				_server_ipaddress;
 		std::string	 				_server_creation_date;
 		std::string 				_away_message;
-        std::vector<Channel*>		_channels; // liste des channels dans lesquels il est     
+        std::vector<Channel*>		_channels; 
         int							_socket;
 		std::vector<std::string>	_command;
 		bool						_registration_status;

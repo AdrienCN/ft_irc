@@ -14,14 +14,10 @@ Server::Server(std::string port, std::string password) : _domain("NULL"), _port(
 	_hints.ai_socktype = SOCK_STREAM; //Sock type
 	_hints.ai_flags = AI_PASSIVE; //Puts my Ip as default + NULL in getaddrinfo
 	std::ifstream image("pic.txt");
-	//_pokemon += ":" + _server_name + " " + "372 " + "nickname :-\r\n";
-	//_pokemon = "\n";	
 	if (image.is_open())
 	{
 		while(image.good())
 		{
-			//_pokemon += ":" + _server_name + " " + "372 " + "nickname ";
-			//_pokemon += ":- ";
 			std::string tmp;
 			std::getline(image, tmp);
 			tmp += "\r\n";
@@ -35,7 +31,7 @@ Server::Server(std::string port, std::string password) : _domain("NULL"), _port(
 
 Server::~Server()
 {
-	std::cout << "<< Server destruction >>" << std::endl;
+	std::cout << RED << "<< Server destruction >>" << RESET << std::endl;
 
 	std::vector<Client*>::iterator it = _all_clients.begin();
 	std::vector<Client*>::iterator ite = _all_clients.end();
@@ -161,13 +157,11 @@ void Server::init()
 	if (fcntl(_server_socket, F_SETFL, O_NONBLOCK) == -1)
 		throw Server::ExceptErrno();
 
-	//3. What port Am I on?
-	//Lie notre socket avec un port
+	//3. What port Am I on? --> Lie notre socket avec un port
 	if ((bind(_server_socket, _serv_info->ai_addr, _serv_info->ai_addrlen)) == -1)
 		throw Server::ExceptErrno();
 
-	// 4. WIll somebody call me?
-	// sockfd et backlog = numbers of connection allowed in the back queue
+	// 4. WIll somebody call me? --> sockfd et backlog = numbers of connection allowed in the back queue
 	if ((listen(_server_socket, MAX_CLIENT)) == -1)
 		throw Server::ExceptErrno();
 	std::cout << "Server init success!!" << std::endl;
@@ -177,24 +171,10 @@ void Server::init()
 	_poll.events = POLLIN;                                           
 }
 
-/*
-   void	Server::pollInfo(std::vector<struct pollfd> const & src)
-   {
-   std::vector<struct pollfd>::const_iterator it = src.begin();
-   while (it != src.end())
-   {
-   std::cout << "FD : " << it->fd  << " | EVENTS: " << it->events << " | REVENTS: "<< it->revents << std::endl;
-   it++;
-   }
-   return ;
-   }
-   */
-
 void	Server::run() 
 {	
 	std::vector<struct pollfd>		tmp;
-	//Useless ?
-	// tmp.push_back(this->_poll);
+
 	while (1)
 	{
 		signal(SIGINT, signal_handler);
@@ -211,11 +191,9 @@ void	Server::run()
 		}
 
 		std::vector<pollfd>::iterator it = tmp.begin();
-		//		std::cout << "Starting new poll ..." << std::endl;
 		int poll_count = poll(&(*it), _nbClients + 1, -1);
 		if (poll_count == -1)
 			throw Server::ExceptErrno();
-		//	this->pollInfo(tmp);
 
 		std::vector<pollfd>::iterator itb = tmp.begin();
 		std::vector<pollfd>::iterator ite = tmp.end();
@@ -236,7 +214,7 @@ void	Server::run()
 					else
 						this->addClient();
 				}
-				else //Je suis un clien
+				else //Je suis un client
 				{
 					Client *client = this->find_client_from_fd((*itb).fd);
 					if (client != NULL) 
@@ -274,6 +252,8 @@ void	Server::find_to_kill()
 	{
 		if ((*it)->getMessageStatus() == DISCONNECT)
 		{
+			std::cout << YELLOW << "******** " << (*it)->getNickname() << " left the server **********" << RESET << std::endl;
+
 			close((*it)->getSocket());
 			delete(*it);
 			_all_clients.erase(it);
@@ -323,7 +303,7 @@ void	Server::addClient()
 	new_client->init(socket);
 	_all_clients.push_back(new_client);
 	_nbClients++;
-	std::cout << YELLOW << "New client not registered yet" << RESET << std::endl;
+	//std::cout << YELLOW << "New client not registered yet" << RESET << std::endl;
 	return;
 }
 
@@ -363,18 +343,6 @@ Client* Server::find_client_from_fd(int fd)
 	}
 	return NULL;
 }
-/*
-   static void	ft_registration_failed(Client *client)
-   {
-   std::string tmp("Registration is not complete : Please enter the following command(s):\n");
-   if (client->getRegNick() == false)
-   tmp += "/NICK <nickname>\n";
-   if (client->getRegUser() == false)
-   tmp += "/USER <username> <mode> <unused> :<realname>\n";
-   tmp += "\r\n";
-   send(client->getSocket(), tmp.c_str(), tmp.size(), 0);
-   }
-   */
 
 void	Server::welcomeClient(Client *client)
 {
@@ -390,13 +358,11 @@ void	Server::welcomeClient(Client *client)
 	{
 		std::cout << GREEN << "********REGISTRATION SUCCESS for " << client->getNickname() << "**********" << RESET << std::endl;
 		client->setRegistration(true);
-		ft_reply("1", client, NULL, "");
-		ft_reply("2", client, NULL, "");
-		ft_reply("3", client, NULL, "");
-		ft_reply("4", client, NULL, "");
-	//	ft_reply(RPL_MOTDSTART, client, NULL, "");
+		ft_reply("001", client, NULL, "");
+		ft_reply("002", client, NULL, "");
+		ft_reply("003", client, NULL, "");
+		ft_reply("004", client, NULL, "");
 		ft_reply(RPL_CUSTOMMOTD, client, NULL, _pokemon);
-	//	ft_reply(RPL_ENDOFMOTD, client, NULL, "");
 		if (client->getRegPass() == true)
 		{
 			if (client->getPassword() != this->_password)
@@ -406,35 +372,4 @@ void	Server::welcomeClient(Client *client)
 			}
 		}
 	}
-	//Evite le msg d'erreur si CAP ou PASS
-	//
-	////Checker si les commandes NICK et USER sont presente dans les cmd
-	/*while (tmp.empty() == false)
-	  {
-	//Si l'une des deux ou les deux sont presente checker l'etat de l'enregistrement
-	if (std::strstr(tmp.front().c_str(), "USER") || std::strstr(tmp.front().c_str(), "NICK"))
-	{
-	if (client->getRegNick() == true && client->getRegUser() == true)
-	{
-	std::cout << GREEN << "********REGISTRATION SUCCESS for " << client->getNickname() << "**********" << RESET << std::endl;
-	client->setRegistration(true);
-	ft_reply("1", client, NULL, "");
-	ft_reply("2", client, NULL, "");
-	ft_reply("3", client, NULL, "");
-	ft_reply("4", client, NULL, "");
-	if (client->getRegPass() == true)
-	{
-	if (client->getPassword() != this->_password)
-	{
-	ft_error(ERR_PASSWDMISMATCH, client, NULL, "");
-	client->setRegPass(false);
-	}
-	}
-	}
-	else
-	return;
-	}
-	tmp.erase(tmp.begin());
-	}
-	*/
 }
