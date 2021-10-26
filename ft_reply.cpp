@@ -32,7 +32,7 @@ void ft_reply(std::string nb_str, Client* client, Channel* channel, std::string 
 		}
 		case 2:
 		{
-			rpl += "Your host is [" + client->getServerIpAddress() + "], running on version [42.42]\r\n";
+			rpl += "Your host is " + client->getServerName() + ", running on version [42.42]\r\n";
 			break;
 		}
 		case 3:

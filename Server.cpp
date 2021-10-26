@@ -2,8 +2,9 @@
 #include <iostream>
 #include <fstream>
 
-Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _server_name("irc.irc90s.com"), _server_ipaddress("127.0.0.1"), _server_creation_date(""), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
+Server::Server(std::string port, std::string password) : _domain("NULL"), _port(port), _serv_info(NULL), _password(password), _server_name("irc.irc90s.com"), _server_ipaddress("127.0.0.1"), _server_creation_date(""), _server_socket(100), _nbClients(0), _command_book(password, "", _server_ipaddress, _server_creation_date) 
 {
+	std::cout << RED << "<< Server creation >>" << RESET << std::endl;
 	time_t	raw_time;
 	time(&raw_time);
 	_server_creation_date = ctime(&raw_time);
@@ -26,7 +27,7 @@ Server::Server(std::string port, std::string password) : _domain("NULL"), _port(
 	}
 	else
 		_pokemon = "";
-	std::cout << _pokemon << std::endl;
+//	std::cout << _pokemon << std::endl;
 }
 
 Server::~Server()
@@ -164,8 +165,8 @@ void Server::init()
 	// 4. WIll somebody call me? --> sockfd et backlog = numbers of connection allowed in the back queue
 	if ((listen(_server_socket, MAX_CLIENT)) == -1)
 		throw Server::ExceptErrno();
-	std::cout << "Server init success!!" << std::endl;
-	std::cout << "Listening for clients ..." << std::endl;
+	std::cout << GREEN  << "Server init success!!" << RESET << std::endl;
+	std::cout << YELLOW << "Listening for clients ..." << RESET << std::endl;
 
 	_poll.fd = _server_socket;
 	_poll.events = POLLIN;                                           
