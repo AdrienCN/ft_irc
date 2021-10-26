@@ -32,7 +32,4 @@
 //Gestion erreurs
 #include <errno.h>
 
-
-
-
 #endif
