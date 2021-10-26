@@ -1215,7 +1215,7 @@ void Commands::names(std::vector<std::string> params, CMD_PARAM) {
 /* ************************************LIST****************************************** */
 
 void Commands::list(std::vector<std::string> params, CMD_PARAM) {
-	std::cout << YELLOW << "Hello from list function!" << RESET << std::endl;
+	/* std::cout << YELLOW << "Hello from list function!" << RESET << std::endl; */
 	(void)params;
 	(void)client_list;
 	std::vector<Channel*>::iterator it = channel_list->begin();
